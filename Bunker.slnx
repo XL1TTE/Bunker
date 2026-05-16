@@ -1,0 +1,10 @@
+<Solution>
+  <Project Path="src/GameStateService/GameStateService.csproj" />
+  <Project Path="src/PlayerService/PlayerService.csproj" />
+  <Project Path="src/LobbyService/LobbyService.csproj" />
+  <Folder Name="/Shared/">
+    <Project Path="src/Bunker.Domain/Bunker.Domain.csproj" />
+    <Project Path="src/Bunker.Infrastructure/Bunker.Infrastructure.csproj" />
+  </Folder>
+  <Project Path="src/AppHost/AppHost.csproj" />
+</Solution>
