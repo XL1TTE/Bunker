@@ -1,9 +1,5 @@
-using Microsoft.AspNetCore.Builder;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Scalar.AspNetCore;
 using MicroElements.AspNetCore.OpenApi.FluentValidation;
-using Microsoft.Extensions.Configuration;
 using Bunker.Infrastructure.Configuration;
 
 namespace PlayerService.Configuration;

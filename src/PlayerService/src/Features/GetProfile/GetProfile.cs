@@ -10,9 +10,10 @@ public static class GetProfileHandler
 {
     public static async Task<GetProfileResult> Handle(GetProfile query, PlayerDbContext db)
     {
+        var guidId = Guid.Parse(query.Id);
         var player = await db.Players
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == PlayerId.Restore(query.Id));
+            .FirstOrDefaultAsync(x => x.Id == PlayerId.Create(guidId));
 
         if (player is null) 
             return GetProfileResult.NotFound();

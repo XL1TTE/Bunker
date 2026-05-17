@@ -1,6 +1,7 @@
 using Bunker.Infrastructure.Configuration;
 using Bunker.Infrastructure.Middlewares;
 using LobbyService.Configuration;
+using LobbyService.Endpoints.Routing;
 using LobbyService.Middlewares;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -8,13 +9,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddLogging();
 builder.Services.AddHttpContextAccessor();
 
-// Infrastructure (Shared)
 builder.IncludeIdentityContext();
 builder.ConfigureJsonOptions();
 builder.IncludeAuthentication();
 builder.IncludeOpenApiDocumentation();
 
-// Service Specific
 builder.IncludeFluentValidation();
 builder.IncludePersistence();
 builder.IncludeRedis();
@@ -27,15 +26,16 @@ app.UseMiddleware<ExceptionToHttpErrorMiddleware>();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Populate Identity Context
 app.UseMiddleware<UserIdentityMiddleware>();
 
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.IncludeScalar("Bunker Lobby API");
+    app.IncludeScalar("Bunker Lobby Service");
     await app.InitializeDatabaseAsync();
 }
+
+app.IncludeLobbyEndpoints();
 
 app.UseHttpsRedirection();
 app.Run();

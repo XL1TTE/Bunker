@@ -39,12 +39,13 @@ builder.AddProject<Projects.GameStateService>("game-state-service")
        .WaitFor(gameStateDb);
 
 builder.AddProject<Projects.PlayerService>("player-service")
-       .WithReference(playerDb)
        .WithReference(auth)
+       .WithReference(playerDb)
        .WithReference(rabbitmq)
        .WaitFor(playerDb);
 
 builder.AddProject<Projects.LobbyService>("lobby-service")
+       .WithReference(auth)
        .WithReference(lobbyDb)
        .WithReference(redis)
        .WithReference(rabbitmq)

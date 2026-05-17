@@ -6,7 +6,7 @@ namespace PlayerService.Persistence;
 
 public class PlayerDbContext(DbContextOptions<PlayerDbContext> options) : DbContext(options)
 {
-    public DbSet<Player> Players { get; init; }
+    public DbSet<User> Players { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -18,8 +18,8 @@ public class PlayerProfileSyncMiddleware(RequestDelegate next)
     {
         if (identityContext.IsAuthenticated)
         {
-            var userId = identityContext.UserId!;
-            var exists = await db.Players.AnyAsync(x => x.Id == PlayerId.Restore(userId));
+            var userId = identityContext.UserId!.Value;
+            var exists = await db.Players.AnyAsync(x => x.Id == PlayerId.Create(userId));
 
             if (!exists)
             {

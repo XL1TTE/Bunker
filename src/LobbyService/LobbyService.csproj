@@ -1,9 +1,12 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);1591</NoWarn>
+    <UserSecretsId>e9a72233-f648-477c-9830-3f10aedc00ca</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -14,7 +17,8 @@
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.8" />
     <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.8" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" />
-    <PackageReference Include="Scalar.AspNetCore" Version="2.14.14" />
+    <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.13.20" />
     <PackageReference Include="WolverineFx" Version="5.39.1" />
     <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="5.39.1" />
     <PackageReference Include="WolverineFx.Postgresql" Version="5.39.1" />

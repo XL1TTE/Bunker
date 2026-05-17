@@ -4,15 +4,15 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace PlayerService.Persistence.Configurations;
 
-internal sealed class PlayerConfiguration : IEntityTypeConfiguration<Player>
+internal sealed class PlayerConfiguration : IEntityTypeConfiguration<User>
 {
-    public void Configure(EntityTypeBuilder<Player> builder)
+    public void Configure(EntityTypeBuilder<User> builder)
     {
         builder.HasKey(e => e.Id);
         builder.HasIndex(e => e.Id);
 
-        builder.Property(e => e.Id)
-               .HasConversion(id => id.Value, value => PlayerId.Restore(value));
+        builder.Property(x => x.Id)
+               .HasConversion(id => id.Value, value => PlayerId.Create(value));
 
         builder.ComplexProperty(e => e.Nickname, builder =>
         {

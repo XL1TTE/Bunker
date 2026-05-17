@@ -3,6 +3,7 @@ using Wolverine;
 using PlayerService.Features.GetProfile;
 using Bunker.Infrastructure.Identity;
 using Microsoft.AspNetCore.Authorization;
+using FluentValidation;
 
 namespace PlayerService.Endpoints;
 
@@ -14,11 +15,21 @@ internal static class PlayerEndpoints
     [Authorize]
     [ProducesResponseType<PlayerProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     internal static async Task<IResult> GetMyProfile(
         [FromServices] IMessageBus bus,
-        [FromServices] IUserIdentityContext identity)
+        [FromServices] IUserIdentityContext identity,
+        [FromServices] IValidator<GetProfile> validator)
     {
-        var result = await bus.InvokeAsync<GetProfileResult>(new GetProfile(identity.UserId!));
+        if (identity.UserId is null)
+            return TypedResults.Unauthorized();
+
+        var query = new GetProfile(identity.UserId.Value.ToString());
+        var validationResult = await validator.ValidateAsync(query);
+        if (!validationResult.IsValid)
+            return TypedResults.ValidationProblem(validationResult.ToDictionary());
+
+        var result = await bus.InvokeAsync<GetProfileResult>(query);
 
         return result switch
         {
@@ -34,11 +45,18 @@ internal static class PlayerEndpoints
     [Authorize]
     [ProducesResponseType<PlayerProfileResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
     internal static async Task<IResult> GetProfileById(
         [FromRoute] string id,
-        [FromServices] IMessageBus bus)
+        [FromServices] IMessageBus bus,
+        [FromServices] IValidator<GetProfile> validator)
     {
-        var result = await bus.InvokeAsync<GetProfileResult>(new GetProfile(id));
+        var query = new GetProfile(id);
+        var validationResult = await validator.ValidateAsync(query);
+        if (!validationResult.IsValid)
+            return TypedResults.ValidationProblem(validationResult.ToDictionary());
+
+        var result = await bus.InvokeAsync<GetProfileResult>(query);
 
         return result switch
         {

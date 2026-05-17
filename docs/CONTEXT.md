@@ -39,7 +39,7 @@ The process where players are voted out of the game (left outside the Bunker) ro
 A player who successfully makes it into the Bunker at the end of the game.
 
 ### AI Bot
-A non-human player powered by a Large Language Model (LLM), capable of participating in discussions, making proposals, and voting based on social context.
+A non-human player powered by a Large Language Model (LLM), configured with specific personality presets and behavior patterns.
 
 ### Character Sheet
 The collection of attributes assigned to a player at the start of the game. A standard sheet includes:
@@ -58,11 +58,49 @@ An event intended for all players in a specific Game or Lobby (e.g., "Player A r
 ### Private Event
 An event intended for a specific player only (e.g., "Your secret cards have been assigned").
 
+### Lobby
+A temporary gathering place for players before a Game starts. Lobbies handle matchmaking, team composition, and readiness checks.
+
+### Lobby Participant
+An entity representing a Player's presence within a specific Lobby. It tracks lobby-specific state like role and readiness. In the domain model, this is often referred to simply as a Player within the Lobby context.
+
+### Bot
+A non-human player entity in the Lobby, configured with specific personality presets and behavior patterns. Bots do not require readiness checks but occupy capacity slots.
+
+### Lobby Host
+The participant who has the authority to change lobby settings (e.g., capacity, bots, packs) and initiate the Game once all participants are ready.
+
+### Lobby Readiness
+A binary state for each participant indicating they are prepared to start the game. A Game can only be initiated when all participants (excluding bots) are Ready.
+
+### Card Pack
+A curated set of Character Sheet attributes (Professions, Health, Hobbies, etc.) and Bunker Cards. Lobbies can include multiple packs (e.g., "Default", "18+", "Sci-Fi") to vary the game content.
+
+### Lobby Capacity
+The maximum total number of entities (Players + Bots) allowed in the Lobby.
+
+### Lobby Handoff
+An asynchronous process initiated by the Host. The Lobby Service requests the Game Service to prepare a session. If preparation is successful, the Lobby is marked as "In Game" and clients are redirected. If it fails, the Lobby remains active, allowing the Host to fix settings or retry.
+
+### Lobby Destruction
+The process where a Lobby and its associated data are deleted.
+- **Pre-game**: Triggered immediately when the Host intentionally leaves. All participants are disbanded.
+- **In-game**: Triggered ONLY when the last remaining player leaves the session. The session persists as long as at least one player is connected.
+
+### Host Migration
+The mechanism in an In-game Lobby where, if the current Host leaves intentionally, the "Host" status is transferred to the oldest remaining participant.
+
+### Host Grace Period
+A configurable duration (e.g., 2 minutes) during which a Lobby persists after a Host disconnects unintentionally. If the Host re-connects within this window, they resume their role; otherwise, Host Migration (In-game) or Lobby Destruction (Pre-game) occurs.
+
+### Bot Auto-Eviction
+the domain logic where Bots are automatically removed from a Lobby when the Host reduces the Capacity below the current total occupant count, provided that the number of human Players does not exceed the new limit.
+
 ### Topic-Based Routing
 The mechanism where domain services publish events to specific Message Broker topics (e.g., `room.{id}` or `user.{id}`) which the Real-time Service uses to target recipients.
 
 ### Invite Code
-A unique alphanumeric string used to join a specific Private Lobby.
+A unique alphanumeric string generated for every Lobby. It is the primary mechanism for joining a Private Lobby and can also be used for direct joining of Public Lobbies.
 
 ### Lobby Browser
 A feature allowing players to find and join Public Lobbies that are looking for more participants.
