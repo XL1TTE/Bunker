@@ -7,6 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <InternalsVisibleTo Include="Bunker.Persistence" />
   </ItemGroup>
 
 </Project>

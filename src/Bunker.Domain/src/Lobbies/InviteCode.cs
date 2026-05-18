@@ -23,7 +23,7 @@ public static class InviteCodeFactory
             return new InviteCode(new string(chars));
         }
 
-        public static InviteCode Restore(string value)
+        public static InviteCode Create(string value)
         {
             if (string.IsNullOrWhiteSpace(value) || value.Length != Length)
                 throw new ArgumentException("Invite code must be 12 characters long");

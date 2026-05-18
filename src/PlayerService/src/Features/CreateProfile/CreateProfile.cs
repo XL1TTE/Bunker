@@ -9,10 +9,11 @@ public static class CreateProfileHandler
 {
     public static async Task Handle(CreateProfile command, PlayerDbContext db)
     {
-        var player = User.Create(
-            PlayerId.Create(command.Id),
-            Nickname.Restore(command.Nickname));
-            
+        var player = User.Restore(
+            id: User.Id.Restore(command.Id),
+            nickname: Nickname.Restore(command.Nickname),
+            stats: Stats.Create());
+
         db.Players.Add(player);
         await db.SaveChangesAsync();
     }

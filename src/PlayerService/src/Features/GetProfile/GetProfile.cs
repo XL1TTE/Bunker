@@ -13,7 +13,7 @@ public static class GetProfileHandler
         var guidId = Guid.Parse(query.Id);
         var player = await db.Players
             .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.Id == PlayerId.Create(guidId));
+            .FirstOrDefaultAsync(x => x.PublicId == User.Id.Restore(guidId));
 
         if (player is null) 
             return GetProfileResult.NotFound();

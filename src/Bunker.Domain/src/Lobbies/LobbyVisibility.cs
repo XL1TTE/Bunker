@@ -1,10 +1,7 @@
 namespace Bunker.Domain.Lobbies;
 
-public abstract record LobbyVisibility
+public record PrivacyPolicy(bool IsVisible, string? Password)
 {
-    public static LobbyVisibility Public  { get; } = new PublicLobby();
-    public static LobbyVisibility Private { get; } = new PrivateLobby();
-}
-
-public record PublicLobby  : LobbyVisibility;
-public record PrivateLobby : LobbyVisibility;
+    public static PrivacyPolicy PublicPolicy(string? password = null) => new(true, password);
+    public static PrivacyPolicy PrivatePolicy(string password) => new(false, password);
+};

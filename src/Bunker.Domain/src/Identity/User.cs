@@ -4,23 +4,23 @@ namespace Bunker.Domain.Identity;
 
 public class User
 {
-    public readonly record struct UserId(Guid Value)
+    public readonly record struct Id(Guid Value)
     {
-        public static UserId Empty { get; }      = new UserId(Guid.Empty);
-        public static UserId New()               => new UserId(Guid.NewGuid());
-        public static UserId Restore(Guid value) => new UserId(value);
+        public static Id Empty { get; } = new(Guid.Empty);
+        public static Id New() => new(Guid.NewGuid());
+        public static Id Restore(Guid value) => new(value);
     }
 
     private User() { } // EF Core
 
-    internal User(UserId id, Nickname nickname, Stats stats)
+    internal User(Id id, Nickname nickname, Stats stats)
     {
         PublicId = id;
         Nickname = nickname;
         Stats    = stats;
     }
-    
-    public UserId   PublicId    { get; private set; } 
+
+    public Id PublicId { get; private set; }
     public Nickname Nickname    { get; private set; }
     public Stats    Stats       { get; private set; }
 
@@ -31,7 +31,8 @@ public static class PlayerFactory
 {
     extension(User)
     {
-        public static User Create(Nickname nickname) => new User(UserId.New(), nickname, Stats.Create());
-        public static User Restore(UserId id, Nickname nickname, Stats stats) => new User(id, nickname, stats);
+        public static User Create(Nickname nickname) => new User(Id.New(), nickname, Stats.Create());
+        public static User Create(Id id, Nickname nickname) => new User(id, nickname, Stats.Create());
+        public static User Restore(Id id, Nickname nickname, Stats stats) => new User(id, nickname, stats);
     }
 }

@@ -28,6 +28,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Bunker.Domain\Bunker.Domain.csproj" />
     <ProjectReference Include="..\Bunker.Infrastructure\Bunker.Infrastructure.csproj" />
+    <ProjectReference Include="..\Bunker.Persistence\Bunker.Persistence.csproj" />
   </ItemGroup>
 
 </Project>

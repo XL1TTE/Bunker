@@ -8,23 +8,29 @@ internal sealed class PlayerConfiguration : IEntityTypeConfiguration<User>
 {
     public void Configure(EntityTypeBuilder<User> builder)
     {
-        builder.HasKey(e => e.Id);
-        builder.HasIndex(e => e.Id);
+        builder.ToTable("Users", "player");
 
-        builder.Property(x => x.Id)
-               .HasConversion(id => id.Value, value => PlayerId.Create(value));
+        builder.Property<int>("Id").ValueGeneratedOnAdd();
+        builder.HasKey("Id");
+
+        builder.Property(x => x.PublicId)
+               .HasConversion(id => id.Value, value => User.Id.Restore(value));
+
+        builder.HasAlternateKey(x => x.PublicId);
 
         builder.ComplexProperty(e => e.Nickname, builder =>
         {
             builder.Property(name => name.Value)
-                   .HasColumnName("Nickname");
+                   .HasColumnName("Nickname")
+                   .HasMaxLength(32)
+                   .IsRequired();
         });
 
         builder.ComplexProperty(e => e.Stats, builder =>
         {
-            builder.Property(s => s.TotalGames).HasColumnName("TotalGames");
-            builder.Property(s => s.Wins).HasColumnName("Wins");
-            builder.Property(s => s.Losses).HasColumnName("Losses");
+            builder.Property(s => s.TotalGames).HasColumnName("TotalGames").IsRequired();
+            builder.Property(s => s.Wins).HasColumnName("Wins").IsRequired();
+            builder.Property(s => s.Losses).HasColumnName("Losses").IsRequired();
         });
     }
 }
