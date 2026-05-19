@@ -1,7 +1,6 @@
 using Microsoft.EntityFrameworkCore;
-using LobbyService.Persistence;
 
-namespace LobbyService.Configuration;
+namespace Bunker.LobbyService.Persistence.Configuration;
 
 internal static class PersistenceConfiguration
 {

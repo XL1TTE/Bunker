@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Bunker.ContentService\Bunker.ContentService.csproj" />
     <ProjectReference Include="..\GameStateService\GameStateService.csproj" />
     <ProjectReference Include="..\PlayerService\PlayerService.csproj" />
     <ProjectReference Include="..\LobbyService\LobbyService.csproj" />

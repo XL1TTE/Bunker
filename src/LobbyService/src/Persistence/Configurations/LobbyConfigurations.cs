@@ -1,9 +1,8 @@
-using Bunker.Persistence.Entities;
-using LobbyService.Persistence.Entities;
+using Bunker.LobbyService.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace LobbyService.Persistence.Configurations;
+namespace Bunker.LobbyService.Persistence;
 
 public readonly record struct LobbyConfigurations;
 
@@ -86,12 +85,6 @@ internal class BotParticipantConfiguration : IEntityTypeConfiguration<BotPartici
         builder.ToTable("Bots", "lobby");
 
         builder.Property(x => x.PersonalityPresetId).HasColumnName("PersonalityId").IsRequired();
-
-        builder.HasOne<PersonalityPreset>()
-            .WithMany()
-            .HasPrincipalKey(x => x.PublicId)
-            .HasForeignKey(x => x.PersonalityPresetId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }
 
@@ -105,11 +98,5 @@ internal class LobbyCardPackConfiguration : IEntityTypeConfiguration<LobbyCardPa
         builder.HasKey("Id");
 
         builder.HasAlternateKey(x => new { x.LobbyId, x.PackId });
-
-        builder.HasOne<CardPack>()
-            .WithMany()
-            .HasPrincipalKey(x => x.PublicId)
-            .HasForeignKey(x => x.PackId)
-            .OnDelete(DeleteBehavior.Restrict);
     }
 }

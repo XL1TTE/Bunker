@@ -1,4 +1,4 @@
-namespace LobbyService.Configuration;
+namespace Bunker.LobbyService.Persistence.Configuration;
 
 internal static class RedisConfiguration
 {

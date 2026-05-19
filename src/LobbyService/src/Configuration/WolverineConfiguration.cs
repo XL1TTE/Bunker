@@ -3,7 +3,7 @@ using Wolverine.EntityFrameworkCore;
 using Wolverine.Postgresql;
 using Wolverine.RabbitMQ;
 
-namespace LobbyService.Configuration;
+namespace Bunker.LobbyService.Messaging.Configuration;
 
 internal static class WolverineConfiguration
 {

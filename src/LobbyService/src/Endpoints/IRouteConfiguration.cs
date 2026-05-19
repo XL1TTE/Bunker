@@ -1,4 +1,4 @@
-namespace LobbyService.Endpoints.Routing;
+namespace Bunker.LobbyService.Endpoints.Configuration;
 
 internal static partial class IRouteBuilderExtensions
 {

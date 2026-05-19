@@ -1,4 +1,4 @@
-namespace LobbyService.Middlewares;
+namespace Bunker.LobbyService.Api.Middlewares;
 
 internal class ExceptionToHttpErrorMiddleware(RequestDelegate next, ILogger<ExceptionToHttpErrorMiddleware> logger)
 {

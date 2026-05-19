@@ -15,6 +15,9 @@ var playerDbPass = builder.AddParameter("player-db-password", secret: true);
 var lobbyDbUser = builder.AddParameter("lobby-db-user", secret: true);
 var lobbyDbPass = builder.AddParameter("lobby-db-password", secret: true);
 
+var contentServiceDbUser = builder.AddParameter("content-service-db-user", secret: true);
+var contentServiceDbPass = builder.AddParameter("content-service-db-password", secret: true);
+
 var redis = builder.AddRedis("redis");
 
 var rabbitmq = builder.AddRabbitMQ("rabbit-mq", rabbitmqUser, rabbitmqPass)
@@ -31,6 +34,9 @@ var playerDb = playerDbServer.AddDatabase("player-db");
 
 var lobbyDbServer = builder.AddPostgres("lobby-db-server", lobbyDbUser, lobbyDbPass).WithPgAdmin();
 var lobbyDb = lobbyDbServer.AddDatabase("lobby-db");
+
+var contentServiceDbServer = builder.AddPostgres("content-service-db-server", contentServiceDbUser, contentServiceDbPass).WithPgAdmin();
+var contentServiceDb = contentServiceDbServer.AddDatabase("content-service-db");
 
 builder.AddProject<Projects.GameStateService>("game-state-service")
        .WithReference(gameStateDb)
@@ -50,5 +56,12 @@ builder.AddProject<Projects.LobbyService>("lobby-service")
        .WithReference(redis)
        .WithReference(rabbitmq)
        .WaitFor(lobbyDb);
+
+builder.AddProject<Projects.Bunker_ContentService>("content-service")
+       .WithReference(auth)
+       .WithReference(contentServiceDb)
+       .WithReference(redis)
+       .WithReference(rabbitmq)
+       .WaitFor(contentServiceDb);
 
 builder.Build().Run();

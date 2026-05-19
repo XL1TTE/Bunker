@@ -1,8 +1,7 @@
 using LobbyService.Validation;
 using FluentValidation;
-using MicroElements.AspNetCore.OpenApi.FluentValidation;
 
-namespace LobbyService.Configuration;
+namespace Bunker.LobbyService.Validation.Configuration;
 
 internal static class ValidationConfiguration
 {

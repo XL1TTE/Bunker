@@ -1,8 +1,11 @@
 using Bunker.Infrastructure.Configuration;
 using Bunker.Infrastructure.Middlewares;
-using LobbyService.Configuration;
-using LobbyService.Endpoints.Routing;
-using LobbyService.Middlewares;
+using Bunker.LobbyService.Api.Configuration;
+using Bunker.LobbyService.Api.Middlewares;
+using Bunker.LobbyService.Endpoints.Configuration;
+using Bunker.LobbyService.Messaging.Configuration;
+using Bunker.LobbyService.Persistence.Configuration;
+using Bunker.LobbyService.Validation.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
