@@ -2,7 +2,7 @@ using Scalar.AspNetCore;
 using MicroElements.AspNetCore.OpenApi.FluentValidation;
 using Bunker.Api.Common;
 
-namespace Bunker.ContentService.Api.Configuration;
+namespace Bunker.AccountService.Api.Configuration;
 
 internal static class OpenApiConfiguration
 {

@@ -9,8 +9,8 @@ var keycloakPass = builder.AddParameter("keycloak-password", secret: true);
 var gameStateDbUser = builder.AddParameter("game-state-db-user", secret: true);
 var gameStateDbPass = builder.AddParameter("game-state-db-password", secret: true);
 
-var playerDbUser = builder.AddParameter("player-db-user", secret: true);
-var playerDbPass = builder.AddParameter("player-db-password", secret: true);
+var accountDbUser = builder.AddParameter("account-db-user", secret: true);
+var accountDbPass = builder.AddParameter("account-db-password", secret: true);
 
 var lobbyDbUser = builder.AddParameter("lobby-db-user", secret: true);
 var lobbyDbPass = builder.AddParameter("lobby-db-password", secret: true);
@@ -23,14 +23,19 @@ var redis = builder.AddRedis("redis");
 var rabbitmq = builder.AddRabbitMQ("rabbit-mq", rabbitmqUser, rabbitmqPass)
                       .WithManagementPlugin();
 
+var rabbitMqProvisioner = builder.AddProject<Projects.Bunker_Provisioner_RabbitMq>("rabbit-mq-provisioner")
+       .WithReference(rabbitmq)
+       .WaitFor(rabbitmq)
+       .WithParentRelationship(rabbitmq);
+
 var auth = builder.AddKeycloak("auth", adminUsername: keycloakUser, adminPassword: keycloakPass)
                       .WithDataVolume();
 
 var gameStateDbServer = builder.AddPostgres("game-state-db-server", gameStateDbUser, gameStateDbPass).WithPgAdmin();
 var gameStateDb = gameStateDbServer.AddDatabase("game-state-db");
 
-var playerDbServer = builder.AddPostgres("player-db-server", playerDbUser, playerDbPass).WithPgAdmin();
-var playerDb = playerDbServer.AddDatabase("player-db");
+var accountDbServer = builder.AddPostgres("account-db-server", accountDbUser, accountDbPass).WithPgAdmin();
+var accountDb = accountDbServer.AddDatabase("account-db");
 
 var lobbyDbServer = builder.AddPostgres("lobby-db-server", lobbyDbUser, lobbyDbPass).WithPgAdmin();
 var lobbyDb = lobbyDbServer.AddDatabase("lobby-db");
@@ -38,19 +43,14 @@ var lobbyDb = lobbyDbServer.AddDatabase("lobby-db");
 var contentServiceDbServer = builder.AddPostgres("content-service-db-server", contentServiceDbUser, contentServiceDbPass).WithPgAdmin();
 var contentServiceDb = contentServiceDbServer.AddDatabase("content-service-db");
 
-builder.AddProject<Projects.GameStateService>("game-state-service")
-       .WithReference(gameStateDb)
-       .WithReference(redis)
-       .WithReference(rabbitmq)
-       .WaitFor(gameStateDb);
 
-builder.AddProject<Projects.PlayerService>("player-service")
+builder.AddProject<Projects.Bunker_AccountService>("account-service")
        .WithReference(auth)
-       .WithReference(playerDb)
+       .WithReference(accountDb)
        .WithReference(rabbitmq)
-       .WaitFor(playerDb);
+       .WaitFor(accountDb);
 
-builder.AddProject<Projects.LobbyService>("lobby-service")
+builder.AddProject<Projects.Bunker_LobbyService>("lobby-service")
        .WithReference(auth)
        .WithReference(lobbyDb)
        .WithReference(redis)

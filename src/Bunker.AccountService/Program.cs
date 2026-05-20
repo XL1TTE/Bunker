@@ -1,10 +1,8 @@
+using Bunker.AccountService.Api.Configuration;
+using Bunker.AccountService.Api.Middlewares;
+using Bunker.AccountService.Endpoints;
 using Bunker.Api.Common;
 using Bunker.Api.Common.Middlewares;
-using Bunker.ContentService.Api.Configuration;
-using Bunker.ContentService.Api.Middlewares;
-using Bunker.ContentService.Messaging.Configuration;
-using Bunker.ContentService.Persistence;
-using Bunker.ContentService.Validation.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,12 +30,18 @@ app.UseAuthorization();
 // Populate Identity Context
 app.UseMiddleware<UserIdentityMiddleware>();
 
+// Sync Profile on first login
+app.UseMiddleware<PlayerProfileSyncMiddleware>();
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
-    app.IncludeScalar("Bunker Content Service API");
+    app.IncludeScalar("Bunker Player API");
     await app.InitializeDatabaseAsync();
 }
+
+// Endpoint Registration
+app.IncludeAccountEndpoints();
 
 app.UseHttpsRedirection();
 app.Run();
