@@ -14,7 +14,7 @@ internal sealed class PlayerConfiguration : IEntityTypeConfiguration<Account>
         builder.HasKey("Id");
 
         builder.Property(x => x.PublicId)
-               .HasConversion(id => id.Value, value => Account.Id.Restore(value));
+               .HasConversion(id => id.Value, value => Account.Id.Create(value));
 
         builder.HasAlternateKey(x => x.PublicId);
 

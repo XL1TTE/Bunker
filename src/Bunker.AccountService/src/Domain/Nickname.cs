@@ -6,7 +6,7 @@ public static class NicknameFactory
 {
     extension(Nickname)
     {
-        public static Nickname Restore(string value)
+        public static Nickname Create(string value)
         {
             if (string.IsNullOrWhiteSpace(value) || value.Length < 3 || value.Length > 32)
                 throw new ArgumentException("Nickname must be between 3 and 32 characters", nameof(value));

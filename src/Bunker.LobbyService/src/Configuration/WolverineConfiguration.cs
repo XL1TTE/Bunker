@@ -1,3 +1,4 @@
+using Bunker.LobbyService.Messages;
 using Wolverine;
 using Wolverine.EntityFrameworkCore;
 using Wolverine.Postgresql;
@@ -16,6 +17,10 @@ internal static class WolverineConfiguration
             options.UseRabbitMqUsingNamedConnection("rabbit-mq");
             options.PersistMessagesWithPostgresql(db_connection ?? throw new Exception("Unable to find database connection string!"));
             options.UseEntityFrameworkCoreTransactions();
+
+            options.ListenToRabbitQueue("lobby-service-account-updates")
+                .DefaultIncomingMessage<AccountUpdated>()
+                .UseDurableInbox();
         });
         return builder;
     }

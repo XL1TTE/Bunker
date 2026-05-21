@@ -39,6 +39,7 @@ var accountDb = accountDbServer.AddDatabase("account-db");
 
 var lobbyDbServer = builder.AddPostgres("lobby-db-server", lobbyDbUser, lobbyDbPass).WithPgAdmin();
 var lobbyDb = lobbyDbServer.AddDatabase("lobby-db");
+var lobbyAccountsDb = lobbyDbServer.AddDatabase("lobby-accounts-replica-db");
 
 var contentServiceDbServer = builder.AddPostgres("content-service-db-server", contentServiceDbUser, contentServiceDbPass).WithPgAdmin();
 var contentServiceDb = contentServiceDbServer.AddDatabase("content-service-db");
@@ -53,9 +54,11 @@ builder.AddProject<Projects.Bunker_AccountService>("account-service")
 builder.AddProject<Projects.Bunker_LobbyService>("lobby-service")
        .WithReference(auth)
        .WithReference(lobbyDb)
+       .WithReference(lobbyAccountsDb)
        .WithReference(redis)
        .WithReference(rabbitmq)
-       .WaitFor(lobbyDb);
+       .WaitFor(lobbyDb)
+       .WaitFor(lobbyAccountsDb);
 
 builder.AddProject<Projects.Bunker_ContentService>("content-service")
        .WithReference(auth)

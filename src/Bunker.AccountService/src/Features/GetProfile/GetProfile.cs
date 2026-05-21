@@ -1,19 +1,18 @@
-using Microsoft.EntityFrameworkCore;
 using Wolverine.Attributes;
 using Bunker.AccountService.Domain;
-using Bunker.AccountService.Persistence;
+using Bunker.AccountService.Persistence.Repository;
 
 namespace Bunker.AccountService.Features.GetProfile;
 
 [WolverineHandler]
 public static class GetProfileHandler
 {
-    public static async Task<GetProfileResult> Handle(GetProfile query, AccountDbContext db)
+    public static async Task<GetProfileResult> Handle(GetProfile query, IUnitOfWork unit)
     {
         var guidId = Guid.Parse(query.Id);
-        var player = await db.Accounts
-            .AsNoTracking()
-            .FirstOrDefaultAsync(x => x.PublicId == Account.Id.Restore(guidId));
+        var accounts = unit.GetRepository<IAccountRepository>();
+
+        var player = accounts.Find(Account.Id.Create(guidId));
 
         if (player is null) 
             return GetProfileResult.NotFound();

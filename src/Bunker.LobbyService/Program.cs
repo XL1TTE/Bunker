@@ -6,12 +6,13 @@ using Bunker.LobbyService.Endpoints.Configuration;
 using Bunker.LobbyService.Messaging.Configuration;
 using Bunker.LobbyService.Persistence.Configuration;
 using Bunker.LobbyService.Validation.Configuration;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddLogging();
 builder.Services.AddHttpContextAccessor();
 
+builder.ConfigureLogging();
 builder.IncludeIdentityContext();
 builder.ConfigureJsonOptions();
 builder.IncludeAuthentication();
@@ -23,6 +24,8 @@ builder.IncludeRedis();
 builder.ConfigureWolverine();
 
 var app = builder.Build();
+
+app.UseSerilogRequestLogging();
 
 app.UseMiddleware<ExceptionToHttpErrorMiddleware>();
 

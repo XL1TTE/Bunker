@@ -6,7 +6,7 @@ public class Account
     {
         public static Id Empty { get; } = new(Guid.Empty);
         public static Id New() => new(Guid.NewGuid());
-        public static Id Restore(Guid value) => new(value);
+        public static Id Create(Guid value) => new(value);
     }
 
     private Account() { } // EF Core
@@ -31,6 +31,6 @@ public static class PlayerFactory
     {
         public static Account Create(Nickname nickname) => new Account(Account.Id.New(), nickname, Stats.Create());
         public static Account Create(Account.Id id, Nickname nickname) => new Account(id, nickname, Stats.Create());
-        public static Account Restore(Account.Id id, Nickname nickname, Stats stats) => new Account(id, nickname, stats);
+        public static Account Create(Account.Id id, Nickname nickname, Stats stats) => new Account(id, nickname, stats);
     }
 }

@@ -2,6 +2,7 @@ using Wolverine;
 using Wolverine.EntityFrameworkCore;
 using Wolverine.RabbitMQ;
 using Wolverine.Postgresql;
+using Bunker.AccountService.Messages;
 
 namespace Bunker.AccountService.Api.Configuration;
 
@@ -18,6 +19,10 @@ internal static class WolverineConfiguration
 
                 options.PersistMessagesWithPostgresql(db_connection ?? throw new Exception("Unable to find data base connection string!"));
                 options.UseEntityFrameworkCoreTransactions();
+
+                options.PublishMessage<AccountUpdated>()
+                    .ToRabbitExchange("account-updates")
+                    .UseDurableOutbox();
             });
 
             return builder;

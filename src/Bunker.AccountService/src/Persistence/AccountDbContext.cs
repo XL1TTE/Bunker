@@ -4,9 +4,9 @@ using Wolverine.EntityFrameworkCore;
 
 namespace Bunker.AccountService.Persistence;
 
-public class AccountDbContext(DbContextOptions<AccountDbContext> options) : DbContext(options)
+public partial class AccountDbContext(DbContextOptions<AccountDbContext> options) : DbContext(options)
 {
-    public DbSet<Account> Accounts { get; init; }
+    internal DbSet<Account> Accounts { get; init; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

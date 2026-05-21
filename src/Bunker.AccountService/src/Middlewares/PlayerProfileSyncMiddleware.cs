@@ -19,14 +19,14 @@ public class PlayerProfileSyncMiddleware(RequestDelegate next)
         if (identityContext.IsAuthenticated)
         {
             var userId = identityContext.UserId!.Value;
-            var exists = await db.Accounts.AnyAsync(x => x.PublicId == Account.Id.Restore(userId));
+            var exists = await db.Accounts.AnyAsync(x => x.PublicId == Account.Id.Create(userId));
 
             if (!exists)
             {
                 logger.LogInformation("[SYNC] Profile not found for user {UserId}. Creating...", userId);
-                
+
                 // Blocking invoke to ensure profile exists for the current request
-                await bus.InvokeAsync(new CreateProfile(userId, identityContext.Nickname!));
+                await bus.InvokeAsync(new CreateProfile(userId, identityContext.Nickname!, identityContext.Email!));
             }
         }
 

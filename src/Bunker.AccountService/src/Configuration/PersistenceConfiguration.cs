@@ -1,4 +1,5 @@
 using Bunker.AccountService.Persistence;
+using Bunker.AccountService.Persistence.Repository;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bunker.AccountService.Api.Configuration;
@@ -10,8 +11,13 @@ internal static class PersistenceConfiguration
         public IHostApplicationBuilder IncludePersistence()
         {
             var connectionString = builder.Configuration.GetConnectionString("account-db");
+
             builder.Services.AddDbContext<AccountDbContext>(options =>
                 options.UseNpgsql(connectionString));
+
+            builder.Services.AddScoped<IUnitOfWork, AccountDbContext>(
+                provider => provider.GetRequiredService<AccountDbContext>());
+
             return builder;
         }
     }

@@ -6,3 +6,5 @@ public readonly record struct AccountId(Guid Value)
     public static AccountId New() => new(Guid.NewGuid());
     public static AccountId Create(Guid value) => new(value);
 }
+
+public sealed record AccountReplica(AccountId PublicId);
