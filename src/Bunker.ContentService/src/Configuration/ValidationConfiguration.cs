@@ -1,4 +1,7 @@
 
+using Bunker.ContentService.Validation;
+using FluentValidation;
+
 namespace Bunker.ContentService.Validation.Configuration;
 
 internal static class ValidationConfiguration
@@ -7,8 +10,7 @@ internal static class ValidationConfiguration
     {
         public IHostApplicationBuilder IncludeFluentValidation()
         {
-            // ValidatorOptions.Global.LanguageManager.Enabled = false;
-            // builder.Services.AddValidatorsFromAssemblyContaining<ValidationMarker>(includeInternalTypes: true);
+            builder.Services.AddValidatorsFromAssemblyContaining<ValidationMarker>(includeInternalTypes: true);
             return builder;
         }
     }

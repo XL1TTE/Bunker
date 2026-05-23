@@ -80,7 +80,14 @@ A curated set of Character Sheet attributes (Professions, Health, Hobbies, etc.)
 The maximum total number of entities (Players + Bots) allowed in the Lobby.
 
 ### Lobby Handoff
-An asynchronous process initiated by the Host. The Lobby Service requests the Game Service to prepare a session. If preparation is successful, the Lobby is marked as "In Game" and clients are redirected. If it fails, the Lobby remains active, allowing the Host to fix settings or retry.
+An asynchronous choreographed saga initiated by the Host. 
+1. The **Lobby Service** requests a game start by passing the IDs of the selected Card Packs and Bot Personalities.
+2. The **Content Service** "hydrates" this request by fetching the full data for all requested IDs. It performs **Strict Validation**; if any ID is missing, the saga is aborted and the Lobby is notified.
+3. If valid, the **Content Service** forwards the full content payload to the **Game Service** to prepare the session.
+4. If preparation is successful, the Lobby is marked as "In Game" and clients are redirected.
+
+### Content Management
+The process of creating and maintaining the game's library of Cards, Card Packs, and Bot Personalities. In the current architecture, this is an **Admin-Only** operation. Changes to content are broadcasted via granular, full-state events (e.g., `FactCardUpdated`) to allow downstream services to update their caches.
 
 ### Lobby Destruction
 The process where a Lobby and its associated data are deleted.

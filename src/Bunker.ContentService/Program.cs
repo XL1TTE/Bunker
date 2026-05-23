@@ -1,7 +1,10 @@
 using Bunker.Api.Common;
 using Bunker.Api.Common.Middlewares;
 using Bunker.ContentService.Api.Configuration;
+using Bunker.ContentService.Api.Endpoints.Cards;
 using Bunker.ContentService.Api.Middlewares;
+using Bunker.ContentService.Endpoints.CardPacks;
+using Bunker.ContentService.Endpoints.PersonalityPresets;
 using Bunker.ContentService.Messaging.Configuration;
 using Bunker.ContentService.Persistence;
 using Bunker.ContentService.Validation.Configuration;
@@ -38,6 +41,10 @@ if (app.Environment.IsDevelopment())
     app.IncludeScalar("Bunker Content Service API");
     await app.InitializeDatabaseAsync();
 }
+
+app.IncludeCardEndpoints();
+app.IncludeCardPackEndpoints();
+app.IncludePersonalityPresetEndpoints();
 
 app.UseHttpsRedirection();
 app.Run();
