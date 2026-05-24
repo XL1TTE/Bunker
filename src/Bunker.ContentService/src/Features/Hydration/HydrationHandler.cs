@@ -1,6 +1,8 @@
 using Bunker.ContentService.Messages;
+using Bunker.ContentService.Messaging.Hydration;
 using Bunker.ContentService.Persistence;
 using Bunker.ContentService.Persistence.Entities;
+using Bunker.ContentService.Transfers;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
 using Wolverine.Attributes;
@@ -10,7 +12,7 @@ namespace Bunker.ContentService.Features.Hydration;
 [WolverineHandler]
 public static class HydrationHandler
 {
-    public static async Task Handle(HydrateGameContent command, ContentDbContext db, IMessageBus bus)
+    public static async Task Handle(HydrationRequested command, ContentDbContext db, IMessageBus bus)
     {
         var packIds = command.CardPackIds.Distinct().ToList();
         var personalityIds = command.PersonalityPresetIds.Distinct().ToList();
@@ -42,14 +44,14 @@ public static class HydrationHandler
             .ToListAsync();
 
         // Map to events
-        var professionCards = allCards.OfType<ProfessionCard>().Select(x => new ProfessionCardUpdated(x.PublicId, x.Profession));
-        var hobbiesCards = allCards.OfType<HobbiesCard>().Select(x => new HobbiesCardUpdated(x.PublicId, x.Hobbies));
-        var ageCards = allCards.OfType<AgeCard>().Select(x => new AgeCardUpdated(x.PublicId, x.Age));
-        var sexCards = allCards.OfType<SexCard>().Select(x => new SexCardUpdated(x.PublicId, (byte)x.Sex));
-        var factCards = allCards.OfType<FactCard>().Select(x => new FactCardUpdated(x.PublicId, x.Fact));
+        var professionCards = allCards.OfType<ProfessionCard>().Select(x => new Transfer.ProfessionCard(x.PublicId, x.Profession));
+        var hobbiesCards = allCards.OfType<HobbiesCard>().Select(x => new Transfer.HobbiesCard(x.PublicId, x.Hobbies));
+        var ageCards = allCards.OfType<AgeCard>().Select(x => new Transfer.AgeCard(x.PublicId, x.Age));
+        var sexCards = allCards.OfType<SexCard>().Select(x => new Transfer.SexCard(x.PublicId, x.Sex.ToString()));
+        var factCards = allCards.OfType<FactCard>().Select(x => new Transfer.FactCard(x.PublicId, x.Fact));
 
-        var packEvents = packs.Select(x => new CardPackUpdated(x.PublicId, x.Title, x.Description, x.Cards.Select(c => c.CardId)));
-        var personalityEvents = personalities.Select(x => new PersonalityPresetUpdated(x.PublicId, x.Title, x.Description));
+        var packEvents = packs.Select(x => new Transfer.CardPack(x.PublicId.ToString(), x.Title, x.Description, x.Cards.Select(c => c.CardId).ToList()));
+        var personalityEvents = personalities.Select(x => new Transfer.PersonalityPreset(x.PublicId, x.Title, x.Description));
 
         await bus.PublishAsync(new GameContentHydrated(
             packEvents,

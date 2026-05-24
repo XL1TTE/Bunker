@@ -2,19 +2,24 @@ using Bunker.ContentService.Domain;
 using Wolverine.Attributes;
 using Microsoft.EntityFrameworkCore;
 using Bunker.ContentService.Persistence;
+using Bunker.ContentService.Persistence.Contracts;
 
 namespace Bunker.ContentService.Features.Cards.DeleteCard;
 
 [WolverineHandler]
 public static class DeleteCardHandler
 {
-    public static async Task<DeleteCard.Result> Handle(DeleteCard command, ContentDbContext db)
+    public static async Task<DeleteCard.Result> Handle(
+        DeleteCard command,
+        IUnitOfWork uow)
     {
-        var card = await db.Cards.FirstOrDefaultAsync(x => x.PublicId == command.Id.Value);
+        var repository = uow.GetRepository<Card, Card.Id>();
+        var card = await repository.TryFindAsync(command.Id);
+
         if (card == null) return DeleteCard.NotFound();
 
-        db.Cards.Remove(card);
-        await db.SaveChangesAsync();
+        repository.Delete(card);
+        await uow.SaveChangesAsync();
 
         return DeleteCard.Success();
     }

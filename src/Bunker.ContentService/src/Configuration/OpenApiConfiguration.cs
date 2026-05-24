@@ -1,6 +1,8 @@
 using Scalar.AspNetCore;
 using MicroElements.AspNetCore.OpenApi.FluentValidation;
 using Bunker.Api.Common;
+using Microsoft.AspNetCore.OpenApi;
+using JasperFx.Core.Reflection;
 
 namespace Bunker.ContentService.Api.Configuration;
 
@@ -15,6 +17,11 @@ internal static class OpenApiConfiguration
             builder.Services.AddOpenApi(options =>
             {
                 options.AddFluentValidationRules();
+                options.CreateSchemaReferenceId = (type) =>
+                {
+                    var id = OpenApiOptions.CreateDefaultSchemaReferenceId(type);
+                    return id is null ? null : type.Type.NameInCode();
+                };
             });
 
             return builder;

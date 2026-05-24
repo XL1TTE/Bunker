@@ -7,6 +7,8 @@ public readonly record struct CreateSexCard(string Sex)
     public abstract record Result
     {
         public record Success(SexCard Card) : Result;
+        public record BadRequest(string Reason) : Result;
     }
     public static Result.Success Success(SexCard created) => new Result.Success(created);
+    public static Result.BadRequest BadRequest(string Reason) => new Result.BadRequest(Reason);
 }

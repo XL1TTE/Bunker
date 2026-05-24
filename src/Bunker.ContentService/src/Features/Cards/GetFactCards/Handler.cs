@@ -1,16 +1,15 @@
 using Bunker.ContentService.Domain;
+using Bunker.ContentService.Persistence.Contracts;
 using Wolverine.Attributes;
-using Microsoft.EntityFrameworkCore;
-using Bunker.ContentService.Persistence;
 
 namespace Bunker.ContentService.Features.Cards.GetFactCards;
 
 [WolverineHandler]
 public static class GetFactCardsHandler
 {
-    public static async Task<GetFactCards.Result> Handle(GetFactCards query, ContentDbContext db)
+    public static async Task<GetFactCards.Result> Handle(GetFactCards query, ICardQueries queries)
     {
-        var cards = await db.Cards.OfType<FactCard>().ToListAsync();
-        return GetFactCards.Success(cards);
+        var (total, cards) = await queries.GetFactCardsAsync(skip: query.Skip, take: query.Take);
+        return GetFactCards.Success(total, cards);
     }
 }

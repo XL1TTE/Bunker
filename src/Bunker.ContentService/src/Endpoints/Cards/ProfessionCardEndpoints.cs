@@ -8,6 +8,7 @@ using Bunker.ContentService.Features.Cards.GetProfessionCards;
 using Bunker.ContentService.Features.Cards.UpdateProfessionCard;
 using Bunker.ContentService.Api.Cards.Endpoints.Requests;
 using Bunker.ContentService.Api.Cards.Endpoints.Responses;
+using Bunker.ContentService.Transfers;
 
 namespace Bunker.ContentService.Api.Cards.Endpoints;
 
@@ -29,7 +30,8 @@ internal static class ProfessionCardEndpoints
 
         return result switch
         {
-            CreateProfessionCard.Result.Success success => TypedResults.Ok(success.Card),
+            CreateProfessionCard.Result.Success success
+                => TypedResults.Ok(success.Card.ToTransferObject()),
             _ => throw new Exception("Unexpected error occurred during profession card creation."),
         };
     }
@@ -59,14 +61,21 @@ internal static class ProfessionCardEndpoints
         };
     }
 
-    [ProducesResponseType<IEnumerable<CardResponse.ProfessionCard>>(StatusCodes.Status200OK)]
-    internal static async Task<IResult> GetProfessionCards([FromServices] IMessageBus bus)
+    [ProducesResponseType<CardResponse.ProfessionCards>(StatusCodes.Status200OK)]
+    internal static async Task<IResult> GetProfessionCards(
+        [FromServices] IMessageBus bus,
+        [FromQuery] int Skip = 0,
+        [FromQuery] int Take = 10)
     {
-        var result = await bus.InvokeAsync<GetProfessionCards.Result>(new GetProfessionCards());
+        var result = await bus.InvokeAsync<GetProfessionCards.Result>(new GetProfessionCards(Skip: Skip, Take: Take));
 
         return result switch
         {
-            GetProfessionCards.Result.Success success => TypedResults.Ok(success.Cards),
+            GetProfessionCards.Result.Success success => TypedResults.Ok(
+                    new CardResponse.ProfessionCards(
+                        Total: success.Total,
+                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.ProfessionCard>()))),
+
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }

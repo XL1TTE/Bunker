@@ -5,6 +5,7 @@ namespace Bunker.ContentService.Domain;
 /// <summary>
 /// Aggregate root for card packs. Each card pack has a unique public identifier, a title, a description, and a collection of cards. The title must be at least 6 characters long, and the description must be at least 10 characters long.
 /// </summary>
+/// <param name="PublicId"></param>
 /// <param name="Title">Title of the card pack.</param>
 /// <param name="Description">Description of the card pack.</param>
 public record CardPack(CardPack.Id PublicId, string Title, string Description)

@@ -1,16 +1,14 @@
-using Bunker.ContentService.Domain;
 using Wolverine.Attributes;
-using Microsoft.EntityFrameworkCore;
-using Bunker.ContentService.Persistence;
+using Bunker.ContentService.Persistence.Contracts;
 
 namespace Bunker.ContentService.Features.Cards.GetProfessionCards;
 
 [WolverineHandler]
 public static class GetProfessionCardsHandler
 {
-    public static async Task<GetProfessionCards.Result> Handle(GetProfessionCards query, ContentDbContext db)
+    public static async Task<GetProfessionCards.Result> Handle(GetProfessionCards query, ICardQueries queries)
     {
-        var cards = await db.Cards.OfType<ProfessionCard>().ToListAsync();
-        return GetProfessionCards.Success(cards);
+        var (total, cards) = await queries.GetProfessionCardsAsync(skip: query.Skip, take: query.Take);
+        return GetProfessionCards.Success(total, cards);
     }
 }
