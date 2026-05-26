@@ -8,6 +8,8 @@ internal sealed class CreateProfessionCardValidator : AbstractValidator<CardRequ
 {
     public CreateProfessionCardValidator()
     {
-        
+        RuleFor(x => x.Profession)
+            .MinimumLength(4)
+            .MaximumLength(64);
     }
 }

@@ -16,6 +16,9 @@ internal static class PersistenceConfiguration
 
             builder.Services.AddScoped<IUnitOfWork, ContentDbContext>();
             builder.Services.AddScoped<ICardQueries, DbContextCardQueries>();
+            builder.Services.AddScoped<ICardPackQueries, DbContextCardPackQueries>();
+            builder.Services.AddScoped<IPersonalityPresetQueries, DbContextPersonalityPresetQueries>();
+            builder.Services.AddScoped<IHydrationQueries, DbContextHydrationQueries>();
 
             return builder;
         }

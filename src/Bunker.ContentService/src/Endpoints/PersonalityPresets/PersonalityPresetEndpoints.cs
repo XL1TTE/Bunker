@@ -2,56 +2,64 @@ using Microsoft.AspNetCore.Mvc;
 using Wolverine;
 using Microsoft.AspNetCore.Authorization;
 using FluentValidation;
-using Bunker.ContentService.Features.PersonalityPresets;
-using Bunker.ContentService.Messages;
+using Bunker.ContentService.Api.PersonalityPresets.Endpoints.Requests;
+using Bunker.ContentService.Api.PersonalityPresets.Endpoints.Responses;
+using Bunker.ContentService.Features.PersonalityPresets.CreatePersonalityPreset;
+using Bunker.ContentService.Features.PersonalityPresets.UpdatePersonalityPreset;
+using Bunker.ContentService.Features.PersonalityPresets.DeletePersonalityPreset;
+using Bunker.ContentService.Features.PersonalityPresets.GetPersonalityPreset;
+using Bunker.ContentService.Features.PersonalityPresets.GetAllPersonalityPresets;
 using Microsoft.AspNetCore.Http;
+using Bunker.ContentService.Domain;
+using Bunker.ContentService.Transfers;
 
 namespace Bunker.ContentService.Endpoints.PersonalityPresets;
 
 internal static class PersonalityPresetEndpoints
 {
     [Authorize(Roles = "content-service.admin")]
-    [ProducesResponseType<PersonalityPresetUpdated>(StatusCodes.Status200OK)]
+    [ProducesResponseType<PersonalityPresetResponse.Created>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     internal static async Task<IResult> Create(
-        [FromBody] CreatePersonalityPreset cmd,
+        [FromBody] PersonalityPresetRequest.Post.Create request,
         [FromServices] IMessageBus bus,
-        [FromServices] IValidator<CreatePersonalityPreset> validator)
+        [FromServices] IValidator<PersonalityPresetRequest.Post.Create> validator)
     {
-        var validationResult = await validator.ValidateAsync(cmd);
+        var validationResult = await validator.ValidateAsync(request);
         if (!validationResult.IsValid)
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
 
-        var result = await bus.InvokeAsync<PersonalityPresetResult>(cmd);
+        var result = await bus.InvokeAsync<CreatePersonalityPreset.Result>(
+            new CreatePersonalityPreset(request.Title, request.Description));
 
         return result switch
         {
-            PersonalityPresetUpdatedSuccess success => TypedResults.Ok(success.Updated),
+            CreatePersonalityPreset.Result.Success success => TypedResults.Ok(new PersonalityPresetResponse.Created(success.Preset.ToTransferObject())),
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }
 
     [Authorize(Roles = "content-service.admin")]
-    [ProducesResponseType<PersonalityPresetUpdated>(StatusCodes.Status200OK)]
+    [ProducesResponseType<PersonalityPresetResponse.Updated>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     internal static async Task<IResult> Update(
         [FromRoute] Guid id,
-        [FromBody] UpdatePersonalityPreset cmd,
+        [FromBody] PersonalityPresetRequest.Put.Update request,
         [FromServices] IMessageBus bus,
-        [FromServices] IValidator<UpdatePersonalityPreset> validator)
+        [FromServices] IValidator<PersonalityPresetRequest.Put.Update> validator)
     {
-        cmd = cmd with { Id = id };
-        var validationResult = await validator.ValidateAsync(cmd);
+        var validationResult = await validator.ValidateAsync(request);
         if (!validationResult.IsValid)
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
 
-        var result = await bus.InvokeAsync<PersonalityPresetResult>(cmd);
+        var result = await bus.InvokeAsync<UpdatePersonalityPreset.Result>(
+            new UpdatePersonalityPreset(PersonalityPreset.Id.Create(id), request.Title, request.Description));
 
         return result switch
         {
-            PersonalityPresetUpdatedSuccess success => TypedResults.Ok(success.Updated),
-            PersonalityPresetNotFound => TypedResults.NotFound(),
+            UpdatePersonalityPreset.Result.Success success => TypedResults.Ok(new PersonalityPresetResponse.Updated(success.Preset.ToTransferObject())),
+            UpdatePersonalityPreset.Result.NotFound => TypedResults.NotFound(),
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }
@@ -63,43 +71,43 @@ internal static class PersonalityPresetEndpoints
         [FromRoute] Guid id,
         [FromServices] IMessageBus bus)
     {
-        var result = await bus.InvokeAsync<PersonalityPresetResult>(new DeletePersonalityPreset(id));
+        var result = await bus.InvokeAsync<DeletePersonalityPreset.Result>(new DeletePersonalityPreset(PersonalityPreset.Id.Create(id)));
 
         return result switch
         {
-            PersonalityPresetDeletedSuccess => TypedResults.NoContent(),
-            PersonalityPresetNotFound => TypedResults.NotFound(),
+            DeletePersonalityPreset.Result.Success => TypedResults.NoContent(),
+            DeletePersonalityPreset.Result.NotFound => TypedResults.NotFound(),
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }
 
     [Authorize(Roles = "content-service.admin")]
-    [ProducesResponseType<Domain.PersonalityPreset>(StatusCodes.Status200OK)]
+    [ProducesResponseType<PersonalityPresetResponse.Single>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     internal static async Task<IResult> GetById(
         [FromRoute] Guid id,
         [FromServices] IMessageBus bus)
     {
-        var result = await bus.InvokeAsync<PersonalityPresetResult>(new GetPersonalityPreset(id));
+        var result = await bus.InvokeAsync<GetPersonalityPreset.Result>(new GetPersonalityPreset(PersonalityPreset.Id.Create(id)));
 
         return result switch
         {
-            PersonalityPresetSuccess success => TypedResults.Ok(success.Preset),
-            PersonalityPresetNotFound => TypedResults.NotFound(),
+            GetPersonalityPreset.Result.Success success => TypedResults.Ok(new PersonalityPresetResponse.Single(success.Preset.ToTransferObject())),
+            GetPersonalityPreset.Result.NotFound => TypedResults.NotFound(),
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }
 
     [Authorize(Roles = "content-service.admin")]
-    [ProducesResponseType<IEnumerable<Domain.PersonalityPreset>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<PersonalityPresetResponse.All>(StatusCodes.Status200OK)]
     internal static async Task<IResult> GetAll(
         [FromServices] IMessageBus bus)
     {
-        var result = await bus.InvokeAsync<PersonalityPresetResult>(new GetAllPersonalityPresets());
+        var result = await bus.InvokeAsync<GetAllPersonalityPresets.Result>(new GetAllPersonalityPresets());
 
         return result switch
         {
-            PersonalityPresetsSuccess success => TypedResults.Ok(success.Presets),
+            GetAllPersonalityPresets.Result.Success success => TypedResults.Ok(new PersonalityPresetResponse.All(success.Presets.Select(x => x.ToTransferObject()))),
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }

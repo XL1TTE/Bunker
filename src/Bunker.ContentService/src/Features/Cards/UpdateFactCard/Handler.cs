@@ -9,10 +9,10 @@ public static class UpdateFactCardHandler
 {
     public static async Task<UpdateFactCard.Result> Handle(UpdateFactCard command, IUnitOfWork uow)
     {
-        var repository = uow.GetRepository<Card, Card.Id>();
-        var card = await repository.TryFindAsync(command.Id);
+        var repository = uow.GetRepository<IFactCardRepository>();
+        var factCard = await repository.TryFindAsync(command.Id);
 
-        if (card is not FactCard factCard) return UpdateFactCard.NotFound();
+        if (factCard == null) return UpdateFactCard.NotFound();
         var update = factCard.WithFact(command.Fact);
 
         repository.Update(update);

@@ -27,6 +27,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Bunker.Api.Common\Bunker.Api.Common.csproj" />
+    <ProjectReference Include="..\Bunker.ContentService.OpenTelemetry\Bunker.ContentService.OpenTelemetry.csproj" />
   </ItemGroup>
 
 </Project>

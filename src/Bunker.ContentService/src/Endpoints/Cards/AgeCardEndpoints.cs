@@ -8,6 +8,7 @@ using Bunker.ContentService.Features.Cards.GetAgeCards;
 using Bunker.ContentService.Features.Cards.UpdateAgeCard;
 using Bunker.ContentService.Api.Cards.Endpoints.Requests;
 using Bunker.ContentService.Api.Cards.Endpoints.Responses;
+using Bunker.ContentService.Transfers;
 
 namespace Bunker.ContentService.Api.Cards.Endpoints;
 
@@ -60,13 +61,21 @@ internal static class AgeCardEndpoints
     }
 
     [ProducesResponseType<IEnumerable<CardResponse.AgeCard>>(StatusCodes.Status200OK)]
-    internal static async Task<IResult> GetAgeCards([FromServices] IMessageBus bus)
+    internal static async Task<IResult> GetAgeCards(
+        [FromServices] IMessageBus bus,
+        [FromQuery] int Skip = 0,
+        [FromQuery] int Take = 10)
     {
-        var result = await bus.InvokeAsync<GetAgeCards.Result>(new GetAgeCards());
+        var result = await bus.InvokeAsync<GetAgeCards.Result>(new GetAgeCards(Skip, Take));
 
         return result switch
         {
-            GetAgeCards.Result.Success success => TypedResults.Ok(success.Cards),
+            GetAgeCards.Result.Success success
+            => TypedResults.Ok(
+                    new CardResponse.AgeCards(
+                        Total: success.Total,
+                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.AgeCard>()))),
+
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }

@@ -13,7 +13,7 @@ public static class DeleteCardHandler
         DeleteCard command,
         IUnitOfWork uow)
     {
-        var repository = uow.GetRepository<Card, Card.Id>();
+        var repository = uow.GetRepository<ICardRepository>();
         var card = await repository.TryFindAsync(command.Id);
 
         if (card == null) return DeleteCard.NotFound();

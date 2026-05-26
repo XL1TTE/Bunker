@@ -9,10 +9,10 @@ public static class UpdateSexCardHandler
 {
     public static async Task<UpdateSexCard.Result> Handle(UpdateSexCard command, IUnitOfWork uow)
     {
-        var repository = uow.GetRepository<Card, Card.Id>();
-        var card = await repository.TryFindAsync(command.Id);
+        var repository = uow.GetRepository<ISexCardRepository>();
+        var sexCard = await repository.TryFindAsync(command.Id);
 
-        if (card is not SexCard sexCard) return UpdateSexCard.NotFound();
+        if (sexCard == null) return UpdateSexCard.NotFound();
         var update = sexCard.WithSex(command.Sex);
 
         repository.Update(update);

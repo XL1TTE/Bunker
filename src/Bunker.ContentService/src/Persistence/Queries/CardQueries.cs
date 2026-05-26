@@ -1,5 +1,5 @@
 using Bunker.ContentService.Persistence.Contracts;
-using Bunker.ContentService.Persistence.Entities;
+using Bunker.ContentService.Persistence.Mappers;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bunker.ContentService.Persistence.Queries;

@@ -1,8 +1,9 @@
 using FluentValidation;
+using Bunker.ContentService.Api.PersonalityPresets.Endpoints.Requests;
 
-namespace Bunker.ContentService.Features.PersonalityPresets;
+namespace Bunker.ContentService.Validation.Requests.PersonalityPresets;
 
-public class CreatePersonalityPresetValidator : AbstractValidator<CreatePersonalityPreset>
+public class CreatePersonalityPresetValidator : AbstractValidator<PersonalityPresetRequest.Post.Create>
 {
     public CreatePersonalityPresetValidator()
     {
@@ -11,11 +12,10 @@ public class CreatePersonalityPresetValidator : AbstractValidator<CreatePersonal
     }
 }
 
-public class UpdatePersonalityPresetValidator : AbstractValidator<UpdatePersonalityPreset>
+public class UpdatePersonalityPresetValidator : AbstractValidator<PersonalityPresetRequest.Put.Update>
 {
     public UpdatePersonalityPresetValidator()
     {
-        RuleFor(x => x.Id).NotEmpty();
         RuleFor(x => x.Title).NotEmpty().MinimumLength(4);
         RuleFor(x => x.Description).NotEmpty().MinimumLength(10);
     }

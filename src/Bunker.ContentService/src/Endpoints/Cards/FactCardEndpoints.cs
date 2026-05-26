@@ -8,6 +8,7 @@ using Bunker.ContentService.Features.Cards.GetFactCards;
 using Bunker.ContentService.Features.Cards.UpdateFactCard;
 using Bunker.ContentService.Api.Cards.Endpoints.Requests;
 using Bunker.ContentService.Api.Cards.Endpoints.Responses;
+using Bunker.ContentService.Transfers;
 
 namespace Bunker.ContentService.Api.Cards.Endpoints;
 
@@ -66,7 +67,12 @@ internal static class FactCardEndpoints
 
         return result switch
         {
-            GetFactCards.Result.Success success => TypedResults.Ok(success.Cards),
+            GetFactCards.Result.Success success
+            => TypedResults.Ok(
+                    new CardResponse.FactCards(
+                        Total: success.Total,
+                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.FactCard>()))),
+
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }

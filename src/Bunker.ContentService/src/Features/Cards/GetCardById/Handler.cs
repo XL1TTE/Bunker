@@ -9,7 +9,7 @@ public static class GetCardByIdHandler
 {
     public static async Task<GetCardById.Result> Handle(GetCardById query, IUnitOfWork uow)
     {
-        var repository = uow.GetRepository<Card, Card.Id>();
+        var repository = uow.GetRepository<ICardRepository>();
         var card = await repository.TryFindAsync(query.Id);
 
         if (card == null) return GetCardById.NotFound();

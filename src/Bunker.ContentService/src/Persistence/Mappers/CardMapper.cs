@@ -1,6 +1,7 @@
+using Bunker.ContentService.Persistence.Entities;
 using Riok.Mapperly.Abstractions;
 
-namespace Bunker.ContentService.Persistence.Entities;
+namespace Bunker.ContentService.Persistence.Mappers;
 
 [Mapper]
 [UseStaticMapper(typeof(CardMapperExtensions))]
@@ -27,6 +28,11 @@ public static partial class CardMapper
     [MapDerivedType<Domain.SexCard, SexCard>]
     public static partial Card ToEntity(this Domain.Card card);
 
+    [MapDerivedType<Domain.ProfessionCard, ProfessionCard>]
+    [MapDerivedType<Domain.HobbiesCard, HobbiesCard>]
+    [MapDerivedType<Domain.AgeCard, AgeCard>]
+    [MapDerivedType<Domain.FactCard, FactCard>]
+    [MapDerivedType<Domain.SexCard, SexCard>]
     public static partial void ApplyUpdate([MappingTarget] this Card entity, Domain.Card card);
 }
 

@@ -24,4 +24,32 @@ public abstract record CardResponse
     /// <param name="Total">Number of cards in total.</param>
     /// <param name="Cards">Cards.</param>
     public readonly record struct ProfessionCards(int Total, IEnumerable<Transfer.ProfessionCard> Cards);
+
+    /// <summary>
+    /// Response with paginated collection of age cards.
+    /// </summary>
+    /// <param name="Total">Number of cards in total.</param>
+    /// <param name="Cards">Cards.</param>
+    public readonly record struct AgeCards(int Total, IEnumerable<Transfer.AgeCard> Cards);
+
+    /// <summary>
+    /// Response with paginated collection of fact cards.
+    /// </summary>
+    /// <param name="Total">Number of cards in total.</param>
+    /// <param name="Cards">Cards.</param>
+    public readonly record struct FactCards(int Total, IEnumerable<Transfer.FactCard> Cards);
+
+    /// <summary>
+    /// Response with paginated collection of hobbies cards.
+    /// </summary>
+    /// <param name="Total">Number of cards in total.</param>
+    /// <param name="Cards">Cards.</param>
+    public readonly record struct HobbiesCards(int Total, IEnumerable<Transfer.HobbiesCard> Cards);
+
+    /// <summary>
+    /// Response with paginated collection of sex cards.
+    /// </summary>
+    /// <param name="Total">Number of cards in total.</param>
+    /// <param name="Cards">Cards.</param>
+    public readonly record struct SexCards(int Total, IEnumerable<Transfer.SexCard> Cards);
 }

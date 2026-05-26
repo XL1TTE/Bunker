@@ -1,7 +1,8 @@
 
+using Bunker.ContentService.Persistence.Entities;
 using Riok.Mapperly.Abstractions;
 
-namespace Bunker.ContentService.Persistence.Entities;
+namespace Bunker.ContentService.Persistence.Mappers;
 
 [Mapper]
 [UseStaticMapper(typeof(BotPersonalityPresetMapperExtensions))]

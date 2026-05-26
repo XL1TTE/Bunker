@@ -1,10 +1,12 @@
 
 namespace Bunker.ContentService.Persistence.Contracts;
 
-public interface IRepository<TAggregate, TKey>
+public interface IRepository;
+
+public interface IRepository<TAggregate, TKey> : IRepository
 {
     Task<TAggregate?> TryFindAsync(TKey key);
-    void Update(TAggregate aggregate);
+    bool Update(TAggregate aggregate);
     void Add(TAggregate aggregate);
     void Delete(TAggregate aggregate);
     

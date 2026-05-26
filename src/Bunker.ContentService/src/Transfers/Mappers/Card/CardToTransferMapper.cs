@@ -1,5 +1,3 @@
-
-using Bunker.ContentService.Api.Cards.Endpoints.Responses;
 using Riok.Mapperly.Abstractions;
 
 namespace Bunker.ContentService.Transfers;

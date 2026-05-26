@@ -8,6 +8,7 @@ using Bunker.ContentService.Features.Cards.GetHobbiesCards;
 using Bunker.ContentService.Features.Cards.UpdateHobbiesCard;
 using Bunker.ContentService.Api.Cards.Endpoints.Requests;
 using Bunker.ContentService.Api.Cards.Endpoints.Responses;
+using Bunker.ContentService.Transfers;
 
 namespace Bunker.ContentService.Api.Cards.Endpoints;
 
@@ -66,7 +67,12 @@ internal static class HobbiesCardEndpoints
 
         return result switch
         {
-            GetHobbiesCards.Result.Success success => TypedResults.Ok(success.Cards),
+            GetHobbiesCards.Result.Success success
+            => TypedResults.Ok(
+                    new CardResponse.HobbiesCards(
+                        Total: success.Total,
+                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.HobbiesCard>()))),
+
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }

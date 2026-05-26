@@ -11,7 +11,7 @@ public static class CreateAgeCardHandler
         CreateAgeCard command,
         IUnitOfWork uow)
     {
-        var repository = uow.GetRepository<Card, Card.Id>();
+        var repository = uow.GetRepository<IAgeCardRepository>();
 
         var card = AgeCard.CreateNew(command.Age);
 

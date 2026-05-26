@@ -1,19 +1,24 @@
 using Bunker.ContentService.Persistence.Contracts;
-using Bunker.ContentService.Persistence.Entities;
+using Bunker.ContentService.Persistence.Mappers;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bunker.ContentService.Persistence;
 
-public partial class ContentDbContext : IRepository<Domain.Card, Domain.Card.Id>
+public partial class ContentDbContext : ICardRepository
 {
-    public async Task<Domain.Card?> TryFindAsync(Domain.Card.Id key) => (await Cards.FindAsync(key.Value))?.ToDomain();
-    
+    public async Task<Domain.Card?> TryFindAsync(Domain.Card.Id key)
+        => (await Cards.FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain();
+
     public void Add(Domain.Card aggregate) => Cards.Add(aggregate.ToEntity());
 
     public void Delete(Domain.Card aggregate) => Cards.Remove(aggregate.ToEntity());
 
-    public void Update(Domain.Card aggregate)
+    public bool Update(Domain.Card aggregate)
     {
-        var origin = Cards.FirstOrDefault(x => Domain.Card.Id.Create(x.PublicId) == aggregate.PublicId);
+        var origin = Cards.FirstOrDefault(x => x.PublicId == aggregate.PublicId.Value);
+        if (origin is null) return false;
+
         origin?.ApplyUpdate(aggregate);
+        return true;
     }
 }

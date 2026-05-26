@@ -8,6 +8,7 @@ using Bunker.ContentService.Features.Cards.GetSexCards;
 using Bunker.ContentService.Features.Cards.UpdateSexCard;
 using Bunker.ContentService.Api.Cards.Endpoints.Requests;
 using Bunker.ContentService.Api.Cards.Endpoints.Responses;
+using Bunker.ContentService.Transfers;
 
 namespace Bunker.ContentService.Api.Cards.Endpoints;
 
@@ -66,7 +67,12 @@ internal static class SexCardEndpoints
 
         return result switch
         {
-            GetSexCards.Result.Success success => TypedResults.Ok(success.Cards),
+            GetSexCards.Result.Success success
+            => TypedResults.Ok(
+                    new CardResponse.SexCards(
+                        Total: success.Total,
+                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.SexCard>()))),
+
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }

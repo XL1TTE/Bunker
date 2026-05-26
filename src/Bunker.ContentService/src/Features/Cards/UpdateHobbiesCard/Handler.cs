@@ -9,10 +9,10 @@ public static class UpdateHobbiesCardHandler
 {
     public static async Task<UpdateHobbiesCard.Result> Handle(UpdateHobbiesCard command, IUnitOfWork uow)
     {
-        var repository = uow.GetRepository<Card, Card.Id>();
-        var card = await repository.TryFindAsync(command.Id);
+        var repository = uow.GetRepository<IHobbiesCardRepository>();
+        var hobbiesCard = await repository.TryFindAsync(command.Id);
 
-        if (card is not HobbiesCard hobbiesCard) return UpdateHobbiesCard.NotFound();
+        if (hobbiesCard == null) return UpdateHobbiesCard.NotFound();
         var update = hobbiesCard.WithHobbies(command.Hobbies);
 
         repository.Update(update);

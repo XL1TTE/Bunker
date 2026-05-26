@@ -2,10 +2,17 @@
   <Folder Name="/Provisioners/">
     <Project Path="src/Provisioners/Bunker.Provisioner.RabbitMq/Bunker.Provisioner.RabbitMq.csproj" />
   </Folder>
+  <Folder Name="/Bunker.ContentService/">
+    <Project Path="src/Bunker.ContentService/Bunker.ContentService.csproj" />
+    <Project Path="src/Bunker.ContentService.OpenTelemetry/Bunker.ContentService.OpenTelemetry.csproj" />
+  </Folder>
+  <Folder Name="/Bunker.AccountService/">
+    <Project Path="src/Bunker.AccountService/Bunker.AccountService.csproj" />  
+  </Folder>
+  <Folder Name="/Bunker.LobbyService/">
+    <Project Path="src/Bunker.LobbyService/Bunker.LobbyService.csproj" />
+  </Folder>
   <Project Path="src/AppHost/AppHost.csproj" />
-  <Project Path="src/Bunker.LobbyService/Bunker.LobbyService.csproj" />
-  <Project Path="src/Bunker.ContentService/Bunker.ContentService.csproj" />
-  <Project Path="src/Bunker.AccountService/Bunker.AccountService.csproj" />  
   <Folder Name="/Shared/">
     <Project Path="src/Bunker.Api.Common/Bunker.Api.Common.csproj" /> 
     <Project Path="src/Bunker.Monads/Bunker.Monads.csproj" />

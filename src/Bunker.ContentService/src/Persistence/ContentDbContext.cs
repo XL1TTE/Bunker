@@ -13,7 +13,9 @@ public partial class ContentDbContext(DbContextOptions<ContentDbContext> options
     public DbSet<PersonalityPreset> PersonalityPresets { get; init; }
 
     public IRepository<TAggregate, TKey> GetRepository<TAggregate, TKey>() => (IRepository<TAggregate, TKey>)this;
-    public async Task<int> SaveChangesAsync() => await SaveChangesAsync();
+
+    public TRepository GetRepository<TRepository>() where TRepository : class, IRepository
+        => this as TRepository ?? throw new InvalidOperationException($"Repository {typeof(TRepository).Name} is not implemented.");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

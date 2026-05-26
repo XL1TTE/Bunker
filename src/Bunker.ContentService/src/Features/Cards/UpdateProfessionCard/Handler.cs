@@ -9,10 +9,10 @@ public static class UpdateProfessionCardHandler
 {
     public static async Task<UpdateProfessionCard.Result> Handle(UpdateProfessionCard command, IUnitOfWork uow)
     {
-        var repository = uow.GetRepository<Card, Card.Id>();
-        var card = await repository.TryFindAsync(command.Id);
+        var repository = uow.GetRepository<IProfessionCardRepository>();
+        var professionCard = await repository.TryFindAsync(command.Id);
 
-        if (card is not ProfessionCard professionCard) return UpdateProfessionCard.NotFound();
+        if (professionCard == null) return UpdateProfessionCard.NotFound();
         var update = professionCard.WithProfession(command.Profession);
 
         repository.Update(update);

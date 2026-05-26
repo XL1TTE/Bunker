@@ -6,7 +6,7 @@ public readonly record struct GetSexCards(int Skip, int Take)
 {
     public abstract record Result
     {
-        public record Success(int total, IReadOnlyCollection<SexCard> Cards) : Result;
+        public record Success(int Total, IReadOnlyCollection<SexCard> Cards) : Result;
     }
     public static Result.Success Success(int total, IReadOnlyCollection<SexCard> cards) => new Result.Success(total, cards);
 }
