@@ -30,7 +30,7 @@ internal static class SexCardEndpoints
 
         return result switch
         {
-            CreateSexCard.Result.Success success => TypedResults.Ok(success.Card),
+            CreateSexCard.Result.Success success => TypedResults.Ok(new CardResponse.SexCard(success.Card.ToTransferObject())),
             _ => throw new Exception("Unexpected error occurred during sex card creation."),
         };
     }
@@ -54,13 +54,13 @@ internal static class SexCardEndpoints
 
         return result switch
         {
-            UpdateSexCard.Result.Success success => TypedResults.Ok(success.Card),
+            UpdateSexCard.Result.Success success => TypedResults.Ok(new CardResponse.SexCard(success.Card.ToTransferObject())),
             UpdateSexCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during sex card updating."),
         };
     }
 
-    [ProducesResponseType<IEnumerable<CardResponse.SexCard>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CardResponse.SexCards>(StatusCodes.Status200OK)]
     internal static async Task<IResult> GetSexCards([FromServices] IMessageBus bus)
     {
         var result = await bus.InvokeAsync<GetSexCards.Result>(new GetSexCards());
@@ -71,7 +71,7 @@ internal static class SexCardEndpoints
             => TypedResults.Ok(
                     new CardResponse.SexCards(
                         Total: success.Total,
-                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.SexCard>()))),
+                        Cards: success.Cards.Select(x => x.ToTransferObject()))),
 
             _ => throw new InvalidOperationException("Unexpected result type.")
         };

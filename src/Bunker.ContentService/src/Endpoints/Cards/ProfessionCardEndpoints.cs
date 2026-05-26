@@ -30,8 +30,7 @@ internal static class ProfessionCardEndpoints
 
         return result switch
         {
-            CreateProfessionCard.Result.Success success
-                => TypedResults.Ok(success.Card.ToTransferObject()),
+            CreateProfessionCard.Result.Success success => TypedResults.Ok(new CardResponse.ProfessionCard(success.Card.ToTransferObject())),
             _ => throw new Exception("Unexpected error occurred during profession card creation."),
         };
     }
@@ -55,7 +54,7 @@ internal static class ProfessionCardEndpoints
 
         return result switch
         {
-            UpdateProfessionCard.Result.Success success => TypedResults.Ok(success.Card),
+            UpdateProfessionCard.Result.Success success => TypedResults.Ok(new CardResponse.ProfessionCard(success.Card.ToTransferObject())),
             UpdateProfessionCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during profession card updating."),
         };
@@ -74,7 +73,7 @@ internal static class ProfessionCardEndpoints
             GetProfessionCards.Result.Success success => TypedResults.Ok(
                     new CardResponse.ProfessionCards(
                         Total: success.Total,
-                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.ProfessionCard>()))),
+                        Cards: success.Cards.Select(x => x.ToTransferObject()))),
 
             _ => throw new InvalidOperationException("Unexpected result type.")
         };

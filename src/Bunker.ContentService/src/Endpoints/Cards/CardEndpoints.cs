@@ -5,6 +5,7 @@ using Bunker.ContentService.Domain;
 using Bunker.ContentService.Features.Cards.DeleteCard;
 using Bunker.ContentService.Features.Cards.GetCardById;
 using Bunker.ContentService.Api.Cards.Endpoints.Responses;
+using Bunker.ContentService.Transfers;
 
 namespace Bunker.ContentService.Api.Endpoints.Cards;
 
@@ -29,7 +30,7 @@ internal static class CardEndpoints
     }
 
     [Authorize(Roles = "content-service.admin")]
-    [ProducesResponseType<Domain.Card>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CardResponse.Single>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     internal static async Task<IResult> GetById(
         [FromRoute] Guid id,
@@ -39,7 +40,7 @@ internal static class CardEndpoints
 
         return result switch
         {
-            GetCardById.Result.Success success => TypedResults.Ok(success.Card),
+            GetCardById.Result.Success success => TypedResults.Ok(new CardResponse.Single(success.Card.ToTransferObject())),
             GetCardById.Result.NotFound => TypedResults.NotFound(),
             _ => throw new InvalidOperationException("Unexpected result type.")
         };

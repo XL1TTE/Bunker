@@ -11,8 +11,8 @@ internal static class PersistenceConfiguration
         public IHostApplicationBuilder IncludePersistence()
         {
             var connectionString = builder.Configuration.GetConnectionString("content-service-db");
-            builder.Services.AddDbContext<ContentDbContext>(options =>
-                options.UseNpgsql(connectionString));
+
+            builder.Services.AddNpgsql<ContentDbContext>(connectionString);
 
             builder.Services.AddScoped<IUnitOfWork, ContentDbContext>();
             builder.Services.AddScoped<ICardQueries, DbContextCardQueries>();

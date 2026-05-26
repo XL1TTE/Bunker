@@ -30,7 +30,7 @@ internal static class AgeCardEndpoints
 
         return result switch
         {
-            CreateAgeCard.Result.Success success => TypedResults.Ok(success.Card),
+            CreateAgeCard.Result.Success success => TypedResults.Ok(new CardResponse.AgeCard(success.Card.ToTransferObject())),
             _ => throw new Exception("Unexpected error occurred during age card creation."),
         };
     }
@@ -54,13 +54,13 @@ internal static class AgeCardEndpoints
 
         return result switch
         {
-            UpdateAgeCard.Result.Success success => TypedResults.Ok(success.Card),
+            UpdateAgeCard.Result.Success success => TypedResults.Ok(new CardResponse.AgeCard(success.Card.ToTransferObject())),
             UpdateAgeCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during age card updating."),
         };
     }
 
-    [ProducesResponseType<IEnumerable<CardResponse.AgeCard>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CardResponse.AgeCards>(StatusCodes.Status200OK)]
     internal static async Task<IResult> GetAgeCards(
         [FromServices] IMessageBus bus,
         [FromQuery] int Skip = 0,
@@ -74,7 +74,7 @@ internal static class AgeCardEndpoints
             => TypedResults.Ok(
                     new CardResponse.AgeCards(
                         Total: success.Total,
-                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.AgeCard>()))),
+                        Cards: success.Cards.Select(x => x.ToTransferObject()))),
 
             _ => throw new InvalidOperationException("Unexpected result type.")
         };

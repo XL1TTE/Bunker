@@ -30,7 +30,7 @@ internal static class HobbiesCardEndpoints
 
         return result switch
         {
-            CreateHobbiesCard.Result.Success success => TypedResults.Ok(success.Card),
+            CreateHobbiesCard.Result.Success success => TypedResults.Ok(new CardResponse.HobbiesCard(success.Card.ToTransferObject())),
             _ => throw new Exception("Unexpected error occurred during hobbies card creation."),
         };
     }
@@ -54,13 +54,13 @@ internal static class HobbiesCardEndpoints
 
         return result switch
         {
-            UpdateHobbiesCard.Result.Success success => TypedResults.Ok(success.Card),
+            UpdateHobbiesCard.Result.Success success => TypedResults.Ok(new CardResponse.HobbiesCard(success.Card.ToTransferObject())),
             UpdateHobbiesCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during hobbies card updating."),
         };
     }
 
-    [ProducesResponseType<IEnumerable<CardResponse.HobbiesCard>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CardResponse.HobbiesCards>(StatusCodes.Status200OK)]
     internal static async Task<IResult> GetHobbiesCards([FromServices] IMessageBus bus)
     {
         var result = await bus.InvokeAsync<GetHobbiesCards.Result>(new GetHobbiesCards());
@@ -71,7 +71,7 @@ internal static class HobbiesCardEndpoints
             => TypedResults.Ok(
                     new CardResponse.HobbiesCards(
                         Total: success.Total,
-                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.HobbiesCard>()))),
+                        Cards: success.Cards.Select(x => x.ToTransferObject()))),
 
             _ => throw new InvalidOperationException("Unexpected result type.")
         };

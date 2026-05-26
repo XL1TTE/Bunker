@@ -30,7 +30,7 @@ internal static class FactCardEndpoints
 
         return result switch
         {
-            CreateFactCard.Result.Success success => TypedResults.Ok(success.Card),
+            CreateFactCard.Result.Success success => TypedResults.Ok(new CardResponse.FactCard(success.Card.ToTransferObject())),
             _ => throw new Exception("Unexpected error occurred during fact card creation."),
         };
     }
@@ -54,13 +54,13 @@ internal static class FactCardEndpoints
 
         return result switch
         {
-            UpdateFactCard.Result.Success success => TypedResults.Ok(success.Card),
+            UpdateFactCard.Result.Success success => TypedResults.Ok(new CardResponse.FactCard(success.Card.ToTransferObject())),
             UpdateFactCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during fact card updating."),
         };
     }
 
-    [ProducesResponseType<IEnumerable<CardResponse.FactCard>>(StatusCodes.Status200OK)]
+    [ProducesResponseType<CardResponse.FactCards>(StatusCodes.Status200OK)]
     internal static async Task<IResult> GetFactCards([FromServices] IMessageBus bus)
     {
         var result = await bus.InvokeAsync<GetFactCards.Result>(new GetFactCards());
@@ -71,7 +71,7 @@ internal static class FactCardEndpoints
             => TypedResults.Ok(
                     new CardResponse.FactCards(
                         Total: success.Total,
-                        Cards: success.Cards.Select(x => x.ToTransferObject<Transfer.FactCard>()))),
+                        Cards: success.Cards.Select(x => x.ToTransferObject()))),
 
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
