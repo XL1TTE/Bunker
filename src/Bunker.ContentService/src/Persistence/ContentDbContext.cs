@@ -23,6 +23,6 @@ public partial class ContentDbContext(DbContextOptions<ContentDbContext> options
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PersistenceConfigurations).Assembly);
 
-        modelBuilder.MapWolverineEnvelopeStorage();
+        modelBuilder.MapWolverineEnvelopeStorage(databaseSchema: "wolverine");
     }
 }

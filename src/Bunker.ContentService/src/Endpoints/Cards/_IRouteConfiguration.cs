@@ -8,11 +8,11 @@ internal static partial class IRouteBuilderExtensions
     {
         var root = builder.MapGroup("/content/cards");
 
-        root.MapPost("/profession", ProfessionCardEndpoints.CreateProfession)
+        root.MapPost("/profession", ProfessionCardEndpoints.CreateProfessionCard)
             .WithSummary("Create profession card")
             .WithDescription("Creates a new profession card that defines a character's job or background.");
-            
-        root.MapPut("/profession/{id:guid}", ProfessionCardEndpoints.UpdateProfession)
+
+        root.MapPut("/profession/{id:guid}", ProfessionCardEndpoints.UpdateProfessionCard)
             .WithSummary("Update profession card")
             .WithDescription("Updates an existing profession card's details.");
             
@@ -20,11 +20,11 @@ internal static partial class IRouteBuilderExtensions
             .WithSummary("Get all profession cards")
             .WithDescription("Retrieves the full library of profession cards.");
 
-        root.MapPost("/hobbies", HobbiesCardEndpoints.CreateHobbies)
+        root.MapPost("/hobbies", HobbiesCardEndpoints.CreateHobbiesCard)
             .WithSummary("Create hobbies card")
             .WithDescription("Creates a new hobbies card representing character interests.");
-            
-        root.MapPut("/hobbies/{id:guid}", HobbiesCardEndpoints.UpdateHobbies)
+
+        root.MapPut("/hobbies/{id:guid}", HobbiesCardEndpoints.UpdateHobbiesCard)
             .WithSummary("Update hobbies card")
             .WithDescription("Updates an existing hobbies card.");
             
@@ -32,11 +32,11 @@ internal static partial class IRouteBuilderExtensions
             .WithSummary("Get all hobbies cards")
             .WithDescription("Retrieves the full library of hobbies cards.");
 
-        root.MapPost("/age", AgeCardEndpoints.CreateAge)
+        root.MapPost("/age", AgeCardEndpoints.CreateAgeCard)
             .WithSummary("Create age card")
             .WithDescription("Creates a new age card [0-254].");
-            
-        root.MapPut("/age/{id:guid}", AgeCardEndpoints.UpdateAge)
+
+        root.MapPut("/age/{id:guid}", AgeCardEndpoints.UpdateAgeCard)
             .WithSummary("Update age card")
             .WithDescription("Updates an existing age card.");
             
@@ -44,11 +44,11 @@ internal static partial class IRouteBuilderExtensions
             .WithSummary("Get all age cards")
             .WithDescription("Retrieves the full library of age cards.");
 
-        root.MapPost("/sex", SexCardEndpoints.CreateSex)
+        root.MapPost("/sex", SexCardEndpoints.CreateSexCard)
             .WithSummary("Create sex card")
             .WithDescription("Creates a new sex card.");
-            
-        root.MapPut("/sex/{id:guid}", SexCardEndpoints.UpdateSex)
+
+        root.MapPut("/sex/{id:guid}", SexCardEndpoints.UpdateSexCard)
             .WithSummary("Update sex card")
             .WithDescription("Updates an existing sex card.");
             
@@ -56,11 +56,11 @@ internal static partial class IRouteBuilderExtensions
             .WithSummary("Get all sex cards")
             .WithDescription("Retrieves the full library of sex cards.");
 
-        root.MapPost("/fact", FactCardEndpoints.CreateFact)
+        root.MapPost("/fact", FactCardEndpoints.CreateFactCard)
             .WithSummary("Create fact card")
             .WithDescription("Creates a new fact card with character-specific trivia.");
-            
-        root.MapPut("/fact/{id:guid}", FactCardEndpoints.UpdateFact)
+
+        root.MapPut("/fact/{id:guid}", FactCardEndpoints.UpdateFactCard)
             .WithSummary("Update fact card")
             .WithDescription("Updates an existing fact card.");
             

@@ -14,7 +14,7 @@ internal static class PersistenceConfiguration
 
             builder.Services.AddNpgsql<ContentDbContext>(connectionString);
 
-            builder.Services.AddScoped<IUnitOfWork, ContentDbContext>();
+            builder.Services.AddScoped<IUnitOfWork, ContentDbContext>(provider => provider.GetRequiredService<ContentDbContext>());
             builder.Services.AddScoped<ICardQueries, DbContextCardQueries>();
             builder.Services.AddScoped<ICardPackQueries, DbContextCardPackQueries>();
             builder.Services.AddScoped<IPersonalityPresetQueries, DbContextPersonalityPresetQueries>();

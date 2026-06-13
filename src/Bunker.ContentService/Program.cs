@@ -11,9 +11,11 @@ using Bunker.ContentService.Validation.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.ConfigureOpenTelemetry();
+builder.ConfigureLogging();
 
-builder.Services.AddLogging();
+builder.ConfigureSentry();
+builder.AddServiceDefaults();
+
 builder.Services.AddHttpContextAccessor();
 
 // Infrastructure (Shared)

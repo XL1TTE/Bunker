@@ -49,6 +49,7 @@ builder.AddProject<Projects.Bunker_AccountService>("account-service")
        .WithReference(auth)
        .WithReference(accountDb)
        .WithReference(rabbitmq)
+       .WaitForCompletion(rabbitMqProvisioner)
        .WaitFor(accountDb);
 
 builder.AddProject<Projects.Bunker_LobbyService>("lobby-service")
@@ -57,6 +58,7 @@ builder.AddProject<Projects.Bunker_LobbyService>("lobby-service")
        .WithReference(lobbyAccountsDb)
        .WithReference(redis)
        .WithReference(rabbitmq)
+       .WaitForCompletion(rabbitMqProvisioner)
        .WaitFor(lobbyDb)
        .WaitFor(lobbyAccountsDb);
 
@@ -65,6 +67,7 @@ builder.AddProject<Projects.Bunker_ContentService>("content-service")
        .WithReference(contentServiceDb)
        .WithReference(redis)
        .WithReference(rabbitmq)
+       .WaitForCompletion(rabbitMqProvisioner)
        .WaitFor(contentServiceDb);
 
 builder.Build().Run();

@@ -15,19 +15,24 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.13.20" />
     <PackageReference Include="MicroElements.AspNetCore.OpenApi.FluentValidation" Version="7.1.4" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.1" />
+    <PackageReference Include="Serilog.AspNetCore" Version="10.0.0" />
+    
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
 
-    <PackageReference Include="WolverineFx" Version="5.39.1" />
-    <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="5.39.1" />
-    <PackageReference Include="WolverineFx.Postgresql" Version="5.39.1" />
-    <PackageReference Include="WolverineFx.RabbitMQ" Version="5.39.1" />
+    <PackageReference Include="WolverineFx" Version="6.8.0" />
+    <PackageReference Include="WolverineFx.EntityFrameworkCore" Version="6.8.0" />
+    <PackageReference Include="WolverineFx.Postgresql" Version="6.8.0" />
+    <PackageReference Include="WolverineFx.RabbitMQ" Version="6.8.0" />
     
     <PackageReference Include="Riok.Mapperly" Version="4.3.1" />
+    
+    <PackageReference Include="WolverineFx.RuntimeCompilation" Version="6.8.0" />
   
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Bunker.Api.Common\Bunker.Api.Common.csproj" />
-    <ProjectReference Include="..\Bunker.ContentService.OpenTelemetry\Bunker.ContentService.OpenTelemetry.csproj" />
+    <ProjectReference Include="..\Bunker.ContentService.Defaults\Bunker.ContentService.Defaults.csproj" />
   </ItemGroup>
 
 </Project>

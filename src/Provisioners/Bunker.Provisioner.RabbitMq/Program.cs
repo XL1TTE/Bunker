@@ -1,5 +1,4 @@
-﻿using ImTools;
-using JasperFx.Core;
+﻿using Bunker.Provisioner.RabbitMq;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -13,14 +12,8 @@ builder.Services.AddLogging(c => c.AddConsole());
 builder.Services.AddWolverine(options =>
 {
     var mq = options.UseRabbitMqUsingNamedConnection("rabbit-mq").AutoProvision();
-    
-    mq.DeclareExchange("account-updates", e => 
-    { 
-        e.ExchangeType = ExchangeType.Fanout; 
-        
-        e.BindQueue("lobby-service-account-updates");
-        e.BindQueue("read-service-account-updates");
-    });
+
+    mq.ProvisionContent();
 });
 
 var app = builder.Build();

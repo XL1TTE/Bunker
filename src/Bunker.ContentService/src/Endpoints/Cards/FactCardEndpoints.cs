@@ -17,7 +17,7 @@ internal static class FactCardEndpoints
     [Authorize(Roles = "content-service.admin")]
     [ProducesResponseType<CardResponse.FactCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
-    internal static async Task<IResult> CreateFact(
+    internal static async Task<IResult> CreateFactCard(
         [FromBody] CardRequest.Post.FactCard request,
         [FromServices] IMessageBus bus,
         [FromServices] IValidator<CardRequest.Post.FactCard> validator)
@@ -39,7 +39,7 @@ internal static class FactCardEndpoints
     [ProducesResponseType<CardResponse.FactCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.NotFound>(StatusCodes.Status404NotFound)]
-    internal static async Task<IResult> UpdateFact(
+    internal static async Task<IResult> UpdateFactCard(
     [FromRoute] Guid id,
     [FromBody] CardRequest.Put.FactCard request,
     [FromServices] IMessageBus bus,
@@ -55,7 +55,7 @@ internal static class FactCardEndpoints
         return result switch
         {
             UpdateFactCard.Result.Success success => TypedResults.Ok(new CardResponse.FactCard(success.Card.ToTransferObject())),
-            UpdateFactCard.Result.NotFound => TypedResults.NotFound(),
+            Features.Cards.UpdateFactCard.UpdateFactCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during fact card updating."),
         };
     }

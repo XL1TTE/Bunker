@@ -1,9 +1,11 @@
+using Bunker.ContentService.Transfers;
+
 namespace Bunker.ContentService.Messages;
 
-public record ProfessionCardUpdated(Guid PublicId, string Profession);
-public record HobbiesCardUpdated(Guid PublicId, string Hobbies);
-public record AgeCardUpdated(Guid PublicId, int Age);
-public record SexCardUpdated(Guid PublicId, byte Sex);
-public record FactCardUpdated(Guid PublicId, string Fact);
+public readonly record struct ProfessionCardUpdated(Transfer.ProfessionCard Card);
+public readonly record struct HobbiesCardUpdated(Transfer.HobbiesCard Card);
+public readonly record struct AgeCardUpdated(Transfer.AgeCard Card);
+public readonly record struct SexCardUpdated(Transfer.SexCard Card);
+public readonly record struct FactCardUpdated(Transfer.FactCard Card);
 
-public record CardDeleted(Guid PublicId);
+public readonly record struct CardDeleted(Guid Id);

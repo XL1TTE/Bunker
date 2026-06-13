@@ -17,7 +17,7 @@ internal static class HobbiesCardEndpoints
     [Authorize(Roles = "content-service.admin")]
     [ProducesResponseType<CardResponse.HobbiesCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
-    internal static async Task<IResult> CreateHobbies(
+    internal static async Task<IResult> CreateHobbiesCard(
         [FromBody] CardRequest.Post.HobbiesCard request,
         [FromServices] IMessageBus bus,
         [FromServices] IValidator<CardRequest.Post.HobbiesCard> validator)
@@ -39,7 +39,7 @@ internal static class HobbiesCardEndpoints
     [ProducesResponseType<CardResponse.HobbiesCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.NotFound>(StatusCodes.Status404NotFound)]
-    internal static async Task<IResult> UpdateHobbies(
+    internal static async Task<IResult> UpdateHobbiesCard(
     [FromRoute] Guid id,
     [FromBody] CardRequest.Put.HobbiesCard request,
     [FromServices] IMessageBus bus,
@@ -55,7 +55,7 @@ internal static class HobbiesCardEndpoints
         return result switch
         {
             UpdateHobbiesCard.Result.Success success => TypedResults.Ok(new CardResponse.HobbiesCard(success.Card.ToTransferObject())),
-            UpdateHobbiesCard.Result.NotFound => TypedResults.NotFound(),
+            Features.Cards.UpdateHobbiesCard.UpdateHobbiesCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during hobbies card updating."),
         };
     }

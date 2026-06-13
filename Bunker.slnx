@@ -3,8 +3,8 @@
     <Project Path="src/Provisioners/Bunker.Provisioner.RabbitMq/Bunker.Provisioner.RabbitMq.csproj" />
   </Folder>
   <Folder Name="/Bunker.ContentService/">
+    <Project Path="src/Bunker.ContentService.Defaults/Bunker.ContentService.Defaults.csproj" />
     <Project Path="src/Bunker.ContentService/Bunker.ContentService.csproj" />
-    <Project Path="src/Bunker.ContentService.OpenTelemetry/Bunker.ContentService.OpenTelemetry.csproj" />
   </Folder>
   <Folder Name="/Bunker.AccountService/">
     <Project Path="src/Bunker.AccountService/Bunker.AccountService.csproj" />  

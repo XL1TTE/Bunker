@@ -51,7 +51,7 @@ public static class AuthConfiguration
                            },
                            OnForbidden = context =>
                            {
-                               Console.WriteLine("Forbidden");
+                               Console.WriteLine($"Forbidden: {context}");
                                return Task.CompletedTask;
                            }
                        };

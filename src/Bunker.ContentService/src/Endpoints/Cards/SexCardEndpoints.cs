@@ -9,6 +9,7 @@ using Bunker.ContentService.Features.Cards.UpdateSexCard;
 using Bunker.ContentService.Api.Cards.Endpoints.Requests;
 using Bunker.ContentService.Api.Cards.Endpoints.Responses;
 using Bunker.ContentService.Transfers;
+using System.Text.Json;
 
 namespace Bunker.ContentService.Api.Cards.Endpoints;
 
@@ -17,12 +18,14 @@ internal static class SexCardEndpoints
     [Authorize(Roles = "content-service.admin")]
     [ProducesResponseType<CardResponse.SexCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
-    internal static async Task<IResult> CreateSex(
+    internal static async Task<IResult> CreateSexCard(
         [FromBody] CardRequest.Post.SexCard request,
         [FromServices] IMessageBus bus,
+        [FromServices] ILogger<CardRequest.Post.SexCard> logger,
         [FromServices] IValidator<CardRequest.Post.SexCard> validator)
     {
         var validation = await validator.ValidateAsync(request);
+
         if (!validation.IsValid)
             return TypedResults.ValidationProblem(validation.ToDictionary());
 
@@ -39,7 +42,7 @@ internal static class SexCardEndpoints
     [ProducesResponseType<CardResponse.SexCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.NotFound>(StatusCodes.Status404NotFound)]
-    internal static async Task<IResult> UpdateSex(
+    internal static async Task<IResult> UpdateSexCard(
     [FromRoute] Guid id,
     [FromBody] CardRequest.Put.SexCard request,
     [FromServices] IMessageBus bus,
@@ -55,7 +58,7 @@ internal static class SexCardEndpoints
         return result switch
         {
             UpdateSexCard.Result.Success success => TypedResults.Ok(new CardResponse.SexCard(success.Card.ToTransferObject())),
-            UpdateSexCard.Result.NotFound => TypedResults.NotFound(),
+            Features.Cards.UpdateSexCard.UpdateSexCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during sex card updating."),
         };
     }

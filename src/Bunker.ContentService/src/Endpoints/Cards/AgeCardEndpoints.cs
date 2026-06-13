@@ -17,7 +17,7 @@ internal static class AgeCardEndpoints
     [Authorize(Roles = "content-service.admin")]
     [ProducesResponseType<CardResponse.AgeCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
-    internal static async Task<IResult> CreateAge(
+    internal static async Task<IResult> CreateAgeCard(
         [FromBody] CardRequest.Post.AgeCard request,
         [FromServices] IMessageBus bus,
         [FromServices] IValidator<CardRequest.Post.AgeCard> validator)
@@ -39,7 +39,7 @@ internal static class AgeCardEndpoints
     [ProducesResponseType<CardResponse.AgeCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.NotFound>(StatusCodes.Status404NotFound)]
-    internal static async Task<IResult> UpdateAge(
+    internal static async Task<IResult> UpdateAgeCard(
     [FromRoute] Guid id,
     [FromBody] CardRequest.Put.AgeCard request,
     [FromServices] IMessageBus bus,
@@ -55,7 +55,7 @@ internal static class AgeCardEndpoints
         return result switch
         {
             UpdateAgeCard.Result.Success success => TypedResults.Ok(new CardResponse.AgeCard(success.Card.ToTransferObject())),
-            UpdateAgeCard.Result.NotFound => TypedResults.NotFound(),
+            Features.Cards.UpdateAgeCard.UpdateAgeCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during age card updating."),
         };
     }

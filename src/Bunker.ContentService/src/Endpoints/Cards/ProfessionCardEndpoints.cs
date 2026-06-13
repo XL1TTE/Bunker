@@ -17,7 +17,7 @@ internal static class ProfessionCardEndpoints
     [Authorize(Roles = "content-service.admin")]
     [ProducesResponseType<CardResponse.ProfessionCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
-    internal static async Task<IResult> CreateProfession(
+    internal static async Task<IResult> CreateProfessionCard(
         [FromBody] CardRequest.Post.ProfessionCard request,
         [FromServices] IMessageBus bus,
         [FromServices] IValidator<CardRequest.Post.ProfessionCard> validator)
@@ -39,7 +39,7 @@ internal static class ProfessionCardEndpoints
     [ProducesResponseType<CardResponse.ProfessionCard>(StatusCodes.Status200OK)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.ValidationProblem>(StatusCodes.Status400BadRequest)]
     [ProducesResponseType<Microsoft.AspNetCore.Http.HttpResults.NotFound>(StatusCodes.Status404NotFound)]
-    internal static async Task<IResult> UpdateProfession(
+    internal static async Task<IResult> UpdateProfessionCard(
     [FromRoute] Guid id,
     [FromBody] CardRequest.Put.ProfessionCard request,
     [FromServices] IMessageBus bus,
@@ -55,7 +55,7 @@ internal static class ProfessionCardEndpoints
         return result switch
         {
             UpdateProfessionCard.Result.Success success => TypedResults.Ok(new CardResponse.ProfessionCard(success.Card.ToTransferObject())),
-            UpdateProfessionCard.Result.NotFound => TypedResults.NotFound(),
+            Features.Cards.UpdateProfessionCard.UpdateProfessionCard.Result.NotFound => TypedResults.NotFound(),
             _ => throw new Exception("Unexpected error occurred during profession card updating."),
         };
     }

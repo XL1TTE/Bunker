@@ -1,4 +1,3 @@
-using Bunker.ContentService.Domain;
 using Wolverine.Attributes;
 using Bunker.ContentService.Persistence.Contracts;
 

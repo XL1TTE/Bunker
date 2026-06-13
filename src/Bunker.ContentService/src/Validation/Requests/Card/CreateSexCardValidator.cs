@@ -9,6 +9,8 @@ internal sealed class CreateSexCardValidator : AbstractValidator<CardRequest.Pos
 {
     public CreateSexCardValidator()
     {
-        RuleFor(x => x.Sex).Must(sex => Enum.TryParse<SexCard.SexEnum>(sex, out _));
+        RuleFor(x => x.Sex)
+            .Must(sex => Enum.TryParse<SexCard.SexEnum>(sex, out _))
+                .WithMessage("Sex value must be one of the followed [Female, Male].");
     }
 }

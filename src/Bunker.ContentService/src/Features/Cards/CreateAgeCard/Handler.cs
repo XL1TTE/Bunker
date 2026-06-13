@@ -1,5 +1,7 @@
 using Bunker.ContentService.Domain;
 using Bunker.ContentService.Persistence.Contracts;
+using Bunker.ContentService.Transfers;
+using Wolverine;
 using Wolverine.Attributes;
 
 namespace Bunker.ContentService.Features.Cards.CreateAgeCard;
@@ -9,6 +11,7 @@ public static class CreateAgeCardHandler
 {
     public static async Task<CreateAgeCard.Result> Handle(
         CreateAgeCard command,
+        IMessageContext messaging,
         IUnitOfWork uow)
     {
         var repository = uow.GetRepository<IAgeCardRepository>();
@@ -16,8 +19,8 @@ public static class CreateAgeCardHandler
         var card = AgeCard.CreateNew(command.Age);
 
         repository.Add(card);
-        await uow.SaveChangesAsync();
 
+        await messaging.PublishAsync(new Messages.AgeCardUpdated(Card: card.ToTransferObject()));
         return CreateAgeCard.Success(card);
     }
 }
