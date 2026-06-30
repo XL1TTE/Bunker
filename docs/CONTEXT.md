@@ -79,6 +79,13 @@ A curated set of Character Sheet attributes (Professions, Health, Hobbies, etc.)
 ### Lobby Capacity
 The maximum total number of entities (Players + Bots) allowed in the Lobby.
 
+### Lobby Slot
+A position in a Lobby that can be occupied by either a human Player (joined
+via invite code) or a Bot (added by the Host from a personality preset). Slots
+are uniform — there is no separate "player section" or "bot section". The
+distinction between a Player-occupied and Bot-occupied slot is the occupant's
+type, plus the fact that Bots auto-count as Ready (no readiness toggle).
+
 ### Lobby Handoff
 An asynchronous choreographed saga initiated by the Host. 
 1. The **Lobby Service** requests a game start by passing the IDs of the selected Card Packs and Bot Personalities.

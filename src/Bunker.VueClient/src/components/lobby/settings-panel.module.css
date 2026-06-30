@@ -1,0 +1,242 @@
+.panel {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.panelHeader {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  background-color: var(--color-bg-elev);
+}
+
+.panelTitle {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-muted);
+}
+
+.panelBody {
+  padding: var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-4);
+}
+
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.checkboxField {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-bg-elev);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  transition: border-color var(--t-base) var(--ease);
+}
+
+.checkboxField:hover {
+  border-color: var(--color-border-strong);
+}
+
+.checkboxField input {
+  margin-top: 3px;
+}
+
+.checkboxFieldBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.checkboxFieldTitle {
+  font-weight: 600;
+}
+
+.checkboxFieldDesc {
+  font-size: 12px;
+  color: var(--color-text-muted);
+}
+
+.packFieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  background-color: var(--color-bg-elev);
+}
+
+.packRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 8px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: background-color var(--t-fast) var(--ease);
+}
+
+.packRow:hover {
+  background-color: var(--color-surface-hover);
+}
+
+.packRowLabel {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+}
+
+.packRowTitle {
+  font-weight: 500;
+}
+
+.packRowMeta {
+  font-size: 11px;
+  color: var(--color-text-dim);
+}
+
+.divider {
+  border: none;
+  border-top: 1px solid var(--color-border);
+  margin: 0;
+}
+
+.botSection {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.addBotButton {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px dashed var(--color-primary-dim);
+  border-radius: var(--radius-md);
+  padding: 10px 14px;
+  font-weight: 600;
+  font-size: 13px;
+}
+
+.addBotButton:hover {
+  border-color: var(--color-primary);
+  background-color: rgba(94, 161, 255, 0.05);
+}
+
+.botForm {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  padding: var(--space-3);
+  background-color: var(--color-bg-elev);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.botFormActions {
+  display: flex;
+  gap: var(--space-2);
+}
+
+.saveButton {
+  background-color: var(--color-primary);
+  color: #0b0e14;
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-weight: 600;
+  font-size: 13px;
+  flex: 1;
+}
+
+.saveButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.cancelButton {
+  background-color: transparent;
+  color: var(--color-text-muted);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 10px 16px;
+  font-weight: 500;
+  font-size: 13px;
+}
+
+.cancelButton:hover {
+  color: var(--color-text);
+  border-color: var(--color-border-strong);
+}
+
+.fullButton {
+  background-color: var(--color-primary);
+  color: #0b0e14;
+  border-radius: var(--radius-md);
+  padding: 12px 18px;
+  font-weight: 600;
+  font-size: 14px;
+  width: 100%;
+  box-shadow: var(--shadow-sm);
+}
+
+.fullButton:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+}
+
+.startButton {
+  background: linear-gradient(135deg, var(--color-success), #2d8f3d);
+  color: #0b0e14;
+  border-radius: var(--radius-md);
+  padding: 14px 20px;
+  font-weight: 700;
+  font-size: 15px;
+  width: 100%;
+  box-shadow: var(--shadow-md);
+}
+
+.startButton:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: var(--shadow-lg);
+}
+
+.startButton:disabled {
+  background: var(--color-border);
+  color: var(--color-text-muted);
+  box-shadow: none;
+}
