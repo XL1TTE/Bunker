@@ -24,7 +24,7 @@ internal static class AccountEndpoints
         if (identity.UserId is null)
             return TypedResults.Unauthorized();
 
-        var query = new GetProfile(identity.UserId.Value.ToString());
+        var query = new GetProfile(identity.UserId);
         var validationResult = await validator.ValidateAsync(query);
         if (!validationResult.IsValid)
             return TypedResults.ValidationProblem(validationResult.ToDictionary());

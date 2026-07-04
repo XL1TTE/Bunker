@@ -69,7 +69,7 @@ public static partial class LobbyExtensions
     {
         public PlayerParticipant WithHost(AccountId userId, string nickname)
         {
-            var host = PlayerParticipantFactory.New(userId, lobby.PublicId, nickname, Role.Host);
+            var host = PlayerParticipant.New(userId, lobby.PublicId, nickname, Role.Host);
             lobby.Participants.Add(host);
             return host;
         }

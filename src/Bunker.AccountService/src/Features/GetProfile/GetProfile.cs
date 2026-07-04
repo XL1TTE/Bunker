@@ -9,10 +9,9 @@ public static class GetProfileHandler
 {
     public static async Task<GetProfileResult> Handle(GetProfile query, IUnitOfWork unit)
     {
-        var guidId = Guid.Parse(query.Id);
         var accounts = unit.GetRepository<IAccountRepository>();
 
-        var player = accounts.Find(Account.Id.Create(guidId));
+        var player = accounts.Find(Account.Id.Create(query.Id));
 
         if (player is null) 
             return GetProfileResult.NotFound();

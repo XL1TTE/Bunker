@@ -1,14 +1,21 @@
+using Bunker.LobbyService.Persistence.Abstractions;
 using Bunker.LobbyService.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Wolverine.EntityFrameworkCore;
 
 namespace Bunker.LobbyService.Persistence;
 
-public class LobbyDbContext(DbContextOptions<LobbyDbContext> options) : DbContext(options)
+public partial class LobbyDbContext(DbContextOptions<LobbyDbContext> options)
+    : DbContext(options), IUnitOfWork
 {
     public DbSet<Lobby> Lobbies { get; init; }
     public DbSet<LobbyParticipant> Participants { get; init; }
     public DbSet<LobbyCardPack> CardPacks { get; init; }
+
+    public IRepository<TAggregate, TKey> GetRepository<TAggregate, TKey>() => (IRepository<TAggregate, TKey>)this;
+
+    public TRepository GetRepository<TRepository>() where TRepository : class, IRepository
+        => this as TRepository ?? throw new InvalidOperationException($"Repository {typeof(TRepository).Name} is not implemented.");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -1,3 +1,4 @@
+using Bunker.LobbyService.Persistence.Abstractions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bunker.LobbyService.Persistence.Configuration;
@@ -14,6 +15,8 @@ internal static class PersistenceConfiguration
 
         builder.Services.AddDbContext<AccountsDbContext>(options =>
             options.UseNpgsql(accountsReplicaDbConnection));
+
+        builder.Services.AddScoped<IUnitOfWork>(provider => provider.GetRequiredService<LobbyDbContext>());
 
         return builder;
     }

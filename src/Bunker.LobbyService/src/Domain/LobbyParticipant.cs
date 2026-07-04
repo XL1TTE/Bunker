@@ -4,12 +4,16 @@ public abstract record Role
 {
     public static Role Host   { get; } = new Host();
     public static Role Member { get; } = new Member();
+
+    public override sealed string ToString() => this.GetType().Name;
 }
 public record Host   : Role;
 public record Member : Role;
 
 public abstract record Status
 {
+    public override sealed string ToString() => this.GetType().Name;
+
     public record Ready : Status;
     public record NotReady : Status;
 

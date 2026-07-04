@@ -38,7 +38,7 @@ public static class AuthConfiguration
                            ValidateIssuer = true,
                            ValidateAudience = true,
                            ValidIssuer = authority,
-                           ValidAudience = clientId,
+                           ValidAudience = audience,
                        };
                        
                        // For debugging 401 issues

@@ -16,6 +16,12 @@ public static partial class LobbyMapper
     [MapperIgnoreSource(nameof(Domain.Lobby.Players))]
     [MapperIgnoreSource(nameof(Domain.Lobby.Bots))]
     public static partial Lobby ToEntity(this Domain.Lobby lobby);
+
+    [MapperIgnoreTarget(nameof(Lobby.Status))]
+    [MapperIgnoreSource(nameof(Domain.Lobby.Players))]
+    [MapperIgnoreSource(nameof(Domain.Lobby.Bots))]
+    public static partial void ApplyUpdate([MappingTarget] this Lobby entity, Domain.Lobby lobby);
+
 }
 
 internal static class LobbyMapperExtensions

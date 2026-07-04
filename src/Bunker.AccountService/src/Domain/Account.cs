@@ -1,12 +1,14 @@
+using ImTools;
+
 namespace Bunker.AccountService.Domain;
 
 public class Account
 {
-    public readonly record struct Id(Guid Value)
+    public readonly record struct Id(string Value)
     {
-        public static Id Empty { get; } = new(Guid.Empty);
-        public static Id New() => new(Guid.NewGuid());
-        public static Id Create(Guid value) => new(value);
+        public static Id Empty { get; } = new(Guid.Empty.ToString());
+        public static Id New() => new(Guid.NewGuid().ToString());
+        public static Id Create(string value) => new(value);
     }
 
     private Account() { } // EF Core
