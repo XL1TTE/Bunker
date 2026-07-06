@@ -3,6 +3,7 @@ using Bunker.Api.Common.Middlewares;
 using Bunker.LobbyService.Api.Configuration;
 using Bunker.LobbyService.Api.Middlewares;
 using Bunker.LobbyService.Endpoints.Configuration;
+using Bunker.LobbyService.Hubs;
 using Bunker.LobbyService.Messaging.Configuration;
 using Bunker.LobbyService.Persistence.Configuration;
 using Bunker.LobbyService.Validation.Configuration;
@@ -11,6 +12,8 @@ using Serilog;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddSignalR();
 
 builder.ConfigureLogging();
 builder.IncludeIdentityContext();
@@ -43,5 +46,7 @@ if (app.Environment.IsDevelopment())
 
 app.IncludeLobbyEndpoints();
 
-app.UseHttpsRedirection();
+app.MapHub<LobbyHub>("/hubs/lobby");
+
+// app.UseHttpsRedirection();
 app.Run();

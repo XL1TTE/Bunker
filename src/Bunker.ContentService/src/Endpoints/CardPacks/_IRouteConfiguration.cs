@@ -21,10 +21,14 @@ internal static partial class IRouteBuilderExtensions
         root.MapGet("/{id:guid}", CardPackEndpoints.GetById)
             .WithSummary("Get card pack by ID")
             .WithDescription("Retrieves the full details and card list of a specific pack.");
-            
-        root.MapGet("/", CardPackEndpoints.GetAll)
-            .WithSummary("Get all card packs")
-            .WithDescription("Retrieves the full catalog of available card packs.");
+
+        root.MapGet("/", CardPackEndpoints.GetAllPreviews)
+            .WithSummary("Get card pack previews")
+            .WithDescription("Retrieves the public catalog of card packs (id, title, description) available for game selection.");
+
+        root.MapGet("/full", CardPackEndpoints.GetAll)
+            .WithSummary("Get all card packs (admin)")
+            .WithDescription("Retrieves the full catalog of card packs including card identifiers (admin only).");
 
         root.MapPost("/{id:guid}/cards/{cardId:guid}", CardPackEndpoints.AddCard)
             .WithSummary("Add card to pack")

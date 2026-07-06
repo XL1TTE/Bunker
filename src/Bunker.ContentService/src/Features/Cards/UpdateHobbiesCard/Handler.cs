@@ -1,5 +1,7 @@
 using Bunker.ContentService.Domain;
 using Bunker.ContentService.Persistence.Contracts;
+using Bunker.ContentService.Transfers;
+using Wolverine;
 using Wolverine.Attributes;
 
 namespace Bunker.ContentService.Features.Cards.UpdateHobbiesCard;
@@ -7,7 +9,10 @@ namespace Bunker.ContentService.Features.Cards.UpdateHobbiesCard;
 [WolverineHandler]
 public static class UpdateHobbiesCardHandler
 {
-    public static async Task<UpdateHobbiesCard.Result> Handle(UpdateHobbiesCard command, IUnitOfWork uow)
+    public static async Task<UpdateHobbiesCard.Result> Handle(
+        UpdateHobbiesCard command,
+        IMessageContext messaging,
+        IUnitOfWork uow)
     {
         var repository = uow.GetRepository<IHobbiesCardRepository>();
         var hobbiesCard = await repository.TryFindAsync(command.Id);
@@ -16,7 +21,8 @@ public static class UpdateHobbiesCardHandler
         var update = hobbiesCard.WithHobbies(command.Hobbies);
 
         repository.Update(update);
-        await uow.SaveChangesAsync();
+
+        await messaging.PublishAsync(new Messages.HobbiesCardUpdated(Card: update.ToTransferObject()));
 
         return UpdateHobbiesCard.Success(update);
     }

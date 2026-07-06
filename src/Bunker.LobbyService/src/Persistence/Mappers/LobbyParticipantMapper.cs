@@ -19,10 +19,10 @@ internal static class LobbyParticipantExtensions
 {
     public static Domain.BotPersonalityId MapPersonalityPresetId(this Guid id) => Domain.BotPersonalityId.Create(id);
     public static Guid MapPersonalityPresetId(this Domain.BotPersonalityId id) => id.Value;
-    
-    public static Guid MapUserId(this Domain.AccountId id) => id.Value;
-    public static Domain.AccountId MapUserId(this Guid id) => Domain.AccountId.Create(id);
-    
+
+    public static string MapUserId(this Domain.AccountId id) => id.Value;
+    public static Domain.AccountId MapUserId(this string id) => Domain.AccountId.Create(id);
+
     public static Guid MapLobbyId(this Domain.Lobby.Id id) => id.Value;
     public static Domain.Lobby.Id MapLobbyId(this Guid id) => Domain.Lobby.Id.Restore(id);
     

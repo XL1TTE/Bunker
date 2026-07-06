@@ -1,0 +1,6 @@
+@Bunker.ContentService_HostAddress = http://localhost:5029
+
+GET {{Bunker.ContentService_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

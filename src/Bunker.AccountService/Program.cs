@@ -43,5 +43,5 @@ if (app.Environment.IsDevelopment())
 // Endpoint Registration
 app.IncludeAccountEndpoints();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.Run();

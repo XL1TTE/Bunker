@@ -1,4 +1,3 @@
-
 using Bunker.AccountService.Domain;
 using Bunker.AccountService.Persistence.Repository;
 
@@ -20,29 +19,9 @@ public partial class AccountDbContext : IAccountRepository, IUnitOfWork
 
     public Account? Find(Account.Id id) => Accounts.FirstOrDefault(x => x.PublicId == id);
 
-    public void Rollback()
-    {
-       return;
-    }
-
-    public void Commit()
-    {
-        SaveChanges();
-    }
+    public IRepository<TAggregate, TKey> GetRepository<TAggregate, TKey>()
+        => (IRepository<TAggregate, TKey>)this;
 
     TRepository IUnitOfWork.GetRepository<TRepository>()
-    {
-        if(this is TRepository tRepository) return tRepository;
-        throw new Exception($"DbContext not implementing {nameof(TRepository)}...");
-    }
-
-    public async Task CommitAsync()
-    {
-        await SaveChangesAsync();
-    }
-
-    public async Task RollbackAsync()
-    {
-        return;
-    }
+        => this as TRepository ?? throw new InvalidOperationException($"Repository {typeof(TRepository).Name} is not implemented.");
 }

@@ -19,7 +19,6 @@ public static class CreateProfileHandler
 
         accounts.Add(player);
 
-        await unit.CommitAsync();
         yield return new AccountUpdated(command.Id.ToString(), command.Nickname, command.Email);
     }
 }

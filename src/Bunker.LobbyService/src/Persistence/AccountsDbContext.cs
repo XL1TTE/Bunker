@@ -6,13 +6,13 @@ namespace Bunker.LobbyService.Persistence;
 public class AccountsDbContext(DbContextOptions<AccountsDbContext> options) : DbContext(options)
 {
     
-    public DbSet<AccountReplica> Accounts => Set<AccountReplica>();
+    public DbSet<AccountReadModel> Accounts => Set<AccountReadModel>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         base.OnModelCreating(modelBuilder);
-        
-        var accounts = modelBuilder.Entity<AccountReplica>();
+
+        var accounts = modelBuilder.Entity<AccountReadModel>();
         
         accounts.Property<int>("Id").ValueGeneratedOnAdd();
         accounts.HasKey("Id");

@@ -1,4 +1,3 @@
-using System.Text.Json;
 using Bunker.LobbyService.Domain;
 using Bunker.LobbyService.Persistence;
 using Bunker.LobbyService.Persistence.Abstractions;
@@ -11,8 +10,7 @@ namespace Bunker.LobbyService.Features.CreateLobby;
 public static class CreateLobbyHandler
 {
     public static async Task<CreateLobby.Result> Handle(
-        CreateLobby command, 
-        IMessageContext messaging,
+        CreateLobby command,
         IUnitOfWork uow,
         ILogger<CreateLobby> logger)
     {
@@ -20,19 +18,23 @@ public static class CreateLobbyHandler
 
         try
         {
-            var lobby = Domain.Lobby.Create(
-                capacity: command.Capacity,
-                visibility: command.Visible ? PrivacyPolicy.PublicPolicy(password: command.LobbyPassword) : PrivacyPolicy.PrivatePolicy(password: command.LobbyPassword)
-            );
-            lobby.WithHost(AccountId.Create(Guid.Parse(command.HostId)), command.Nickname);
+            var visibility = command.IsPublic
+                ? PrivacyPolicy.PublicPolicy(command.Password)
+                : PrivacyPolicy.PrivatePolicy(command.Password);
+
+            var lobby = Domain.Lobby.Create(capacity: command.Capacity, visibility: visibility);
+            lobby.WithHost(AccountId.Create(command.HostId), command.Nickname);
+
+            foreach (var packId in command.SelectedPackIds)
+                lobby.AddCardPack(CardPackId.Create(Guid.Parse(packId)));
+
             repository.Add(lobby);
-            
             await uow.SaveChangesAsync();
             return CreateLobby.Success(lobby);
         }
-        catch
+        catch (Exception ex)
         {
-            logger.LogError("Failed to create lobby with command: {@Command}", JsonSerializer.Serialize(command));
+            logger.LogError(ex, "Failed to create lobby (capacity={Capacity}, isPublic={IsPublic})", command.Capacity, command.IsPublic);
             return CreateLobby.Failure("Failed to create lobby.");
         }
     }

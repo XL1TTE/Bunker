@@ -1,10 +1,10 @@
 namespace Bunker.LobbyService.Domain;
 
-public readonly record struct AccountId(Guid Value)
+public readonly record struct AccountId(string Value)
 {
-    public static AccountId Empty { get; } = new(Guid.Empty);
-    public static AccountId New() => new(Guid.NewGuid());
-    public static AccountId Create(Guid value) => new(value);
+    public static AccountId Empty { get; } = new(Guid.Empty.ToString());
+    public static AccountId New() => new(Guid.NewGuid().ToString());
+    public static AccountId Create(string value) => new(value);
 }
 
-public sealed record AccountReplica(AccountId PublicId);
+public sealed record AccountReadModel(AccountId PublicId);

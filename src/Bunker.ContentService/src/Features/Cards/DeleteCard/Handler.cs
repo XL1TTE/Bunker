@@ -1,4 +1,5 @@
 using Bunker.ContentService.Domain;
+using Wolverine;
 using Wolverine.Attributes;
 using Microsoft.EntityFrameworkCore;
 using Bunker.ContentService.Persistence;
@@ -11,6 +12,7 @@ public static class DeleteCardHandler
 {
     public static async Task<DeleteCard.Result> Handle(
         DeleteCard command,
+        IMessageContext messaging,
         IUnitOfWork uow)
     {
         var repository = uow.GetRepository<ICardRepository>();
@@ -19,7 +21,8 @@ public static class DeleteCardHandler
         if (card == null) return DeleteCard.NotFound();
 
         repository.Delete(card);
-        await uow.SaveChangesAsync();
+
+        await messaging.PublishAsync(new Messages.CardDeleted(Id: command.Id.Value));
 
         return DeleteCard.Success();
     }

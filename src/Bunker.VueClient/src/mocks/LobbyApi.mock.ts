@@ -34,6 +34,7 @@ export class LobbyApiMock implements ILobbyApi {
       capacity: request.capacity,
       isPublic: request.isPublic,
       hostParticipantId: 'p-host-new',
+      state: 'WaitingForPlayers',
       participants: [
         {
           id: 'p-host-new',
@@ -57,6 +58,15 @@ export class LobbyApiMock implements ILobbyApi {
       throw new Error(`Lobby with code ${inviteCode} not found.`);
     }
     return structuredClone(match);
+  }
+
+  async joinLobbyByPassword(lobbyId: string, _password: string): Promise<LobbySnapshot> {
+    await delay(100);
+    const lobby = lobbies.get(lobbyId);
+    if (!lobby) {
+      throw new Error(`Lobby ${lobbyId} not found.`);
+    }
+    return structuredClone(lobby);
   }
 
   async leaveLobby(lobbyId: string): Promise<void> {

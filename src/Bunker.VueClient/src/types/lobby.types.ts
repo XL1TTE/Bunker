@@ -1,6 +1,7 @@
 export type ParticipantRole = 'Host' | 'Member';
 export type ParticipantStatus = 'Ready' | 'NotReady';
 export type ParticipantType = 'Player' | 'Bot';
+export type LobbyState = 'WaitingForPlayers' | 'Starting' | 'InGame';
 
 export interface Participant {
   id: string;
@@ -18,6 +19,7 @@ export interface LobbySnapshot {
   capacity: number;
   isPublic: boolean;
   hostParticipantId: string;
+  state: LobbyState;
   participants: Participant[];
   selectedPackIds: string[];
 }
@@ -45,6 +47,7 @@ export interface CreateLobbyRequest {
   capacity: number;
   isPublic: boolean;
   selectedPackIds: string[];
+  password?: string;
 }
 
 export interface AddBotRequest {
@@ -56,6 +59,7 @@ export interface UpdateSettingsRequest {
   capacity?: number;
   isPublic?: boolean;
   selectedPackIds?: string[];
+  password?: string;
 }
 
 export interface SendMessageRequest {

@@ -10,7 +10,7 @@ public interface IUserIdentityContext
     void SetUser(string userId, string nickname, string? email);
 }
 
-internal class UserIdentityContext : IUserIdentityContext
+public class UserIdentityContext : IUserIdentityContext
 {
     public string? UserId { get; private set; }
     public string? Nickname { get; private set; }

@@ -13,7 +13,7 @@ public partial class AccountDbContext(DbContextOptions<AccountDbContext> options
         base.OnModelCreating(modelBuilder);
         
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AccountDbContext).Assembly);
-        
-        modelBuilder.MapWolverineEnvelopeStorage();
+
+        modelBuilder.MapWolverineEnvelopeStorage("wolverine");
     }
 }

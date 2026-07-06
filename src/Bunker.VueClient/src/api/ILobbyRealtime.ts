@@ -14,6 +14,7 @@ export type LobbyEventMap = {
   ChatMessageReceived: ChatMessage;
   LobbyDestroyed: { reason: LobbyDestroyedReason };
   HandoffStarted: { gameSessionId: string };
+  GameStartFailed: { reason: string };
 };
 
 export type LobbyEvent = keyof LobbyEventMap;

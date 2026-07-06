@@ -30,7 +30,7 @@ public class LobbyParticipant
 
 public class PlayerParticipant : LobbyParticipant
 {
-    public required Guid UserId { get; set; }
+    public required string UserId { get; set; }
 }
 
 public class BotParticipant : LobbyParticipant

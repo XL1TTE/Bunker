@@ -46,7 +46,48 @@ internal static class ProvisionExtensions
                 e.ExchangeType = ExchangeType.Fanout;
                 e.BindQueue("lobby-hobbies-card-updates-queue");
             });
-            
+
+            rabbit.DeclareExchange("card-deleted", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+            });
+
+            rabbit.DeclareExchange("game-start-requests", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+                e.BindQueue("game-service-game-start-requests");
+            });
+
+            rabbit.DeclareExchange("content-hydration-requests", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+                e.BindQueue("content-service-hydration-requests");
+            });
+
+            rabbit.DeclareExchange("game-content-hydrated", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+                e.BindQueue("game-service-game-content-hydrated");
+            });
+
+            rabbit.DeclareExchange("game-content-hydration-failed", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+                e.BindQueue("game-service-content-hydration-failed");
+            });
+
+            rabbit.DeclareExchange("game-start-succeeded", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+                e.BindQueue("lobby-service-game-start-succeeded");
+            });
+
+            rabbit.DeclareExchange("game-start-failed", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+                e.BindQueue("lobby-service-game-start-failed");
+            });
+
             return rabbit;
         }
     }

@@ -10,5 +10,21 @@ internal static partial class IRouteBuilderExtensions
             .WithTags("Lobbies");
 
         root.MapPost("/", LobbyEndpoints.Create);
+
+        root.MapPost("/{inviteCode}/join", LobbyEndpoints.JoinByInviteCode);
+        root.MapPost("/{lobbyId:guid}/join", LobbyEndpoints.JoinByPassword);
+
+        root.MapPost("/{lobbyId:guid}/leave", LobbyEndpoints.Leave);
+        root.MapGet("/{lobbyId:guid}", LobbyEndpoints.GetOne);
+        root.MapGet("/", LobbyEndpoints.List);
+        root.MapPatch("/{lobbyId:guid}/settings", LobbyEndpoints.UpdateSettings);
+
+        root.MapPost("/{lobbyId:guid}/bots", LobbyEndpoints.AddBot);
+        root.MapDelete("/{lobbyId:guid}/bots/{participantId:guid}", LobbyEndpoints.RemoveBot);
+        root.MapDelete("/{lobbyId:guid}/participants/{participantId:guid}", LobbyEndpoints.KickParticipant);
+
+        root.MapPost("/{lobbyId:guid}/ready", LobbyEndpoints.ToggleReadiness);
+        root.MapPost("/{lobbyId:guid}/start", LobbyEndpoints.Start);
+        root.MapPost("/{lobbyId:guid}/messages", LobbyEndpoints.SendMessage);
     }
 }

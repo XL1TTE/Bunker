@@ -2,6 +2,13 @@ using System.Collections.ObjectModel;
 
 namespace Bunker.LobbyService.Domain;
 
+public enum LobbyState
+{
+    WaitingForPlayers,
+    Starting,
+    InGame
+}
+
 public record Lobby
 {
     public readonly record struct Id(Guid Value)
@@ -18,6 +25,8 @@ public record Lobby
     public int Capacity          { get; internal set; }
 
     public PrivacyPolicy PrivacyPolicy { get; internal set; } = PrivacyPolicy.PublicPolicy();
+
+    public LobbyState State { get; internal set; } = LobbyState.WaitingForPlayers;
 
     public Collection<LobbyParticipant> Participants { get; internal set; } = [];
     public Collection<LobbyCardPack> Packs { get; internal set; } = [];

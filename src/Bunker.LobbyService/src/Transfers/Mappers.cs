@@ -14,7 +14,7 @@ public static class LobbyParticipantMappers
                 Status: participant.Status.ToString(),
                 Type: participant is BotParticipant ? "Bot" : "Player",
                 AccountId: participant is PlayerParticipant player ? player.UserId.Value.ToString() : null,
-                BotPresetId: participant is BotParticipant bot ? bot.PersonalityPresetId.Value.ToString() : null
+                PersonalityPresetId: participant is BotParticipant bot ? bot.PersonalityPresetId.Value.ToString() : null
             );
     }
 }
@@ -24,16 +24,31 @@ public static class LobbyMappers
     extension(Lobby lobby)
     {
         public Transfer.LobbySnapshot ToTransfer()
-            => new(
+        {
+            var host = lobby.Participants.FirstOrDefault(x => x.Role == Role.Host);
+            return new Transfer.LobbySnapshot(
                 Id: lobby.PublicId.Value.ToString(),
                 InviteCode: lobby.InviteCode.Value,
                 Capacity: lobby.Capacity,
-                Visible: lobby.PrivacyPolicy.IsVisible,
-                HostId: lobby.Players.First(x => x.Role == Role.Host).UserId.Value.ToString(),
+                IsPublic: lobby.PrivacyPolicy.IsVisible,
+                HostParticipantId: host?.PublicId.Value.ToString(),
+                State: lobby.State.ToString(),
                 Participants: lobby.Participants.Select(x => x.ToTransfer()).ToArray(),
-                CardPackIds: lobby.Packs.Select(x => x.PackId.Value.ToString()).ToArray()
+                SelectedPackIds: lobby.Packs.Select(x => x.PackId.Value.ToString()).ToArray()
             );
+        }
 
-
+        public Transfer.LobbySummary ToSummary()
+        {
+            var host = lobby.Participants.FirstOrDefault(x => x.Role == Role.Host);
+            return new Transfer.LobbySummary(
+                Id: lobby.PublicId.Value.ToString(),
+                InviteCode: lobby.InviteCode.Value,
+                Capacity: lobby.Capacity,
+                CurrentPlayers: lobby.Participants.Count,
+                HostNickname: host?.Nickname ?? string.Empty,
+                SelectedPackIds: lobby.Packs.Select(x => x.PackId.Value.ToString()).ToArray()
+            );
+        }
     }
 }

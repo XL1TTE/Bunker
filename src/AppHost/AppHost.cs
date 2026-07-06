@@ -39,20 +39,20 @@ var accountDb = accountDbServer.AddDatabase("account-db");
 
 var lobbyDbServer = builder.AddPostgres("lobby-db-server", lobbyDbUser, lobbyDbPass).WithPgAdmin();
 var lobbyDb = lobbyDbServer.AddDatabase("lobby-db");
-var lobbyAccountsDb = lobbyDbServer.AddDatabase("lobby-accounts-replica-db");
+var lobbyAccountsDb = lobbyDbServer.AddDatabase("lobby-accounts-cache");
 
 var contentServiceDbServer = builder.AddPostgres("content-service-db-server", contentServiceDbUser, contentServiceDbPass).WithPgAdmin();
 var contentServiceDb = contentServiceDbServer.AddDatabase("content-service-db");
 
 
-builder.AddProject<Projects.Bunker_AccountService>("account-service")
+var accountService = builder.AddProject<Projects.Bunker_AccountService>("account-service")
        .WithReference(auth)
        .WithReference(accountDb)
        .WithReference(rabbitmq)
        .WaitForCompletion(rabbitMqProvisioner)
        .WaitFor(accountDb);
 
-builder.AddProject<Projects.Bunker_LobbyService>("lobby-service")
+var lobbyService = builder.AddProject<Projects.Bunker_LobbyService>("lobby-service")
        .WithReference(auth)
        .WithReference(lobbyDb)
        .WithReference(lobbyAccountsDb)
@@ -62,12 +62,34 @@ builder.AddProject<Projects.Bunker_LobbyService>("lobby-service")
        .WaitFor(lobbyDb)
        .WaitFor(lobbyAccountsDb);
 
-builder.AddProject<Projects.Bunker_ContentService>("content-service")
+var contentService = builder.AddProject<Projects.Bunker_ContentService>("content-service")
        .WithReference(auth)
        .WithReference(contentServiceDb)
        .WithReference(redis)
        .WithReference(rabbitmq)
        .WaitForCompletion(rabbitMqProvisioner)
        .WaitFor(contentServiceDb);
+
+var gameService = builder.AddProject<Projects.Bunker_GameService>("game-service")
+       .WithReference(auth)
+       .WithReference(gameStateDb)
+       .WithReference(rabbitmq)
+       .WaitForCompletion(rabbitMqProvisioner)
+       .WaitFor(gameStateDb);
+
+
+builder.AddNpmApp("gateway", "../Bunker.Gateway", "start")
+       .WithReference(accountService)
+       .WithReference(lobbyService)
+       .WithReference(contentService)
+       .WithHttpEndpoint(port: 5174, env: "PORT")
+       .WithExternalHttpEndpoints();
+
+
+builder.AddNpmApp("frontend", "../Bunker.VueClient", "dev")
+       .WithReference(auth)
+       .WaitFor(auth)
+       .WithHttpEndpoint(port: 5173, env: "PORT")
+       .WithExternalHttpEndpoints();
 
 builder.Build().Run();

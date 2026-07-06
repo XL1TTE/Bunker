@@ -26,8 +26,21 @@ internal static class WolverineConfiguration
             options.UseEntityFrameworkCoreTransactions()
                 .WithDbContextAbstraction<IUnitOfWork, LobbyDbContext>();
 
+            options.Policies.AutoApplyTransactions();
+            options.Policies.UseDurableOutboxOnAllSendingEndpoints();
+
+            options.PublishMessage<GameStartRequested>().ToRabbitExchange("game-start-requests");
+
             options.ListenToRabbitQueue("lobby-service-account-updates")
                 .DefaultIncomingMessage<AccountUpdated>()
+                .UseDurableInbox();
+
+            options.ListenToRabbitQueue("lobby-service-game-start-succeeded")
+                .DefaultIncomingMessage<GameStartSucceeded>()
+                .UseDurableInbox();
+
+            options.ListenToRabbitQueue("lobby-service-game-start-failed")
+                .DefaultIncomingMessage<GameStartFailed>()
                 .UseDurableInbox();
         });
         return builder;

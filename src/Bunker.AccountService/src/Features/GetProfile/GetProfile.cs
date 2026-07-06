@@ -17,6 +17,7 @@ public static class GetProfileHandler
             return GetProfileResult.NotFound();
 
         var response = new PlayerProfileResponse(
+            player.PublicId.Value,
             player.Nickname.Value,
             player.Stats.TotalGames,
             player.Stats.Wins,

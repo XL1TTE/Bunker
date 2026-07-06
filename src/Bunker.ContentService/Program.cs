@@ -50,5 +50,5 @@ app.IncludeCardEndpoints();
 app.IncludeCardPackEndpoints();
 app.IncludePersonalityPresetEndpoints();
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection();
 app.Run();

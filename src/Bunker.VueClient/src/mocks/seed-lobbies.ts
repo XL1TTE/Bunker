@@ -10,6 +10,7 @@ export const SEED_LOBBY: LobbySnapshot = {
   capacity: 8,
   isPublic: true,
   hostParticipantId: PLAYER_HOST_ID,
+  state: 'WaitingForPlayers',
   participants: [
     {
       id: PLAYER_HOST_ID,

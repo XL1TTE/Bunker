@@ -1,11 +1,20 @@
 import Keycloak from 'keycloak-js';
 
+// Injected at build time by vite.config.ts from the Aspire-provided Keycloak URL
+// (AUTH_HTTPS/AUTH_HTTP). Falls back to import.meta.env.VITE_KEYCLOAK_URL for
+// standalone `npm run dev` without Aspire.
+declare const __KEYCLOAK_URL__: string | undefined;
+
 let keycloakInstance: Keycloak | null = null;
+
+function keycloakUrl(): string {
+  return __KEYCLOAK_URL__ ?? import.meta.env.VITE_KEYCLOAK_URL ?? 'http://localhost:8080';
+}
 
 function initKeycloak(): Keycloak {
   if (keycloakInstance) return keycloakInstance;
   keycloakInstance = new Keycloak({
-    url: import.meta.env.VITE_KEYCLOAK_URL,
+    url: keycloakUrl(),
     realm: import.meta.env.VITE_KEYCLOAK_REALM,
     clientId: import.meta.env.VITE_KEYCLOAK_CLIENT_ID,
   });

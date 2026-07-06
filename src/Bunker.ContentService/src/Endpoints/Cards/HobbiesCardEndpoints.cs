@@ -61,9 +61,12 @@ internal static class HobbiesCardEndpoints
     }
 
     [ProducesResponseType<CardResponse.HobbiesCards>(StatusCodes.Status200OK)]
-    internal static async Task<IResult> GetHobbiesCards([FromServices] IMessageBus bus)
+    internal static async Task<IResult> GetHobbiesCards(
+        [FromServices] IMessageBus bus,
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 10)
     {
-        var result = await bus.InvokeAsync<GetHobbiesCards.Result>(new GetHobbiesCards());
+        var result = await bus.InvokeAsync<GetHobbiesCards.Result>(new GetHobbiesCards(Skip: skip, Take: take));
 
         return result switch
         {

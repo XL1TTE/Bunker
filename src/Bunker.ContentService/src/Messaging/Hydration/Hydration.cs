@@ -2,16 +2,25 @@ using Bunker.ContentService.Transfers;
 
 namespace Bunker.ContentService.Messaging.Hydration;
 
-public record HydrationRequested(IEnumerable<Guid> CardPackIds, IEnumerable<Guid> PersonalityPresetIds);
-
-public record GameContentHydrated(
-    IEnumerable<Transfer.CardPack> CardPacks,
-    IEnumerable<Transfer.PersonalityPreset> PersonalityPresets,
-    IEnumerable<Transfer.ProfessionCard> ProfessionCards,
-    IEnumerable<Transfer.HobbiesCard> HobbiesCards,
-    IEnumerable<Transfer.AgeCard> AgeCards,
-    IEnumerable<Transfer.SexCard> SexCards,
-    IEnumerable<Transfer.FactCard> FactCards
+public record RequestGameContentHydration(
+    Guid StartRequestId,
+    IReadOnlyList<Guid> CardPackIds,
+    IReadOnlyList<Guid> PersonalityPresetIds
 );
 
-public record GameContentHydrationFailed(string Reason, IEnumerable<Guid> MissingIds);
+public record GameContentHydrated(
+    Guid StartRequestId,
+    IReadOnlyList<Transfer.CardPack> CardPacks,
+    IReadOnlyList<Transfer.PersonalityPreset> PersonalityPresets,
+    IReadOnlyList<Transfer.ProfessionCard> ProfessionCards,
+    IReadOnlyList<Transfer.HobbiesCard> HobbiesCards,
+    IReadOnlyList<Transfer.AgeCard> AgeCards,
+    IReadOnlyList<Transfer.SexCard> SexCards,
+    IReadOnlyList<Transfer.FactCard> FactCards
+);
+
+public record GameContentHydrationFailed(
+    Guid StartRequestId,
+    string Reason,
+    IReadOnlyList<Guid> MissingIds
+);

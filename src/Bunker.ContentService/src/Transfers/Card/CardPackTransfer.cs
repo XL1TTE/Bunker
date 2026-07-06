@@ -4,5 +4,5 @@ public abstract partial class Transfer
 {
     public readonly record struct CardPack(Guid Id, string Title, string Description, IReadOnlyCollection<Guid> CardIds);
 
+    public readonly record struct CardPackPreview(Guid Id, string Title, string Description);
 }
-

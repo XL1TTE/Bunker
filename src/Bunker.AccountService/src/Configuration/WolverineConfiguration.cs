@@ -22,6 +22,8 @@ internal static class WolverineConfiguration
                 options.PersistMessagesWithPostgresql(db_connection ?? throw new Exception("Unable to find data base connection string!"));
                 options.UseEntityFrameworkCoreTransactions().WithDbContextAbstraction<IUnitOfWork, AccountDbContext>();
 
+                options.Policies.AutoApplyTransactions();
+
                 options.PublishMessage<AccountUpdated>()
                     .ToRabbitExchange("account-updates")
                     .UseDurableOutbox();

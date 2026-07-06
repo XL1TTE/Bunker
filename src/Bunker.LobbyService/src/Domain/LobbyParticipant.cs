@@ -51,18 +51,34 @@ public static class PlayerParticipantFactory
     {
         public static PlayerParticipant New(AccountId userId, Lobby.Id lobbyId, string nickname, Role role)
         {
-            if (string.IsNullOrWhiteSpace(nickname) || nickname.Length < 4)
-                throw new ArgumentException("Nickname length must be at least 4 characters long.");
-            
+            ValidateNickname(nickname);
             return new PlayerParticipant(LobbyParticipant.Id.New(), userId, lobbyId, nickname, role);
         }
-        
+
         public static PlayerParticipant Create(LobbyParticipant.Id id, AccountId userId, Lobby.Id lobbyId, string nickname, Role role, Status status)
         {
-            if (string.IsNullOrWhiteSpace(nickname) || nickname.Length < 4)
-                throw new ArgumentException("Nickname length must be at least 4 characters long.");
-            
+            ValidateNickname(nickname);
             return new PlayerParticipant(id, userId, lobbyId, nickname, role) { Status = status };
+        }
+
+        private static void ValidateNickname(string nickname)
+        {
+            if (string.IsNullOrWhiteSpace(nickname) || nickname.Length < 3 || nickname.Length > 32)
+                throw new ArgumentException("Nickname length must be between 3 and 32 characters.");
+        }
+    }
+}
+
+public static class BotParticipantFactory
+{
+    extension (BotParticipant)
+    {
+        public static BotParticipant New(Lobby.Id lobbyId, string nickname, BotPersonalityId personalityPresetId)
+        {
+            if (string.IsNullOrWhiteSpace(nickname) || nickname.Length > 32)
+                throw new ArgumentException("Bot nickname must be between 1 and 32 characters.");
+
+            return new BotParticipant(LobbyParticipant.Id.New(), lobbyId, nickname, Role.Member, personalityPresetId);
         }
     }
 }

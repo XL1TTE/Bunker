@@ -111,4 +111,18 @@ internal static class PersonalityPresetEndpoints
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }
+
+    [Authorize]
+    [ProducesResponseType<IEnumerable<Transfer.PersonalityPreset>>(StatusCodes.Status200OK)]
+    internal static async Task<IResult> GetAllPublic(
+        [FromServices] IMessageBus bus)
+    {
+        var result = await bus.InvokeAsync<GetAllPersonalityPresets.Result>(new GetAllPersonalityPresets());
+
+        return result switch
+        {
+            GetAllPersonalityPresets.Result.Success success => TypedResults.Ok(success.Presets.Select(x => x.ToTransferObject())),
+            _ => throw new InvalidOperationException("Unexpected result type.")
+        };
+    }
 }

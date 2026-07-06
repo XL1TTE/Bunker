@@ -29,5 +29,11 @@ internal static partial class IRouteBuilderExtensions
         root.MapGet("/", PersonalityPresetEndpoints.GetAll)
             .WithSummary("Get all personality presets")
             .WithDescription("Retrieves all personality presets.");
+
+        var publicRoot = builder.MapGroup("/content/personalities");
+
+        publicRoot.MapGet("/", PersonalityPresetEndpoints.GetAllPublic)
+            .WithSummary("Get personality preset previews")
+            .WithDescription("Retrieves the public catalog of personality presets (id, title, description) available for bot creation.");
     }
 }

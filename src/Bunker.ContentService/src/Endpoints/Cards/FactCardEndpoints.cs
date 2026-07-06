@@ -61,9 +61,13 @@ internal static class FactCardEndpoints
     }
 
     [ProducesResponseType<CardResponse.FactCards>(StatusCodes.Status200OK)]
-    internal static async Task<IResult> GetFactCards([FromServices] IMessageBus bus)
+    internal static async Task<IResult> GetFactCards(
+        [FromServices] IMessageBus bus,
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 10
+    )
     {
-        var result = await bus.InvokeAsync<GetFactCards.Result>(new GetFactCards());
+        var result = await bus.InvokeAsync<GetFactCards.Result>(new GetFactCards(Skip: skip, Take: take));
 
         return result switch
         {

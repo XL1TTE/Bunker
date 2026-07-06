@@ -11,6 +11,7 @@ import type {
 export interface ILobbyApi {
   createLobby(request: CreateLobbyRequest): Promise<LobbySnapshot>;
   joinLobby(inviteCode: string): Promise<LobbySnapshot>;
+  joinLobbyByPassword(lobbyId: string, password: string): Promise<LobbySnapshot>;
   leaveLobby(lobbyId: string): Promise<void>;
   getLobby(lobbyId: string): Promise<LobbySnapshot>;
   listPublicLobbies(limit?: number, offset?: number): Promise<{ items: LobbySummary[]; total: number }>;

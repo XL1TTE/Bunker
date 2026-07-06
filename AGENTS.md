@@ -12,7 +12,7 @@ generates mappers at build time. Scalar (not Swagger) for API docs.
 src/
   AppHost/                                 Aspire orchestrator (full-stack entrypoint)
   Bunker.AccountService/                   Web API — player profiles, account-updates
-  Bunker.LobbyService/                     Web API — lobbies, lobby-accounts replica
+  Bunker.LobbyService/                     Web API — lobbies, lobby-accounts read-model
   Bunker.ContentService/                   Web API — cards/packs/personalities (admin)
   Bunker.ContentService.Defaults/          Shared Aspire defaults (OTel, Sentry, health)
   Bunker.Api.Common/                       Shared lib — JWT auth, IUserIdentityContext
@@ -51,9 +51,11 @@ Dockerfile**. `dotnet test` does nothing. Don't waste time looking for them.
   `account-updates`, `sex-card-updates`, `profession-card-updates`,
   `fact-card-updates`, `age-card-updates`, `hobbies-card-updates`.
 - **Five PostgreSQL databases**, each its own connection string:
-  `game-state-db`, `account-db`, `lobby-db`, `lobby-accounts-replica-db`,
-  `content-service-db`. The Lobby service reads from a **replica** of the
-  account DB (`lobby-accounts-replica-db`) — don't write to it from Lobby.
+  `game-state-db`, `account-db`, `lobby-db`, `lobby-accounts-cache`,
+  `content-service-db`. `lobby-accounts-cache` is a Lobby-owned read-model on
+  the lobby Postgres server (NOT a PG replica of `account-db`). The
+  `AccountUpdated` consumer idempotently upserts account ids into it via
+  `ON CONFLICT DO NOTHING`; Lobby owns its schema (`EnsureCreatedAsync`).
 - **Database schema is bootstrapped via `EnsureCreatedAsync()`** in each
   service's `PersistenceConfiguration.InitializeDatabaseAsync`, called only in
   `IsDevelopment()`. There are no EF migrations — adding `IEntityTypeConfiguration`

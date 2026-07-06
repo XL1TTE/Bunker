@@ -9,6 +9,7 @@ using Bunker.ContentService.Features.CardPacks.UpdateCardPack;
 using Bunker.ContentService.Features.CardPacks.DeleteCardPack;
 using Bunker.ContentService.Features.CardPacks.GetCardPack;
 using Bunker.ContentService.Features.CardPacks.GetAllCardPacks;
+using Bunker.ContentService.Features.CardPacks.GetAllCardPackPreviews;
 using Bunker.ContentService.Features.CardPacks.AddCardToPack;
 using Bunker.ContentService.Features.CardPacks.RemoveCardFromPack;
 using Microsoft.AspNetCore.Http;
@@ -110,6 +111,20 @@ internal static class CardPackEndpoints
         return result switch
         {
             GetAllCardPacks.Result.Success success => TypedResults.Ok(new CardPackResponse.All(success.Packs.Select(x => x.ToTransferObject()))),
+            _ => throw new InvalidOperationException("Unexpected result type.")
+        };
+    }
+
+    [Authorize]
+    [ProducesResponseType<IEnumerable<Transfer.CardPackPreview>>(StatusCodes.Status200OK)]
+    internal static async Task<IResult> GetAllPreviews(
+        [FromServices] IMessageBus bus)
+    {
+        var result = await bus.InvokeAsync<GetAllCardPackPreviews.Result>(new GetAllCardPackPreviews());
+
+        return result switch
+        {
+            GetAllCardPackPreviews.Result.Success success => TypedResults.Ok(success.Previews),
             _ => throw new InvalidOperationException("Unexpected result type.")
         };
     }

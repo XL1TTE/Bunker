@@ -12,6 +12,9 @@
   <Folder Name="/Bunker.LobbyService/">
     <Project Path="src/Bunker.LobbyService/Bunker.LobbyService.csproj" />
   </Folder>
+  <Folder Name="/Bunker.GameService/">
+    <Project Path="src/Bunker.GameService/Bunker.GameService.csproj" />
+  </Folder>
   <Project Path="src/AppHost/AppHost.csproj" />
   <Folder Name="/Shared/">
     <Project Path="src/Bunker.Api.Common/Bunker.Api.Common.csproj" /> 

@@ -3,6 +3,7 @@ using Wolverine.EntityFrameworkCore;
 using Wolverine.RabbitMQ;
 using Wolverine.Postgresql;
 using Bunker.ContentService.Persistence;
+using Bunker.ContentService.Messaging.Hydration;
 using Microsoft.EntityFrameworkCore;
 using Bunker.ContentService.Persistence.Contracts;
 
@@ -33,6 +34,10 @@ internal static class WolverineConfiguration
 
                 options.Policies.AutoApplyTransactions();
 
+                options.ListenToRabbitQueue("content-service-hydration-requests")
+                    .DefaultIncomingMessage<RequestGameContentHydration>()
+                    .UseDurableInbox();
+
                 options.ConfigureMessaging();
             });
 
@@ -49,6 +54,15 @@ internal static class WolverineConfiguration
         options.PublishMessage<Messages.FactCardUpdated>().ToRabbitExchange("fact-card-updates");
         options.PublishMessage<Messages.AgeCardUpdated>().ToRabbitExchange("age-card-updates");
         options.PublishMessage<Messages.HobbiesCardUpdated>().ToRabbitExchange("hobbies-card-updates");
+        options.PublishMessage<Messages.CardDeleted>().ToRabbitExchange("card-deleted");
+
+        options.PublishMessage<Messages.CardPackUpdated>().ToRabbitExchange("card-pack-updates");
+        options.PublishMessage<Messages.CardPackDeleted>().ToRabbitExchange("card-pack-deleted");
+        options.PublishMessage<Messages.PersonalityPresetUpdated>().ToRabbitExchange("personality-preset-updates");
+        options.PublishMessage<Messages.PersonalityPresetDeleted>().ToRabbitExchange("personality-preset-deleted");
+
+        options.PublishMessage<GameContentHydrated>().ToRabbitExchange("game-content-hydrated");
+        options.PublishMessage<GameContentHydrationFailed>().ToRabbitExchange("game-content-hydration-failed");
 
         return options;
     }

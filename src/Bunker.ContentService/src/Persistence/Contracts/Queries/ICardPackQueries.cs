@@ -6,4 +6,5 @@ public interface ICardPackQueries
 {
     Task<CardPack?> TryFindAsync(CardPack.Id id);
     Task<IReadOnlyCollection<CardPack>> GetAllAsync();
+    Task<IReadOnlyCollection<CardPack>> GetAllPreviewsAsync();
 }

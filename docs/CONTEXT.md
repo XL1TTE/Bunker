@@ -87,11 +87,11 @@ distinction between a Player-occupied and Bot-occupied slot is the occupant's
 type, plus the fact that Bots auto-count as Ready (no readiness toggle).
 
 ### Lobby Handoff
-An asynchronous choreographed saga initiated by the Host. 
-1. The **Lobby Service** requests a game start by passing the IDs of the selected Card Packs and Bot Personalities.
-2. The **Content Service** "hydrates" this request by fetching the full data for all requested IDs. It performs **Strict Validation**; if any ID is missing, the saga is aborted and the Lobby is notified.
-3. If valid, the **Content Service** forwards the full content payload to the **Game Service** to prepare the session.
-4. If preparation is successful, the Lobby is marked as "In Game" and clients are redirected.
+An asynchronous choreographed saga initiated by the Host, orchestrated by the **Game Service** (which owns the saga and session lifecycle). The Lobby stays thin — it holds opaque content references and does **not** subscribe to content update events; validation happens on-demand at game start against the source of truth (Content Service).
+1. The Host calls `POST /lobbies/{id}/start` (returns **204** immediately). The **Lobby Service** validates host + readiness + participant count, transitions the lobby to `Starting`, and publishes a `GameStartRequested` event carrying the selected Card Pack IDs, Bot Personality Preset IDs, and participants.
+2. The **Game Service** saga starts and sends a `RequestGameContentHydration` message to the **Content Service**.
+3. The **Content Service** "hydrates" the request by fetching the full data for all requested IDs. It performs **Strict Validation**; if any ID is missing it replies with `GameContentHydrationFailed`, otherwise with `GameContentHydrated`.
+4. On success the **Game Service** prepares a `GameSession` and publishes `GameStartSucceeded`; on failure it publishes `GameStartFailed` as compensation. The **Lobby Service** handles these: `GameStartSucceeded` marks the lobby `InGame` and broadcasts `HandoffStarted` (carrying the `gameSessionId`) to the lobby's SignalR group; `GameStartFailed` reverts the lobby to `WaitingForPlayers` and broadcasts `GameStartFailed(reason)`. Clients are redirected only on success; on failure they stay in the lobby and see the error.
 
 ### Content Management
 The process of creating and maintaining the game's library of Cards, Card Packs, and Bot Personalities. In the current architecture, this is an **Admin-Only** operation. Changes to content are broadcasted via granular, full-state events (e.g., `FactCardUpdated`) to allow downstream services to update their caches.

@@ -12,6 +12,11 @@ public static partial class CardPackMapper
     [MapProperty(nameof(Domain.CardPack.Cards), nameof(Transfer.CardPack.CardIds))]
     [MapperIgnoreSource(nameof(Domain.CardPack._cards))]
     public static partial Transfer.CardPack ToTransferObject(this Domain.CardPack cardPack);
+
+    [MapProperty(nameof(Domain.CardPack.PublicId), nameof(Transfer.CardPackPreview.Id))]
+    [MapperIgnoreSource(nameof(Domain.CardPack.Cards))]
+    [MapperIgnoreSource(nameof(Domain.CardPack._cards))]
+    public static partial Transfer.CardPackPreview ToPreviewObject(this Domain.CardPack cardPack);
 }
 
 internal static class CardPackMapperExtensions

@@ -20,6 +20,7 @@ export const useLobbyStore = defineStore('lobby', () => {
   const summariesTotal = ref(0);
   const destroyed = ref<{ reason: LobbyDestroyedReason } | null>(null);
   const handoffGameId = ref<string | null>(null);
+  const gameStartError = ref<string | null>(null);
   const connecting = ref(false);
   const myAccountId = ref<string | null>(null);
 
@@ -62,6 +63,12 @@ export const useLobbyStore = defineStore('lobby', () => {
 
   async function joinByCode(code: string): Promise<LobbySnapshot> {
     const snapshot = await api().joinLobby(code);
+    applySnapshot(snapshot);
+    return snapshot;
+  }
+
+  async function joinByPassword(lobbyId: string, password: string): Promise<LobbySnapshot> {
+    const snapshot = await api().joinLobbyByPassword(lobbyId, password);
     applySnapshot(snapshot);
     return snapshot;
   }
@@ -141,6 +148,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     messages.value = [];
     destroyed.value = null;
     handoffGameId.value = null;
+    gameStartError.value = null;
     myAccountId.value = null;
   }
 
@@ -199,6 +207,10 @@ export const useLobbyStore = defineStore('lobby', () => {
     });
     rt().on('HandoffStarted', ({ gameSessionId }) => {
       handoffGameId.value = gameSessionId;
+      gameStartError.value = null;
+    });
+    rt().on('GameStartFailed', ({ reason }) => {
+      gameStartError.value = reason;
     });
   }
 
@@ -209,6 +221,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     summariesTotal,
     destroyed,
     handoffGameId: computed(() => handoffGameId.value),
+    gameStartError: computed(() => gameStartError.value),
     connecting,
     participants,
     hostParticipantId,
@@ -218,6 +231,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     fetchLobby,
     create,
     joinByCode,
+    joinByPassword,
     leaveCurrent,
     updateSettings,
     addBot,

@@ -11,8 +11,8 @@ public record FactCard : Card
     public static FactCard Restore(Id Id, string Fact) => CreateValid(Id, Fact);
         
     private static FactCard CreateValid(Id Id, string Fact)
-        => string.IsNullOrWhiteSpace(Fact) | Fact.Length >= 8
-        ? throw new ArgumentException("Fact must be at least 6 characters long.")
+        => string.IsNullOrWhiteSpace(Fact) | Fact.Length < 8
+        ? throw new ArgumentException("Fact must be at least 8 characters long.")
         : new FactCard(Id, Fact);
 }
 

@@ -1,5 +1,8 @@
 /// <reference types="vite/client" />
 
+// Injected by vite.config.ts from the Aspire-provided Keycloak URL. See keycloak.ts.
+declare const __KEYCLOAK_URL__: string | undefined;
+
 declare module '*.vue' {
   import type { DefineComponent } from 'vue';
   const component: DefineComponent<{}, {}, any>;

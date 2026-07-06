@@ -64,9 +64,12 @@ internal static class SexCardEndpoints
     }
 
     [ProducesResponseType<CardResponse.SexCards>(StatusCodes.Status200OK)]
-    internal static async Task<IResult> GetSexCards([FromServices] IMessageBus bus)
+    internal static async Task<IResult> GetSexCards(
+        [FromServices] IMessageBus bus,
+        [FromQuery] int skip = 0,
+        [FromQuery] int take = 10)
     {
-        var result = await bus.InvokeAsync<GetSexCards.Result>(new GetSexCards());
+        var result = await bus.InvokeAsync<GetSexCards.Result>(new GetSexCards(Skip: skip, Take: take));
 
         return result switch
         {

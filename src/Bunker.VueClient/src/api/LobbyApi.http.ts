@@ -20,6 +20,10 @@ export class LobbyApiHttp implements ILobbyApi {
     return apiRequest(this.tokens, 'POST', `/lobbies/${encodeURIComponent(inviteCode)}/join`);
   }
 
+  joinLobbyByPassword(lobbyId: string, password: string): Promise<LobbySnapshot> {
+    return apiRequest(this.tokens, 'POST', `/lobbies/${lobbyId}/join`, { password });
+  }
+
   async leaveLobby(lobbyId: string): Promise<void> {
     await apiRequest(this.tokens, 'POST', `/lobbies/${lobbyId}/leave`);
   }

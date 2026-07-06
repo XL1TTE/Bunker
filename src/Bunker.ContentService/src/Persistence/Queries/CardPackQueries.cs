@@ -18,4 +18,11 @@ public class DbContextCardPackQueries(ContentDbContext dbContext) : ICardPackQue
             .ToListAsync();
         return entities.Select(x => x.ToDomain()).ToList();
     }
+
+    public async Task<IReadOnlyCollection<Domain.CardPack>> GetAllPreviewsAsync()
+    {
+        var entities = await dbContext.CardPacks.AsNoTracking()
+            .ToListAsync();
+        return entities.Select(x => x.ToDomain()).ToList();
+    }
 }
