@@ -4,6 +4,7 @@ import { useRouter } from 'vue-router';
 import { useLobbyStore } from '@/stores/lobby.store';
 import { useCatalogStore } from '@/stores/catalog.store';
 import { useAuthStore } from '@/stores/auth.store';
+import { useToast } from '@/composables/useToast';
 import ParticipantSlot from '@/components/lobby/ParticipantSlot.vue';
 import SettingsPanel from '@/components/lobby/SettingsPanel.vue';
 import ChatPanel from '@/components/lobby/ChatPanel.vue';
@@ -14,6 +15,7 @@ const router = useRouter();
 const lobbyStore = useLobbyStore();
 const catalogStore = useCatalogStore();
 const authStore = useAuthStore();
+const { run } = useToast();
 
 const showDestroyedModal = ref(false);
 const showHandoffModal = ref(false);
@@ -32,11 +34,12 @@ const myParticipant = computed(() =>
 const isReady = computed(() => myParticipant.value?.status === 'Ready');
 
 onMounted(async () => {
-  await catalogStore.load();
+  await run(() => catalogStore.load());
   await authStore.fetchProfile();
   lobbyStore.setMyAccountId(authStore.profile?.id ?? null);
-  await lobbyStore.fetchLobby(props.id);
-  await lobbyStore.connectAndJoin(props.id);
+  const lobby = await run(() => lobbyStore.fetchLobby(props.id));
+  if (!lobby) return;
+  await run(() => lobbyStore.connectAndJoin(props.id));
 });
 
 onBeforeUnmount(async () => {
@@ -59,8 +62,21 @@ watch(
 );
 
 async function leave(): Promise<void> {
-  await lobbyStore.leaveCurrent();
+  const ok = await run(() => lobbyStore.leaveCurrent());
+  if (ok === null) return;
   await router.push('/lobbies');
+}
+
+async function kickParticipant(participantId: string): Promise<void> {
+  await run(() => lobbyStore.kickParticipant(participantId));
+}
+
+async function removeBot(participantId: string): Promise<void> {
+  await run(() => lobbyStore.removeBot(participantId));
+}
+
+async function toggleReadiness(): Promise<void> {
+  await run(() => lobbyStore.toggleReadiness());
 }
 
 async function goToLobbies(): Promise<void> {
@@ -132,8 +148,8 @@ async function copyCode(): Promise<void> {
                   :is-host="lobbyStore.isHost"
                   :self-account-id="authStore.profile?.id"
                   :host-participant-id="lobby?.hostParticipantId ?? ''"
-                  @kick="lobbyStore.kickParticipant"
-                  @remove-bot="lobbyStore.removeBot"
+                  @kick="kickParticipant"
+                  @remove-bot="removeBot"
                 />
               </li>
               <li
@@ -155,7 +171,7 @@ async function copyCode(): Promise<void> {
             <button
               :class="[styles.readyButton, isReady ? styles.readyButtonReady : '']"
               :disabled="!lobby"
-              @click="lobbyStore.toggleReadiness"
+              @click="toggleReadiness"
             >
               {{ isReady ? '✓ Ready' : 'Mark as ready' }}
             </button>

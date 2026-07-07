@@ -29,6 +29,7 @@ export interface LobbySummary {
   inviteCode: string;
   capacity: number;
   currentPlayers: number;
+  hasPassword: boolean;
   hostNickname: string;
   selectedPackIds: string[];
 }

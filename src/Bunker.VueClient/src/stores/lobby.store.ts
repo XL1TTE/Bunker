@@ -50,9 +50,10 @@ export const useLobbyStore = defineStore('lobby', () => {
     summariesTotal.value = data.total;
   }
 
-  async function fetchLobby(id: string): Promise<void> {
+  async function fetchLobby(id: string): Promise<LobbySnapshot> {
     const snapshot = await api().getLobby(id);
     applySnapshot(snapshot);
+    return snapshot;
   }
 
   async function create(request: CreateLobbyRequest): Promise<LobbySnapshot> {
@@ -76,6 +77,10 @@ export const useLobbyStore = defineStore('lobby', () => {
   async function leaveCurrent(): Promise<void> {
     if (!currentLobby.value) return;
     const id = currentLobby.value.id;
+    if (reconnectHandler) {
+      rt().offReconnected(reconnectHandler);
+      reconnectHandler = null;
+    }
     await rt().leaveLobby(id);
     await rt().disconnect();
     await api().leaveLobby(id);
@@ -127,11 +132,23 @@ export const useLobbyStore = defineStore('lobby', () => {
     await api().sendMessage(currentLobby.value.id, { text });
   }
 
+  // Re-fetch the lobby after a transport reconnect so we close any gap missed
+  // while the socket was down. Registered per connectAndJoin, cleared on disconnect.
+  let reconnectHandler: (() => void) | null = null;
+
   async function connectAndJoin(lobbyId: string): Promise<void> {
     connecting.value = true;
     try {
       await rt().connect();
       registerRealtimeHandlers();
+      if (reconnectHandler) rt().offReconnected(reconnectHandler);
+      reconnectHandler = () => {
+        // Silent: a flaky connection shouldn't toast on every reconnect fetch.
+        if (currentLobby.value) {
+          fetchLobby(currentLobby.value.id).catch(() => {});
+        }
+      };
+      rt().onReconnected(reconnectHandler);
       await rt().joinLobby(lobbyId);
     } finally {
       connecting.value = false;
@@ -139,6 +156,10 @@ export const useLobbyStore = defineStore('lobby', () => {
   }
 
   async function disconnectRealtime(): Promise<void> {
+    if (reconnectHandler) {
+      rt().offReconnected(reconnectHandler);
+      reconnectHandler = null;
+    }
     if (currentLobby.value) await rt().leaveLobby(currentLobby.value.id);
     await rt().disconnect();
   }
@@ -160,7 +181,18 @@ export const useLobbyStore = defineStore('lobby', () => {
     rt().on(event, handler);
   }
 
+  // Handlers close over this store's stable refs (currentLobby, messages, …),
+  // and the store is a singleton, so they only need to be registered once for
+  // the app lifetime. connect() re-wires the dispatch wrappers to any new
+  // SignalR connection from these same handler sets, so re-entries/reconnects
+  // keep receiving events. Without this guard, each connectAndJoin adds another
+  // set of handlers and a single broadcast multiplies (e.g. 3 chat copies).
+  let realtimeHandlersRegistered = false;
+
   function registerRealtimeHandlers(): void {
+    if (realtimeHandlersRegistered) return;
+    realtimeHandlersRegistered = true;
+
     rt().on('ParticipantJoined', ({ participant }) => {
       if (!currentLobby.value) return;
       if (!currentLobby.value.participants.some((p) => p.id === participant.id)) {

@@ -21,14 +21,31 @@ const contentServiceUrl =
 
 const app = express();
 
+// CORS preflight + response headers.
+//
+// The browser cannot send custom headers on a WebSocket handshake, and SignalR's
+// negotiate POST carries headers like `x-signalr-user-agent` that aren't in a
+// fixed allow-list. With `Access-Control-Allow-Credentials: true` the wildcard
+// `*` is not honored for `Allow-Headers`, so we reflect whatever the client
+// asked for in `Access-Control-Request-Headers` (falling back to a broad list).
+const DEFAULT_ALLOW_HEADERS =
+  "Authorization, Content-Type, x-signalr-user-agent, x-signalr-protocol";
+
 app.use((req, res, next) => {
   const origin = req.headers.origin;
   if (origin) {
     res.setHeader("Access-Control-Allow-Origin", origin);
     res.setHeader("Vary", "Origin");
     res.setHeader("Access-Control-Allow-Credentials", "true");
-    res.setHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
-    res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, OPTIONS");
+    const requested = req.headers["access-control-request-headers"];
+    res.setHeader(
+      "Access-Control-Allow-Headers",
+      requested ? requested : DEFAULT_ALLOW_HEADERS,
+    );
+    res.setHeader(
+      "Access-Control-Allow-Methods",
+      "GET, POST, PUT, PATCH, DELETE, OPTIONS",
+    );
   }
   if (req.method === "OPTIONS") {
     res.status(204).end();
@@ -61,19 +78,26 @@ app.use(
   }),
 );
 
-app.use(
-  createProxyMiddleware({
-    pathFilter: "/hubs/lobby",
-    target: lobbyServiceUrl,
-    changeOrigin: true,
-    ws: true,
-  }),
-);
+// SignalR hub. `ws: true` enables WebSocket proxying, but http-proxy-middleware
+// v3 does not auto-attach the `upgrade` handler when using `app.listen()` — we
+// wire it manually on the server below.
+const lobbyHubProxy = createProxyMiddleware({
+  pathFilter: "/hubs/lobby",
+  target: lobbyServiceUrl,
+  changeOrigin: true,
+  ws: true,
+});
+app.use(lobbyHubProxy);
 
-app.listen(port, () => {
+const server = app.listen(port, () => {
   console.log(`Bunker gateway listening on http://localhost:${port}`);
   console.log(`  /account        -> ${accountServiceUrl}`);
   console.log(`  /content        -> ${contentServiceUrl}`);
   console.log(`  /lobbies        -> ${lobbyServiceUrl}`);
   console.log(`  /hubs/lobby (ws)-> ${lobbyServiceUrl}`);
+});
+
+server.on("upgrade", (req, socket, head) => {
+  // Only /hubs/lobby is a WebSocket endpoint; hand its upgrade to that proxy.
+  lobbyHubProxy.upgrade(req, socket, head);
 });

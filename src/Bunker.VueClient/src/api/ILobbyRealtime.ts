@@ -29,6 +29,12 @@ export interface ILobbyRealtime {
   leaveLobby(lobbyId: string): Promise<void>;
   on<K extends LobbyEvent>(event: K, handler: LobbyEventHandler<K>): void;
   off<K extends LobbyEvent>(event: K, handler: LobbyEventHandler<K>): void;
+  /**
+   * Fired after the transport reconnects (and has re-joined its lobby group).
+   * Lets the store re-fetch state to close any gap missed while disconnected.
+   */
+  onReconnected(handler: () => void): void;
+  offReconnected(handler: () => void): void;
 }
 
 export const LobbyRealtimeKey: InjectionKey<ILobbyRealtime> = Symbol('ILobbyRealtime');

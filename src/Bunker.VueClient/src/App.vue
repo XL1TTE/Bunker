@@ -3,6 +3,7 @@ import { computed, onMounted } from 'vue';
 import { RouterLink } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
 import { auth } from '@/auth/keycloak';
+import ToastHost from '@/components/common/ToastHost.vue';
 import styles from '@/styles/app.module.css';
 
 const authStore = useAuthStore();
@@ -53,5 +54,7 @@ onMounted(async () => {
     <main :class="styles.main">
       <RouterView />
     </main>
+
+    <ToastHost />
   </div>
 </template>

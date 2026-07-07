@@ -53,6 +53,21 @@ public static class AuthConfiguration
                            {
                                Console.WriteLine($"Forbidden: {context}");
                                return Task.CompletedTask;
+                           },
+                           // Browsers cannot set the Authorization header on a WebSocket
+                           // handshake, so the SignalR JS client sends the JWT as the
+                           // `access_token` query parameter on the upgrade. Pull it into
+                           // the bearer pipeline for requests under /hubs so the hub can
+                           // be authorized.
+                           OnMessageReceived = context =>
+                           {
+                               var accessToken = context.Request.Query["access_token"];
+                               if (!string.IsNullOrEmpty(accessToken) &&
+                                   context.HttpContext.Request.Path.StartsWithSegments("/hubs"))
+                               {
+                                   context.Token = accessToken;
+                               }
+                               return Task.CompletedTask;
                            }
                        };
                    });

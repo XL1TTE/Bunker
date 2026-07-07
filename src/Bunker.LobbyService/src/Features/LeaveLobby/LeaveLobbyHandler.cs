@@ -15,13 +15,14 @@ public static class LeaveLobbyHandler
     public static async Task<LeaveLobby.Result> Handle(
         LeaveLobby command,
         IUnitOfWork uow,
-        ILobbyRepository repository,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
         if (!Guid.TryParse(command.LobbyId, out var lobbyGuid))
             return LeaveLobby.Failure("Invalid lobby id.");
 
         var callerId = AccountId.Create(command.CallerId);
+        var repository = uow.GetRepository<ILobbyRepository>();
+
         var lobby = await repository.TryFindAsync(Domain.Lobby.Id.Restore(lobbyGuid));
         if (lobby is null)
             return LeaveLobby.Failure("Lobby not found.");

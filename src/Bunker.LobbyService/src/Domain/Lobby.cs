@@ -33,6 +33,8 @@ public record Lobby
 
     public IReadOnlyCollection<PlayerParticipant> Players => Participants.OfType<PlayerParticipant>().ToList().AsReadOnly();
     public IReadOnlyCollection<BotParticipant> Bots => Participants.OfType<BotParticipant>().ToList().AsReadOnly();
+
+    public PlayerParticipant Host => Participants.OfType<PlayerParticipant>().First(x => x.Role == Role.Host);
 }
 
 public readonly record struct LobbyConfiguration(

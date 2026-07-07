@@ -1,4 +1,4 @@
-using Bunker.LobbyService.Persistence.Abstractions;
+using Bunker.LobbyService.Domain;
 using Bunker.LobbyService.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Shared.Monads.Result;
@@ -10,6 +10,7 @@ public interface ILobbyQueries
     Task<Result<Domain.Lobby, string>> GetByInviteCodeAsync(string inviteCode, CancellationToken cancellationToken = default);
     Task<Domain.Lobby?> GetByIdAsync(Domain.Lobby.Id id, CancellationToken cancellationToken = default);
     Task<(IReadOnlyList<Domain.Lobby> Items, int Total)> ListPublicAsync(int limit, int offset, CancellationToken cancellationToken = default);
+    Task<Domain.Lobby?> GetByHostIdAsync(Domain.AccountId Host, CancellationToken cancellationToken = default);
 }
 
 public sealed class LobbyQueries(LobbyDbContext db) : ILobbyQueries
@@ -56,5 +57,10 @@ public sealed class LobbyQueries(LobbyDbContext db) : ILobbyQueries
             .ToListAsync(cancellationToken);
 
         return (lobbies.Select(l => l.ToDomain()).ToList(), total);
+    }
+
+    public async Task<Domain.Lobby?> GetByHostIdAsync(AccountId Host, CancellationToken cancellationToken = default)
+    {
+        return db.Lobbies.FirstOrDefault(l => l.Participants.OfType<Entities.PlayerParticipant>().Any(p => p.UserId == Host.Value && p.Role == "Host"))?.ToDomain();
     }
 }

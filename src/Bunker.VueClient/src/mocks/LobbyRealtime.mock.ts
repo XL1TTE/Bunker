@@ -53,6 +53,14 @@ export class LobbyRealtimeMock implements ILobbyRealtime {
     this.handlers.get(event)?.delete(handler as (payload: unknown) => void);
   }
 
+  onReconnected(_handler: () => void): void {
+    // The mock never drops/reconnects, so this is a no-op.
+  }
+
+  offReconnected(_handler: () => void): void {
+    // no-op
+  }
+
   private dispatch<K extends LobbyEvent>(event: K, payload: LobbyEventMap[K]): void {
     const handlers = this.handlers.get(event);
     if (!handlers) return;

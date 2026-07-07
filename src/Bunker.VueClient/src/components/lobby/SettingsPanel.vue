@@ -2,10 +2,12 @@
 import { computed, ref, watch } from 'vue';
 import { useLobbyStore } from '@/stores/lobby.store';
 import { useCatalogStore } from '@/stores/catalog.store';
+import { useToast } from '@/composables/useToast';
 import styles from '@/components/lobby/settings-panel.module.css';
 
 const lobbyStore = useLobbyStore();
 const catalogStore = useCatalogStore();
+const { run, success } = useToast();
 
 const lobby = computed(() => lobbyStore.currentLobby);
 
@@ -34,26 +36,34 @@ function togglePack(id: string): void {
 
 async function saveSettings(): Promise<void> {
   if (!lobby.value) return;
-  await lobbyStore.updateSettings({
-    capacity: localCapacity.value,
-    isPublic: localIsPublic.value,
-    selectedPackIds: localPacks.value,
-  });
+  const ok = await run(() =>
+    lobbyStore.updateSettings({
+      capacity: localCapacity.value,
+      isPublic: localIsPublic.value,
+      selectedPackIds: localPacks.value,
+    }),
+  );
+  if (ok !== null) success('Settings saved.');
 }
 
 async function addBot(): Promise<void> {
-  if (!selectedPresetId.value || !botNickname.value.trim()) return;
-  await lobbyStore.addBot({
-    personalityPresetId: selectedPresetId.value,
-    nickname: botNickname.value.trim(),
-  });
+  const presetId = selectedPresetId.value;
+  const nickname = botNickname.value.trim();
+  if (!presetId || !nickname) return;
+  const ok = await run(() =>
+    lobbyStore.addBot({
+      personalityPresetId: presetId,
+      nickname,
+    }),
+  );
+  if (ok === null) return;
   botNickname.value = '';
   selectedPresetId.value = null;
   addingBot.value = false;
 }
 
 async function startGame(): Promise<void> {
-  await lobbyStore.start();
+  await run(() => lobbyStore.start());
 }
 
 const canStart = computed(() => {

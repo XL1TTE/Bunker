@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import { nextTick, ref, watch } from 'vue';
 import { useLobbyStore } from '@/stores/lobby.store';
+import { useToast } from '@/composables/useToast';
 import styles from '@/components/lobby/chat-panel.module.css';
 
 const lobbyStore = useLobbyStore();
+const { run } = useToast();
 const draft = ref('');
 const scrollEl = ref<HTMLElement | null>(null);
 
@@ -15,8 +17,9 @@ function timeOf(sentAt: string): string {
 async function send(): Promise<void> {
   const text = draft.value.trim();
   if (!text) return;
+  const ok = await run(() => lobbyStore.sendMessage(text));
+  if (ok === null) return; // keep the draft so the user can retry
   draft.value = '';
-  await lobbyStore.sendMessage(text);
   await nextTick();
   if (scrollEl.value) {
     scrollEl.value.scrollTop = scrollEl.value.scrollHeight;

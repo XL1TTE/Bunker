@@ -1,4 +1,3 @@
-using Bunker.Api.Common.Identity;
 using Bunker.LobbyService.Domain;
 using Bunker.LobbyService.Hubs;
 using Bunker.LobbyService.Persistence;
@@ -35,12 +34,13 @@ public static class JoinLobbyHandler
     public static async Task<JoinLobby.Result> Handle(
         JoinByPassword command,
         IUnitOfWork uow,
-        ILobbyRepository repository,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
         var callerId = AccountId.Create(command.CallerId);
 
+        var repository = uow.GetRepository<ILobbyRepository>();
         var lobby = await repository.TryFindAsync(Domain.Lobby.Id.Restore(command.LobbyId));
+
         if (lobby is null)
             return JoinLobby.Failure("Lobby not found.");
 
@@ -57,8 +57,11 @@ public static class JoinLobbyHandler
         IUnitOfWork uow,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
+        // Joining a lobby you're already in is idempotent: return success without
+        // re-adding or broadcasting, so re-entering a room (e.g. via the browser
+        // after navigating away) doesn't surface a "already joined" error.
         if (lobby.Players.Any(p => p.UserId == callerId))
-            return JoinLobby.Failure("You already joined this lobby.");
+            return JoinLobby.Success(lobby);
 
         var addResult = lobby.AddPlayer(PlayerParticipant.New(callerId, lobby.PublicId, nickname, Role.Member));
         if (addResult.IsFailure)

@@ -15,7 +15,10 @@ const isFull = computed(() => props.summary.currentPlayers >= props.summary.capa
 <template>
   <article :class="styles.card">
     <div :class="styles.headRow">
-      <span :class="styles.code">{{ summary.inviteCode }}</span>
+      <span v-if="!summary.hasPassword" :class="styles.code">{{ summary.inviteCode }}</span>
+      <span v-else :class="styles.protected" :title="'Joining requires a password'">
+        <span aria-hidden="true">🔒</span> Protected
+      </span>
       <span :class="[styles.countWrap, isFull ? styles.countWrapFull : '']">
         {{ summary.currentPlayers }} / {{ summary.capacity }}
       </span>

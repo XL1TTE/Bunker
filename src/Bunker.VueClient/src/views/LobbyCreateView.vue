@@ -2,25 +2,35 @@
 import { ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useLobbyStore } from '@/stores/lobby.store';
+import { useToast } from '@/composables/useToast';
 import styles from '@/views/lobby-create.module.css';
 
 const router = useRouter();
 const lobbyStore = useLobbyStore();
+const { run } = useToast();
 
 const capacity = ref(8);
 const isPublic = ref(true);
+const password = ref('');
 const inviteCode = ref('');
 const submitting = ref(false);
 
 async function createNew(): Promise<void> {
   submitting.value = true;
   try {
-    const lobby = await lobbyStore.create({
-      capacity: capacity.value,
-      isPublic: isPublic.value,
-      selectedPackIds: [],
-    });
-    await router.push({ name: 'lobby-room', params: { id: lobby.id } });
+    // Passwords only apply to public lobbies (private lobbies are invite-code
+    // only). Send undefined when empty so the backend stores no password.
+    const lobby = await run(() =>
+      lobbyStore.create({
+        capacity: capacity.value,
+        isPublic: isPublic.value,
+        selectedPackIds: [],
+        password: isPublic.value && password.value ? password.value : undefined,
+      }),
+    );
+    if (lobby) {
+      await router.push({ name: 'lobby-room', params: { id: lobby.id } });
+    }
   } finally {
     submitting.value = false;
   }
@@ -30,8 +40,10 @@ async function joinExisting(): Promise<void> {
   if (!inviteCode.value.trim()) return;
   submitting.value = true;
   try {
-    const lobby = await lobbyStore.joinByCode(inviteCode.value.trim().toUpperCase());
-    await router.push({ name: 'lobby-room', params: { id: lobby.id } });
+    const lobby = await run(() => lobbyStore.joinByCode(inviteCode.value.trim().toUpperCase()));
+    if (lobby) {
+      await router.push({ name: 'lobby-room', params: { id: lobby.id } });
+    }
   } finally {
     submitting.value = false;
   }
@@ -99,6 +111,22 @@ async function joinExisting(): Promise<void> {
             <span :class="styles.checkboxFieldDesc">
               Visible in the public browser. Turn off to keep it invite-only.
             </span>
+          </span>
+        </label>
+
+        <label v-if="isPublic" :class="styles.field">
+          <span :class="styles.fieldLabel">Password (optional)</span>
+          <input
+            v-model="password"
+            type="password"
+            :class="styles.input"
+            placeholder="Leave empty for open access"
+            autocomplete="new-password"
+            maxlength="100"
+          />
+          <span :class="styles.fieldHint">
+            Players joining from the browser will need this. Anyone with the
+            invite code can still join without it.
           </span>
         </label>
 

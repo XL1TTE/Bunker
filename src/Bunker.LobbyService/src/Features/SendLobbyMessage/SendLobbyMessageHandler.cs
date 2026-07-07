@@ -13,14 +13,17 @@ public static class SendLobbyMessageHandler
 {
     public static async Task<SendLobbyMessage.Result> Handle(
         SendLobbyMessage command,
-        ILobbyRepository repository,
+        IUnitOfWork uow,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
         if (!Guid.TryParse(command.LobbyId, out var lobbyGuid))
             return SendLobbyMessage.Failure("Invalid lobby id.");
 
         var callerId = AccountId.Create(command.CallerId);
+
+        var repository = uow.GetRepository<ILobbyRepository>();
         var lobby = await repository.TryFindAsync(Domain.Lobby.Id.Restore(lobbyGuid));
+
         if (lobby is null)
             return SendLobbyMessage.Failure("Lobby not found.");
 

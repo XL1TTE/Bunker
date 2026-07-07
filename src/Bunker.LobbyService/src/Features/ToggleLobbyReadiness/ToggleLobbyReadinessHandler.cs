@@ -15,13 +15,14 @@ public static class ToggleLobbyReadinessHandler
     public static async Task<ToggleLobbyReadiness.Result> Handle(
         ToggleLobbyReadiness command,
         IUnitOfWork uow,
-        ILobbyRepository repository,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
         if (!Guid.TryParse(command.LobbyId, out var lobbyGuid))
             return ToggleLobbyReadiness.Failure("Invalid lobby id.");
 
         var callerId = AccountId.Create(command.CallerId);
+        var repository = uow.GetRepository<ILobbyRepository>();
+
         var lobby = await repository.TryFindAsync(Domain.Lobby.Id.Restore(lobbyGuid));
         if (lobby is null)
             return ToggleLobbyReadiness.Failure("Lobby not found.");

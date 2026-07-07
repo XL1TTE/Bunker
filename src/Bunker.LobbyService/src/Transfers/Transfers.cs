@@ -30,6 +30,7 @@ public abstract partial class Transfer
         string InviteCode,
         int Capacity,
         int CurrentPlayers,
+        bool HasPassword,
         string HostNickname,
         string[] SelectedPackIds
     );

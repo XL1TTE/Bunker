@@ -46,6 +46,7 @@ public static class LobbyMappers
                 InviteCode: lobby.InviteCode.Value,
                 Capacity: lobby.Capacity,
                 CurrentPlayers: lobby.Participants.Count,
+                HasPassword: !string.IsNullOrEmpty(lobby.PrivacyPolicy.Password),
                 HostNickname: host?.Nickname ?? string.Empty,
                 SelectedPackIds: lobby.Packs.Select(x => x.PackId.Value.ToString()).ToArray()
             );
