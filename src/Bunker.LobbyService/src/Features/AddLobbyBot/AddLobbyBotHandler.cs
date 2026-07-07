@@ -16,13 +16,14 @@ public static class AddLobbyBotHandler
     public static async Task<AddLobbyBot.Result> Handle(
         AddLobbyBot command,
         IUnitOfWork uow,
-        ILobbyRepository repository,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
         if (!Guid.TryParse(command.LobbyId, out var lobbyGuid))
             return AddLobbyBot.Failure("Invalid lobby id.");
 
         var callerId = AccountId.Create(command.CallerId);
+        var repository = uow.GetRepository<ILobbyRepository>();
+
         var lobby = await repository.TryFindAsync(Domain.Lobby.Id.Restore(lobbyGuid));
         if (lobby is null)
             return AddLobbyBot.Failure("Lobby not found.");

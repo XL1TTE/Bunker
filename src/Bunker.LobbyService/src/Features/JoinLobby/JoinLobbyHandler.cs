@@ -28,12 +28,13 @@ public static class JoinLobbyHandler
 
         var lobby = found.Match(onSuccess: l => l, onFailure: _ => null!);
 
-        return await AddPlayerAndBroadcast(lobby, callerId, command.Nickname, uow, hub);
+        return await AddPlayerAndBroadcast(lobby, callerId, command.Nickname, uow, queries, hub);
     }
 
     public static async Task<JoinLobby.Result> Handle(
         JoinByPassword command,
         IUnitOfWork uow,
+        ILobbyQueries queries,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
         var callerId = AccountId.Create(command.CallerId);
@@ -47,7 +48,7 @@ public static class JoinLobbyHandler
         if (!string.IsNullOrEmpty(lobby.PrivacyPolicy.Password) && lobby.PrivacyPolicy.Password != command.Password)
             return JoinLobby.Failure("Wrong password.");
 
-        return await AddPlayerAndBroadcast(lobby, callerId, command.Nickname, uow, hub);
+        return await AddPlayerAndBroadcast(lobby, callerId, command.Nickname, uow, queries, hub);
     }
 
     private static async Task<JoinLobby.Result> AddPlayerAndBroadcast(
@@ -55,6 +56,7 @@ public static class JoinLobbyHandler
         AccountId callerId,
         string nickname,
         IUnitOfWork uow,
+        ILobbyQueries queries,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
         // Joining a lobby you're already in is idempotent: return success without
@@ -62,6 +64,10 @@ public static class JoinLobbyHandler
         // after navigating away) doesn't surface a "already joined" error.
         if (lobby.Players.Any(p => p.UserId == callerId))
             return JoinLobby.Success(lobby);
+
+        var existing = await queries.GetByPlayerIdAsync(callerId);
+        if (existing is not null && existing.PublicId != lobby.PublicId)
+            return JoinLobby.Failure("You're already in another lobby. Leave it before joining a new one.");
 
         var addResult = lobby.AddPlayer(PlayerParticipant.New(callerId, lobby.PublicId, nickname, Role.Member));
         if (addResult.IsFailure)

@@ -4,8 +4,8 @@ import type { LobbySummary } from '@/types/lobby.types';
 import { useCatalogStore } from '@/stores/catalog.store';
 import styles from '@/components/lobby/lobby-summary-card.module.css';
 
-const props = defineProps<{ summary: LobbySummary }>();
-defineEmits<{ join: [] }>();
+const props = defineProps<{ summary: LobbySummary; isCurrent?: boolean }>();
+defineEmits<{ join: []; enter: [] }>();
 
 const catalogStore = useCatalogStore();
 
@@ -36,7 +36,11 @@ const isFull = computed(() => props.summary.currentPlayers >= props.summary.capa
     </div>
     <div :class="styles.footer">
       <span :class="styles.meta">{{ summary.id.slice(0, 8) }}</span>
-      <button :class="styles.joinButton" :disabled="isFull" @click="$emit('join')">
+      <!-- The lobby we're already in: we can always re-enter it, even when full. -->
+      <button v-if="isCurrent" :class="styles.enterButton" @click="$emit('enter')">
+        Enter →
+      </button>
+      <button v-else :class="styles.joinButton" :disabled="isFull" @click="$emit('join')">
         {{ isFull ? 'Full' : 'Join →' }}
       </button>
     </div>

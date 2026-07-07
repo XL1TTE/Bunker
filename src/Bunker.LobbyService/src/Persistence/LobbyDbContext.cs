@@ -23,6 +23,6 @@ public partial class LobbyDbContext(DbContextOptions<LobbyDbContext> options)
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(LobbyConfigurations).Assembly);
 
-        modelBuilder.MapWolverineEnvelopeStorage();
+        modelBuilder.MapWolverineEnvelopeStorage("wolverine");
     }
 }

@@ -10,7 +10,7 @@ public interface ILobbyQueries
     Task<Result<Domain.Lobby, string>> GetByInviteCodeAsync(string inviteCode, CancellationToken cancellationToken = default);
     Task<Domain.Lobby?> GetByIdAsync(Domain.Lobby.Id id, CancellationToken cancellationToken = default);
     Task<(IReadOnlyList<Domain.Lobby> Items, int Total)> ListPublicAsync(int limit, int offset, CancellationToken cancellationToken = default);
-    Task<Domain.Lobby?> GetByHostIdAsync(Domain.AccountId Host, CancellationToken cancellationToken = default);
+    Task<Domain.Lobby?> GetByPlayerIdAsync(Domain.AccountId player, CancellationToken cancellationToken = default);
 }
 
 public sealed class LobbyQueries(LobbyDbContext db) : ILobbyQueries
@@ -59,8 +59,8 @@ public sealed class LobbyQueries(LobbyDbContext db) : ILobbyQueries
         return (lobbies.Select(l => l.ToDomain()).ToList(), total);
     }
 
-    public async Task<Domain.Lobby?> GetByHostIdAsync(AccountId Host, CancellationToken cancellationToken = default)
+    public async Task<Domain.Lobby?> GetByPlayerIdAsync(AccountId player, CancellationToken cancellationToken = default)
     {
-        return db.Lobbies.FirstOrDefault(l => l.Participants.OfType<Entities.PlayerParticipant>().Any(p => p.UserId == Host.Value && p.Role == "Host"))?.ToDomain();
+        return (await db.Lobbies.AsNoTracking().FirstOrDefaultAsync(l => l.Participants.OfType<Entities.PlayerParticipant>().Any(p => p.UserId == player.Value), cancellationToken))?.ToDomain();
     }
 }

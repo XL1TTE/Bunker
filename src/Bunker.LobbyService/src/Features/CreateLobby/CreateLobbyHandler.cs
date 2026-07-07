@@ -2,7 +2,6 @@ using Bunker.LobbyService.Domain;
 using Bunker.LobbyService.Persistence;
 using Bunker.LobbyService.Persistence.Abstractions;
 using Bunker.LobbyService.Persistence.Queries;
-using Wolverine;
 using Wolverine.Attributes;
 
 namespace Bunker.LobbyService.Features.CreateLobby;
@@ -18,8 +17,8 @@ public static class CreateLobbyHandler
     {
         var repository = uow.GetRepository<ILobbyRepository>();
 
-        if (await queries.GetByHostIdAsync(AccountId.Create(command.HostId)) is not null)
-            return CreateLobby.Failure("You already host a lobby. Leave it before creating a new one.");
+        if (await queries.GetByPlayerIdAsync(AccountId.Create(command.HostId)) is not null)
+            return CreateLobby.Failure("You're already in a lobby. Leave it before creating a new one.");
 
         try
         {

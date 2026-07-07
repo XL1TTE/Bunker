@@ -8,7 +8,9 @@ public static partial class LobbyExtensions
 {
     extension (Lobby lobby)
     {
-        public bool AllReady => lobby.Players.All(p => p.Status is Status.Ready);
+        // The host owns the Start button and has no readiness toggle, so they're
+        // exempt from the all-ready requirement — only the other members must be ready.
+        public bool AllReady => lobby.Players.Where(p => p.Role is not Host).All(p => p.Status is Status.Ready);
 
         public Result<Lobby, LobbyErrors.AddPlayerError> AddPlayer(PlayerParticipant player)
         {

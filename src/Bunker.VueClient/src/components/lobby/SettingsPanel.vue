@@ -66,12 +66,27 @@ async function startGame(): Promise<void> {
   await run(() => lobbyStore.start());
 }
 
-const canStart = computed(() => {
+// Start requirements, aligned with the backend Lobby.StartGame:
+//   1. at least 2 human players (bots don't count)
+//   2. every non-host human player is Ready (bots are always Ready)
+// The host owns this button, so the "must be host" rule is implicit.
+const humanPlayers = computed(() =>
+  lobby.value ? lobby.value.participants.filter((p) => p.type === 'Player') : [],
+);
+const nonHostHumans = computed(() => {
   const l = lobby.value;
-  if (!l) return false;
-  if (l.participants.length < 4) return false;
-  return l.participants.every((p) => p.status === 'Ready');
+  return l ? humanPlayers.value.filter((p) => p.id !== l.hostParticipantId) : [];
 });
+const readyNonHostHumans = computed(() =>
+  nonHostHumans.value.filter((p) => p.status === 'Ready'),
+);
+
+const playersReqMet = computed(() => humanPlayers.value.length >= 2);
+// Vacuously true when there are no other players yet — matches the backend's
+// AllReady (All over an empty set). The players requirement is the real blocker then.
+const readyReqMet = computed(() => readyNonHostHumans.value.length === nonHostHumans.value.length);
+
+const canStart = computed(() => playersReqMet.value && readyReqMet.value);
 </script>
 
 <template>
@@ -152,10 +167,36 @@ const canStart = computed(() => {
 
       <hr :class="styles.divider" />
 
+      <div :class="styles.section">
+        <h3 :class="styles.sectionTitle">Ready to start</h3>
+        <ul :class="styles.requirements">
+          <li :class="styles.requirement">
+            <span :class="[styles.requirementIcon, playersReqMet ? styles.requirementIconMet : '']">
+              {{ playersReqMet ? '✓' : '○' }}
+            </span>
+            <span :class="styles.requirementText">
+              At least 2 players
+              <span :class="styles.requirementMeta">{{ humanPlayers.length }}/2</span>
+            </span>
+          </li>
+          <li :class="styles.requirement">
+            <span :class="[styles.requirementIcon, readyReqMet ? styles.requirementIconMet : '']">
+              {{ readyReqMet ? '✓' : '○' }}
+            </span>
+            <span :class="styles.requirementText">
+              All other players ready
+              <span :class="styles.requirementMeta">
+                {{ readyNonHostHumans.length }}/{{ nonHostHumans.length }}
+              </span>
+            </span>
+          </li>
+        </ul>
+      </div>
+
       <button
         :class="styles.startButton"
         :disabled="!canStart"
-        :title="canStart ? 'Start the game' : 'Need at least 4 participants, all ready'"
+        :title="canStart ? 'Start the game' : 'Fulfill the requirements above to start'"
         @click="startGame"
       >
         Start game

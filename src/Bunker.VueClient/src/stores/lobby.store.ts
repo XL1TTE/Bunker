@@ -29,6 +29,10 @@ export const useLobbyStore = defineStore('lobby', () => {
 
   const participants = computed(() => currentLobby.value?.participants ?? []);
   const hostParticipantId = computed(() => currentLobby.value?.hostParticipantId ?? null);
+  // The lobby we're currently a participant in, or null when we're in none.
+  // The lobby browser uses this to render an "Enter" action for our own lobby
+  // (even when it's full) and to prompt before joining a different one.
+  const currentLobbyId = computed(() => currentLobby.value?.id ?? null);
   const isHost = computed(() => {
     const lobby = currentLobby.value;
     if (!lobby || !myAccountId.value) return false;
@@ -257,6 +261,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     connecting,
     participants,
     hostParticipantId,
+    currentLobbyId,
     isHost,
     findParticipant,
     fetchBrowser,

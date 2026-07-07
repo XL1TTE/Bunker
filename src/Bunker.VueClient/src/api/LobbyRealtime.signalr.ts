@@ -106,6 +106,11 @@ export class LobbyRealtimeSignalR implements ILobbyRealtime {
   }
 
   async joinLobby(lobbyId: string): Promise<void> {
+    // Skip if we're already subscribed to this lobby's group on the current
+    // connection — a duplicate AddToGroupAsync could multiply deliveries, and
+    // a re-mount shouldn't re-join. (Reconnect re-joins via onreconnected, not
+    // here, and disconnect/leave clear joinedLobbyId so genuine re-joins run.)
+    if (this.joinedLobbyId === lobbyId && this.connection) return;
     this.joinedLobbyId = lobbyId;
     await this.connection?.invoke('JoinLobby', lobbyId);
   }
