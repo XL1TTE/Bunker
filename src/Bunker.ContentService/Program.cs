@@ -5,6 +5,7 @@ using Bunker.ContentService.Api.Endpoints.Cards;
 using Bunker.ContentService.Api.Middlewares;
 using Bunker.ContentService.Endpoints.CardPacks;
 using Bunker.ContentService.Endpoints.PersonalityPresets;
+using Bunker.ContentService.Endpoints.BunkerCards;
 using Bunker.ContentService.Messaging.Configuration;
 using Bunker.ContentService.Persistence;
 using Bunker.ContentService.Validation.Configuration;
@@ -49,6 +50,7 @@ if (app.Environment.IsDevelopment())
 app.IncludeCardEndpoints();
 app.IncludeCardPackEndpoints();
 app.IncludePersonalityPresetEndpoints();
+app.IncludeBunkerCardEndpoints();
 
 // app.UseHttpsRedirection();
 app.Run();

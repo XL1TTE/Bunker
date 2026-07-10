@@ -26,6 +26,7 @@ public static class RemoveCardFromPackHandler
             Id: domain.PublicId.Value,
             Title: domain.Title,
             Description: domain.Description,
+            GenerationPrompt: domain.GenerationPrompt,
             CardIds: domain.Cards.Select(c => c.CardId.Value)));
 
         return RemoveCardFromPack.Success(domain);

@@ -15,10 +15,9 @@ const router = useRouter();
 const lobbyStore = useLobbyStore();
 const catalogStore = useCatalogStore();
 const authStore = useAuthStore();
-const { run } = useToast();
+const { run, error: toastError } = useToast();
 
 const showDestroyedModal = ref(false);
-const showHandoffModal = ref(false);
 const codeCopied = ref(false);
 
 const lobby = computed(() => lobbyStore.currentLobby);
@@ -57,7 +56,20 @@ watch(
 watch(
   () => lobbyStore.handoffGameId,
   (val) => {
-    if (val) showHandoffModal.value = true;
+    // The game has started — hand off to the game screen. The lobby view unmounts
+    // (onBeforeUnmount tears down lobby realtime) and GameRoomView connects /hubs/game.
+    if (val) router.push({ name: 'game-room', params: { gameId: val } });
+  },
+);
+
+// The Start button's HTTP call only kicks off an async saga; the actual failure
+// (e.g. insufficient canned content) arrives later as a GameStartFailed event,
+// which the store captures in gameStartError. Surface it so a failed start isn't
+// silent ("nothing happens, no error").
+watch(
+  () => lobbyStore.gameStartError,
+  (val) => {
+    if (val) toastError(`Couldn't start the game: ${val}`);
   },
 );
 
@@ -197,17 +209,6 @@ async function copyCode(): Promise<void> {
           <div :class="styles.modalActions">
             <button :class="styles.modalButton" @click="goToLobbies">Back to browser</button>
           </div>
-        </div>
-      </div>
-
-      <div v-if="showHandoffModal" :class="styles.modalBackdrop">
-        <div :class="styles.modal" role="dialog" aria-modal="true">
-          <h2>Game starting…</h2>
-          <p>Game session ID:</p>
-          <code :class="styles.modalGameId">{{ lobbyStore.handoffGameId }}</code>
-          <p :class="styles.modalFooter">
-            The game screen is out of MVP scope — this is where it would launch.
-          </p>
         </div>
       </div>
     </Teleport>

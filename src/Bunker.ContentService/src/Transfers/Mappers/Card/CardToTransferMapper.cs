@@ -11,6 +11,8 @@ public static partial class CardToTransferMapper
     [MapDerivedType<Transfer.AgeCard, Domain.AgeCard>]
     [MapDerivedType<Transfer.FactCard, Domain.FactCard>]
     [MapDerivedType<Transfer.SexCard, Domain.SexCard>]
+    [MapDerivedType<Transfer.HealthCard, Domain.HealthCard>]
+    [MapDerivedType<Transfer.LuggageCard, Domain.LuggageCard>]
     [MapProperty(nameof(Transfer.Card.Id), nameof(Domain.Card.PublicId))]
     public static partial Domain.Card ToDomain(this Transfer.Card card);
 
@@ -19,6 +21,8 @@ public static partial class CardToTransferMapper
     [MapDerivedType<Domain.AgeCard, Transfer.AgeCard>]
     [MapDerivedType<Domain.FactCard, Transfer.FactCard>]
     [MapDerivedType<Domain.SexCard, Transfer.SexCard>]
+    [MapDerivedType<Domain.HealthCard, Transfer.HealthCard>]
+    [MapDerivedType<Domain.LuggageCard, Transfer.LuggageCard>]
     [MapProperty(nameof(Domain.Card.PublicId), nameof(Transfer.Card.Id))]
     public static partial T ToTransferObject<T>(this Domain.Card card) where T: Transfer.Card;
 
@@ -27,6 +31,8 @@ public static partial class CardToTransferMapper
     [MapDerivedType<Domain.AgeCard, Transfer.AgeCard>]
     [MapDerivedType<Domain.FactCard, Transfer.FactCard>]
     [MapDerivedType<Domain.SexCard, Transfer.SexCard>]
+    [MapDerivedType<Domain.HealthCard, Transfer.HealthCard>]
+    [MapDerivedType<Domain.LuggageCard, Transfer.LuggageCard>]
     [MapProperty(nameof(Domain.Card.PublicId), nameof(Transfer.Card.Id))]
     public static partial Transfer.Card ToTransferObject(this Domain.Card card);
 
@@ -44,6 +50,12 @@ public static partial class CardToTransferMapper
 
     [MapProperty(nameof(Domain.FactCard.PublicId), nameof(Transfer.FactCard.Id))]
     public static partial Transfer.FactCard ToTransferObject(this Domain.FactCard card);
+
+    [MapProperty(nameof(Domain.HealthCard.PublicId), nameof(Transfer.HealthCard.Id))]
+    public static partial Transfer.HealthCard ToTransferObject(this Domain.HealthCard card);
+
+    [MapProperty(nameof(Domain.LuggageCard.PublicId), nameof(Transfer.LuggageCard.Id))]
+    public static partial Transfer.LuggageCard ToTransferObject(this Domain.LuggageCard card);
 }
 
 internal static class CardMapperExtensions

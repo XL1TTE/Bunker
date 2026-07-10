@@ -2,7 +2,7 @@ using Bunker.ContentService.Domain;
 
 namespace Bunker.ContentService.Features.CardPacks.UpdateCardPack;
 
-public readonly record struct UpdateCardPack(CardPack.Id Id, string Title, string Description, IEnumerable<Guid> CardIds)
+public readonly record struct UpdateCardPack(CardPack.Id Id, string Title, string Description, string GenerationPrompt, IEnumerable<Guid> CardIds)
 {
     public abstract record Result
     {

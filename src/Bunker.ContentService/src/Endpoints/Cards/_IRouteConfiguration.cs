@@ -68,6 +68,30 @@ internal static partial class IRouteBuilderExtensions
             .WithSummary("Get all fact cards")
             .WithDescription("Retrieves the full library of fact cards.");
 
+        root.MapPost("/health", HealthCardEndpoints.CreateHealthCard)
+            .WithSummary("Create health card")
+            .WithDescription("Creates a new health card describing a character's physical and mental state.");
+
+        root.MapPut("/health/{id:guid}", HealthCardEndpoints.UpdateHealthCard)
+            .WithSummary("Update health card")
+            .WithDescription("Updates an existing health card.");
+
+        root.MapGet("/health", HealthCardEndpoints.GetHealthCards)
+            .WithSummary("Get all health cards")
+            .WithDescription("Retrieves the full library of health cards.");
+
+        root.MapPost("/luggage", LuggageCardEndpoints.CreateLuggageCard)
+            .WithSummary("Create luggage card")
+            .WithDescription("Creates a new luggage card describing the items a character carries.");
+
+        root.MapPut("/luggage/{id:guid}", LuggageCardEndpoints.UpdateLuggageCard)
+            .WithSummary("Update luggage card")
+            .WithDescription("Updates an existing luggage card.");
+
+        root.MapGet("/luggage", LuggageCardEndpoints.GetLuggageCards)
+            .WithSummary("Get all luggage cards")
+            .WithDescription("Retrieves the full library of luggage cards.");
+
         root.MapDelete("/{id:guid}", CardEndpoints.Delete)
             .WithSummary("Delete card")
             .WithDescription("Permanently removes a card from the content library by its ID.");

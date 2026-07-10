@@ -4,7 +4,7 @@ namespace Bunker.ContentService.Persistence.Contracts;
 
 public interface IHydrationQueries
 {
-    Task<(IReadOnlyCollection<CardPack> Packs, IReadOnlyCollection<PersonalityPreset> Presets, IReadOnlyCollection<Card> Cards)> GetHydrationDataAsync(
-        IEnumerable<Guid> cardPackIds, 
+    Task<(IReadOnlyCollection<CardPack> Packs, IReadOnlyCollection<PersonalityPreset> Presets, IReadOnlyCollection<Card> Cards, IReadOnlyCollection<BunkerCard> BunkerCards)> GetHydrationDataAsync(
+        IEnumerable<Guid> cardPackIds,
         IEnumerable<Guid> personalityPresetIds);
 }

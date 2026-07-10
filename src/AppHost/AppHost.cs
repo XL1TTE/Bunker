@@ -82,6 +82,7 @@ builder.AddNpmApp("gateway", "../Bunker.Gateway", "start")
        .WithReference(accountService)
        .WithReference(lobbyService)
        .WithReference(contentService)
+       .WithReference(gameService)
        .WithHttpEndpoint(port: 5174, env: "PORT")
        .WithExternalHttpEndpoints();
 
@@ -90,6 +91,12 @@ builder.AddNpmApp("frontend", "../Bunker.VueClient", "dev")
        .WithReference(auth)
        .WaitFor(auth)
        .WithHttpEndpoint(port: 5173, env: "PORT")
+       .WithExternalHttpEndpoints();
+
+builder.AddNpmApp("admin-frontend", "../Bunker.AdminVueClient", "dev")
+       .WithReference(auth)
+       .WaitFor(auth)
+       .WithHttpEndpoint(port: 5175, env: "PORT")
        .WithExternalHttpEndpoints();
 
 builder.Build().Run();

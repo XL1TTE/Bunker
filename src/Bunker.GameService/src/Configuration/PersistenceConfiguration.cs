@@ -1,4 +1,6 @@
 using Bunker.GameService.Persistence.Contracts;
+using Bunker.GameService.Persistence.Contracts.Queries;
+using Bunker.GameService.Persistence.Queries;
 using Microsoft.EntityFrameworkCore;
 
 namespace Bunker.GameService.Persistence;
@@ -14,6 +16,7 @@ internal static class PersistenceConfiguration
             builder.Services.AddNpgsql<GameDbContext>(connectionString);
 
             builder.Services.AddScoped<IUnitOfWork, GameDbContext>(provider => provider.GetRequiredService<GameDbContext>());
+            builder.Services.AddScoped<IGameQueries, GameQueries>();
 
             return builder;
         }

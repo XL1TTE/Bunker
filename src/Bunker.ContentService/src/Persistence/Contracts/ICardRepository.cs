@@ -28,6 +28,16 @@ public interface IHobbiesCardRepository : IRepository<HobbiesCard, Card.Id>;
 public interface IFactCardRepository : IRepository<FactCard, Card.Id>;
 
 /// <summary>
+/// Specialized repository interface for Health cards.
+/// </summary>
+public interface IHealthCardRepository : IRepository<HealthCard, Card.Id>;
+
+/// <summary>
+/// Specialized repository interface for Luggage cards.
+/// </summary>
+public interface ILuggageCardRepository : IRepository<LuggageCard, Card.Id>;
+
+/// <summary>
 /// Specialized repository interface for Sex cards.
 /// </summary>
 public interface ISexCardRepository : IRepository<SexCard, Card.Id>;

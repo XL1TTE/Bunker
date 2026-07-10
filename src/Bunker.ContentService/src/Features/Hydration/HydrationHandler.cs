@@ -18,7 +18,7 @@ public static class HydrationHandler
         var packIds = command.CardPackIds.Distinct().ToList();
         var personalityIds = command.PersonalityPresetIds.Distinct().ToList();
 
-        var (packs, personalities, allCards) = await queries.GetHydrationDataAsync(packIds, personalityIds);
+        var (packs, personalities, allCards, bunkerCards) = await queries.GetHydrationDataAsync(packIds, personalityIds);
 
         var missingPacks = packIds.Except(packs.Select(x => x.PublicId.Value)).ToList();
         var missingPersonalities = personalityIds.Except(personalities.Select(x => x.PublicId.Value)).ToList();
@@ -38,7 +38,10 @@ public static class HydrationHandler
             allCards.OfType<HobbiesCard>().Select(x => x.ToTransferObject()).ToList(),
             allCards.OfType<AgeCard>().Select(x => x.ToTransferObject()).ToList(),
             allCards.OfType<SexCard>().Select(x => x.ToTransferObject()).ToList(),
-            allCards.OfType<FactCard>().Select(x => x.ToTransferObject()).ToList()
+            allCards.OfType<FactCard>().Select(x => x.ToTransferObject()).ToList(),
+            allCards.OfType<HealthCard>().Select(x => x.ToTransferObject()).ToList(),
+            allCards.OfType<LuggageCard>().Select(x => x.ToTransferObject()).ToList(),
+            bunkerCards.Select(x => x.ToTransferObject()).ToList()
         ));
     }
 }

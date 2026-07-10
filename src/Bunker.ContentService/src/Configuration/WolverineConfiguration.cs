@@ -54,12 +54,16 @@ internal static class WolverineConfiguration
         options.PublishMessage<Messages.FactCardUpdated>().ToRabbitExchange("fact-card-updates");
         options.PublishMessage<Messages.AgeCardUpdated>().ToRabbitExchange("age-card-updates");
         options.PublishMessage<Messages.HobbiesCardUpdated>().ToRabbitExchange("hobbies-card-updates");
+        options.PublishMessage<Messages.HealthCardUpdated>().ToRabbitExchange("health-card-updates");
+        options.PublishMessage<Messages.LuggageCardUpdated>().ToRabbitExchange("luggage-card-updates");
         options.PublishMessage<Messages.CardDeleted>().ToRabbitExchange("card-deleted");
 
         options.PublishMessage<Messages.CardPackUpdated>().ToRabbitExchange("card-pack-updates");
         options.PublishMessage<Messages.CardPackDeleted>().ToRabbitExchange("card-pack-deleted");
         options.PublishMessage<Messages.PersonalityPresetUpdated>().ToRabbitExchange("personality-preset-updates");
         options.PublishMessage<Messages.PersonalityPresetDeleted>().ToRabbitExchange("personality-preset-deleted");
+        options.PublishMessage<Messages.BunkerCardUpdated>().ToRabbitExchange("bunker-card-updates");
+        options.PublishMessage<Messages.BunkerCardDeleted>().ToRabbitExchange("bunker-card-deleted");
 
         options.PublishMessage<GameContentHydrated>().ToRabbitExchange("game-content-hydrated");
         options.PublishMessage<GameContentHydrationFailed>().ToRabbitExchange("game-content-hydration-failed");

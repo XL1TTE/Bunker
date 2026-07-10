@@ -42,4 +42,20 @@ public interface ICardQueries
     /// <param name="take">Cards to take.</param>
     /// <returns>Tuple with total cards in the database and cards after pagination applied.</returns>
     Task<(int, IReadOnlyCollection<Domain.FactCard>)> GetFactCardsAsync(int skip, int take);
+
+    /// <summary>
+    /// Gets health cards with pagination.
+    /// </summary>
+    /// <param name="skip">Cards to skip.</param>
+    /// <param name="take">Cards to take.</param>
+    /// <returns>Tuple with total cards in the database and cards after pagination applied.</returns>
+    Task<(int, IReadOnlyCollection<Domain.HealthCard>)> GetHealthCardsAsync(int skip, int take);
+
+    /// <summary>
+    /// Gets luggage cards with pagination.
+    /// </summary>
+    /// <param name="skip">Cards to skip.</param>
+    /// <param name="take">Cards to take.</param>
+    /// <returns>Tuple with total cards in the database and cards after pagination applied.</returns>
+    Task<(int, IReadOnlyCollection<Domain.LuggageCard>)> GetLuggageCardsAsync(int skip, int take);
 }

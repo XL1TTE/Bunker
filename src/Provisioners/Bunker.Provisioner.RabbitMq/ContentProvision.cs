@@ -52,6 +52,26 @@ internal static class ProvisionExtensions
                 e.ExchangeType = ExchangeType.Fanout;
             });
 
+            rabbit.DeclareExchange("health-card-updates", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+            });
+
+            rabbit.DeclareExchange("luggage-card-updates", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+            });
+
+            rabbit.DeclareExchange("bunker-card-updates", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+            });
+
+            rabbit.DeclareExchange("bunker-card-deleted", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+            });
+
             rabbit.DeclareExchange("game-start-requests", e =>
             {
                 e.ExchangeType = ExchangeType.Fanout;

@@ -16,6 +16,7 @@ public static partial class CardPackMapper
     [MapProperty(nameof(Domain.CardPack.PublicId), nameof(Transfer.CardPackPreview.Id))]
     [MapperIgnoreSource(nameof(Domain.CardPack.Cards))]
     [MapperIgnoreSource(nameof(Domain.CardPack._cards))]
+    [MapperIgnoreSource(nameof(Domain.CardPack.GenerationPrompt))]
     public static partial Transfer.CardPackPreview ToPreviewObject(this Domain.CardPack cardPack);
 }
 

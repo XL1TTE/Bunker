@@ -13,7 +13,7 @@ public static class CreateCardPackHandler
         IMessageContext messaging,
         IUnitOfWork uow)
     {
-        var domain = CardPackFactory.New(command.Title, command.Description);
+        var domain = CardPackFactory.New(command.Title, command.Description, command.GenerationPrompt);
         foreach (var cardId in command.CardIds)
         {
             domain.AddCard(Card.Id.Create(cardId));
@@ -26,6 +26,7 @@ public static class CreateCardPackHandler
             Id: domain.PublicId.Value,
             Title: domain.Title,
             Description: domain.Description,
+            GenerationPrompt: domain.GenerationPrompt,
             CardIds: domain.Cards.Select(c => c.CardId.Value)));
 
         return CreateCardPack.Success(domain);

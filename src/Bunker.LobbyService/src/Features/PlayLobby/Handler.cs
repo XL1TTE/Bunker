@@ -38,7 +38,8 @@ public static class PlayLobbyHandler
             Id: p.PublicId.Value.ToString(),
             Nickname: p.Nickname,
             Type: p is BotParticipant ? "Bot" : "Player",
-            PersonalityPresetId: p is BotParticipant bot ? bot.PersonalityPresetId.Value : null
+            PersonalityPresetId: p is BotParticipant bot ? bot.PersonalityPresetId.Value : null,
+            AccountId: p is PlayerParticipant player ? player.UserId.Value : null
         )).ToList();
 
         await messaging.PublishAsync(new GameStartRequested(

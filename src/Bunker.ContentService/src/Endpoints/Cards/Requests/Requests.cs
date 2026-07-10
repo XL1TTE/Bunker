@@ -18,8 +18,14 @@ public abstract record CardRequest
 
         /// <summary>Request to create a new Fact card.</summary>
         public readonly record struct FactCard(string Fact);
+
+        /// <summary>Request to create a new Health card.</summary>
+        public readonly record struct HealthCard(string Health);
+
+        /// <summary>Request to create a new Luggage card.</summary>
+        public readonly record struct LuggageCard(string Luggage);
     }
-    
+
     public abstract record Put
     {
         /// <summary>Request to update an existing Profession card.</summary>
@@ -36,6 +42,12 @@ public abstract record CardRequest
 
         /// <summary>Request to update an existing Fact card.</summary>
         public readonly record struct FactCard(string Fact);
+
+        /// <summary>Request to update an existing Health card.</summary>
+        public readonly record struct HealthCard(string Health);
+
+        /// <summary>Request to update an existing Luggage card.</summary>
+        public readonly record struct LuggageCard(string Luggage);
     }
 }
 

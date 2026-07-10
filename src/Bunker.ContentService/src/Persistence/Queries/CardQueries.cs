@@ -67,7 +67,33 @@ public class DbContextCardQueries(ContentDbContext dbContext) : ICardQueries
             .Skip(skip).Take(take)
             .Select(x => x.ToDomain<Domain.SexCard>())
             .ToListAsync();
-            
+
+        return (total, cards);
+    }
+
+    public async Task<(int, IReadOnlyCollection<Domain.HealthCard>)> GetHealthCardsAsync(int skip, int take)
+    {
+        var total = await dbContext.Cards.AsNoTracking()
+            .OfType<Entities.HealthCard>().CountAsync();
+
+        var cards = await dbContext.Cards.AsNoTracking().OfType<Entities.HealthCard>()
+            .Skip(skip).Take(take)
+            .Select(x => x.ToDomain<Domain.HealthCard>())
+            .ToListAsync();
+
+        return (total, cards);
+    }
+
+    public async Task<(int, IReadOnlyCollection<Domain.LuggageCard>)> GetLuggageCardsAsync(int skip, int take)
+    {
+        var total = await dbContext.Cards.AsNoTracking()
+            .OfType<Entities.LuggageCard>().CountAsync();
+
+        var cards = await dbContext.Cards.AsNoTracking().OfType<Entities.LuggageCard>()
+            .Skip(skip).Take(take)
+            .Select(x => x.ToDomain<Domain.LuggageCard>())
+            .ToListAsync();
+
         return (total, cards);
     }
 }

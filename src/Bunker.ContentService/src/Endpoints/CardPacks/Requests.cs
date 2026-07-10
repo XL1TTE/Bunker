@@ -15,8 +15,9 @@ public abstract record CardPackRequest
         /// </summary>
         /// <param name="Title">The title of the card pack. Minimum 6 characters.</param>
         /// <param name="Description">The description of the card pack. Minimum 10 characters.</param>
+        /// <param name="GenerationPrompt">The LLM-facing prompt used to theme AI-generated content to this pack. Minimum 10 characters.</param>
         /// <param name="CardIds">A collection of unique identifiers for the cards to be included in the pack.</param>
-        public readonly record struct Create(string Title, string Description, IEnumerable<Guid> CardIds);
+        public readonly record struct Create(string Title, string Description, string GenerationPrompt, IEnumerable<Guid> CardIds);
 
         /// <summary>
         /// Request to add a card to an existing card pack.
@@ -35,7 +36,8 @@ public abstract record CardPackRequest
         /// </summary>
         /// <param name="Title">The new title of the card pack. Minimum 6 characters.</param>
         /// <param name="Description">The new description of the card pack. Minimum 10 characters.</param>
+        /// <param name="GenerationPrompt">The new LLM-facing generation prompt. Minimum 10 characters.</param>
         /// <param name="CardIds">The new set of identifiers for the cards in the pack.</param>
-        public readonly record struct Update(string Title, string Description, IEnumerable<Guid> CardIds);
+        public readonly record struct Update(string Title, string Description, string GenerationPrompt, IEnumerable<Guid> CardIds);
     }
 }

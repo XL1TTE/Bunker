@@ -11,6 +11,7 @@ public partial class ContentDbContext(DbContextOptions<ContentDbContext> options
     public DbSet<Card> Cards { get; init; }
     public DbSet<CardPack> CardPacks { get; init; }
     public DbSet<PersonalityPreset> PersonalityPresets { get; init; }
+    public DbSet<BunkerCard> BunkerCards { get; init; }
 
     public IRepository<TAggregate, TKey> GetRepository<TAggregate, TKey>() => (IRepository<TAggregate, TKey>)this;
 

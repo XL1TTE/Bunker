@@ -12,6 +12,8 @@ public static partial class CardMapper
     [MapDerivedType<AgeCard, Domain.AgeCard>]
     [MapDerivedType<FactCard, Domain.FactCard>]
     [MapDerivedType<SexCard, Domain.SexCard>]
+    [MapDerivedType<HealthCard, Domain.HealthCard>]
+    [MapDerivedType<LuggageCard, Domain.LuggageCard>]
     public static partial Domain.Card ToDomain(this Card card);
 
     [MapDerivedType<ProfessionCard, Domain.ProfessionCard>]
@@ -19,6 +21,8 @@ public static partial class CardMapper
     [MapDerivedType<AgeCard, Domain.AgeCard>]
     [MapDerivedType<FactCard, Domain.FactCard>]
     [MapDerivedType<SexCard, Domain.SexCard>]
+    [MapDerivedType<HealthCard, Domain.HealthCard>]
+    [MapDerivedType<LuggageCard, Domain.LuggageCard>]
     public static partial T ToDomain<T>(this Card card) where T : Domain.Card;
 
     [MapDerivedType<Domain.ProfessionCard, ProfessionCard>]
@@ -26,6 +30,8 @@ public static partial class CardMapper
     [MapDerivedType<Domain.AgeCard, AgeCard>]
     [MapDerivedType<Domain.FactCard, FactCard>]
     [MapDerivedType<Domain.SexCard, SexCard>]
+    [MapDerivedType<Domain.HealthCard, HealthCard>]
+    [MapDerivedType<Domain.LuggageCard, LuggageCard>]
     public static partial Card ToEntity(this Domain.Card card);
 
     [MapDerivedType<Domain.ProfessionCard, ProfessionCard>]
@@ -33,6 +39,8 @@ public static partial class CardMapper
     [MapDerivedType<Domain.AgeCard, AgeCard>]
     [MapDerivedType<Domain.FactCard, FactCard>]
     [MapDerivedType<Domain.SexCard, SexCard>]
+    [MapDerivedType<Domain.HealthCard, HealthCard>]
+    [MapDerivedType<Domain.LuggageCard, LuggageCard>]
     public static partial void ApplyUpdate([MappingTarget] this Card entity, Domain.Card card);
 }
 

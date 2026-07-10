@@ -1,32 +1,21 @@
 using Bunker.GameService.Persistence.Configurations;
 using Bunker.GameService.Persistence.Contracts;
 using Bunker.GameService.Persistence.Entities;
+using Bunker.GameService.Sagas;
 using Microsoft.EntityFrameworkCore;
 using Wolverine.EntityFrameworkCore;
 
 namespace Bunker.GameService.Persistence;
 
-public partial class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(options), IUnitOfWork, IGameSessionRepository
+public partial class GameDbContext(DbContextOptions<GameDbContext> options) : DbContext(options), IUnitOfWork
 {
-    public DbSet<GameSessionEntity> GameSessions { get; init; } = null!;
+    public DbSet<GameSaga> Games { get; init; } = null!;
+    public DbSet<GameChatMessage> GameChatMessages { get; init; } = null!;
 
     public IRepository<TAggregate, TKey> GetRepository<TAggregate, TKey>() => (IRepository<TAggregate, TKey>)this;
 
     public TRepository GetRepository<TRepository>() where TRepository : class, IRepository
         => this as TRepository ?? throw new InvalidOperationException($"Repository {typeof(TRepository).Name} is not implemented.");
-
-    public async Task<GameSessionEntity?> TryFindAsync(Guid key)
-        => await GameSessions.AsNoTracking().FirstOrDefaultAsync(x => x.GameId == key);
-
-    public bool Update(GameSessionEntity aggregate)
-    {
-        Entry(aggregate).State = EntityState.Modified;
-        return true;
-    }
-
-    public void Add(GameSessionEntity session) => GameSessions.Add(session);
-
-    public void Delete(GameSessionEntity aggregate) => GameSessions.Remove(aggregate);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

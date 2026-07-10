@@ -16,7 +16,10 @@ public record GameContentHydrated(
     IReadOnlyList<Transfer.HobbiesCard> HobbiesCards,
     IReadOnlyList<Transfer.AgeCard> AgeCards,
     IReadOnlyList<Transfer.SexCard> SexCards,
-    IReadOnlyList<Transfer.FactCard> FactCards
+    IReadOnlyList<Transfer.FactCard> FactCards,
+    IReadOnlyList<Transfer.HealthCard> HealthCards,
+    IReadOnlyList<Transfer.LuggageCard> LuggageCards,
+    IReadOnlyList<Transfer.BunkerCard> BunkerCards
 );
 
 public record GameContentHydrationFailed(

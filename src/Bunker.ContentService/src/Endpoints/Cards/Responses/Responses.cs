@@ -38,6 +38,18 @@ public abstract record CardResponse
     public readonly record struct FactCard(Transfer.FactCard Card);
 
     /// <summary>
+    /// Response containing a health card.
+    /// </summary>
+    /// <param name="Card">The health card data.</param>
+    public readonly record struct HealthCard(Transfer.HealthCard Card);
+
+    /// <summary>
+    /// Response containing a luggage card.
+    /// </summary>
+    /// <param name="Card">The luggage card data.</param>
+    public readonly record struct LuggageCard(Transfer.LuggageCard Card);
+
+    /// <summary>
     /// Response containing any card.
     /// </summary>
     /// <param name="Card">The card data.</param>
@@ -77,4 +89,18 @@ public abstract record CardResponse
     /// <param name="Total">Total number of sex cards available.</param>
     /// <param name="Cards">The collection of sex cards for the current page.</param>
     public readonly record struct SexCards(int Total, IEnumerable<Transfer.SexCard> Cards);
+
+    /// <summary>
+    /// Response with paginated collection of health cards.
+    /// </summary>
+    /// <param name="Total">Total number of health cards available.</param>
+    /// <param name="Cards">The collection of health cards for the current page.</param>
+    public readonly record struct HealthCards(int Total, IEnumerable<Transfer.HealthCard> Cards);
+
+    /// <summary>
+    /// Response with paginated collection of luggage cards.
+    /// </summary>
+    /// <param name="Total">Total number of luggage cards available.</param>
+    /// <param name="Cards">The collection of luggage cards for the current page.</param>
+    public readonly record struct LuggageCards(int Total, IEnumerable<Transfer.LuggageCard> Cards);
 }

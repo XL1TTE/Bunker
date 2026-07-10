@@ -18,7 +18,7 @@ public static class UpdateCardPackHandler
 
         if (domain is null) return UpdateCardPack.NotFound();
 
-        var update = new CardPack(command.Id, command.Title, command.Description);
+        var update = new CardPack(command.Id, command.Title, command.Description, command.GenerationPrompt);
 
         foreach(var cardId in command.CardIds)
         {
@@ -31,6 +31,7 @@ public static class UpdateCardPackHandler
             Id: update.PublicId.Value,
             Title: update.Title,
             Description: update.Description,
+            GenerationPrompt: update.GenerationPrompt,
             CardIds: update.Cards.Select(c => c.CardId.Value)));
 
         return UpdateCardPack.Success(update);

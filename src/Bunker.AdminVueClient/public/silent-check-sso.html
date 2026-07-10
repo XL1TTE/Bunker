@@ -1,0 +1,13 @@
+<!doctype html>
+<html>
+  <head>
+    <title>silent-check-sso</title>
+  </head>
+  <body>
+    <script>
+      // Keycloak silent SSO check iframe callback. The parent window's keycloak-js
+      // instance reads the auth state from this iframe to avoid a full redirect.
+      parent.checkLoginIframe();
+    </script>
+  </body>
+</html>

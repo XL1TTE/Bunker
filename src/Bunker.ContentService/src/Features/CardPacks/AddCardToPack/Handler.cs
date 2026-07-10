@@ -26,6 +26,7 @@ public static class AddCardToPackHandler
             Id: domain.PublicId.Value,
             Title: domain.Title,
             Description: domain.Description,
+            GenerationPrompt: domain.GenerationPrompt,
             CardIds: domain.Cards.Select(c => c.CardId.Value)));
 
         return AddCardToPack.Success(domain);

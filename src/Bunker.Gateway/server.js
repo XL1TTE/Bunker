@@ -19,6 +19,11 @@ const contentServiceUrl =
   process.env.CONTENT_SERVICE_HTTP ??
   "http://localhost:5029";
 
+const gameServiceUrl =
+  process.env["services__game-service__http__0"] ??
+  process.env.GAME_SERVICE_HTTP ??
+  "http://localhost:5083";
+
 const app = express();
 
 // CORS preflight + response headers.
@@ -78,7 +83,15 @@ app.use(
   }),
 );
 
-// SignalR hub. `ws: true` enables WebSocket proxying, but http-proxy-middleware
+app.use(
+  createProxyMiddleware({
+    pathFilter: "/game",
+    target: gameServiceUrl,
+    changeOrigin: true,
+  }),
+);
+
+// SignalR hubs. `ws: true` enables WebSocket proxying, but http-proxy-middleware
 // v3 does not auto-attach the `upgrade` handler when using `app.listen()` — we
 // wire it manually on the server below.
 const lobbyHubProxy = createProxyMiddleware({
@@ -89,15 +102,32 @@ const lobbyHubProxy = createProxyMiddleware({
 });
 app.use(lobbyHubProxy);
 
+const gameHubProxy = createProxyMiddleware({
+  pathFilter: "/hubs/game",
+  target: gameServiceUrl,
+  changeOrigin: true,
+  ws: true,
+});
+app.use(gameHubProxy);
+
 const server = app.listen(port, () => {
   console.log(`Bunker gateway listening on http://localhost:${port}`);
   console.log(`  /account        -> ${accountServiceUrl}`);
   console.log(`  /content        -> ${contentServiceUrl}`);
   console.log(`  /lobbies        -> ${lobbyServiceUrl}`);
+  console.log(`  /game           -> ${gameServiceUrl}`);
   console.log(`  /hubs/lobby (ws)-> ${lobbyServiceUrl}`);
+  console.log(`  /hubs/game  (ws)-> ${gameServiceUrl}`);
 });
 
 server.on("upgrade", (req, socket, head) => {
-  // Only /hubs/lobby is a WebSocket endpoint; hand its upgrade to that proxy.
-  lobbyHubProxy.upgrade(req, socket, head);
+  // Dispatch each WebSocket upgrade to the matching hub proxy by path.
+  const url = req.url ?? "";
+  if (url.startsWith("/hubs/lobby")) {
+    lobbyHubProxy.upgrade(req, socket, head);
+  } else if (url.startsWith("/hubs/game")) {
+    gameHubProxy.upgrade(req, socket, head);
+  } else {
+    socket.destroy();
+  }
 });

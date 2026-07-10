@@ -9,6 +9,7 @@ public class CreateCardPackValidator : AbstractValidator<CardPackRequest.Post.Cr
     {
         RuleFor(x => x.Title).NotEmpty().MinimumLength(6);
         RuleFor(x => x.Description).NotEmpty().MinimumLength(10);
+        RuleFor(x => x.GenerationPrompt).NotEmpty().MinimumLength(10).MaximumLength(2000);
         RuleFor(x => x.CardIds).NotNull();
     }
 }
@@ -19,6 +20,7 @@ public class UpdateCardPackValidator : AbstractValidator<CardPackRequest.Put.Upd
     {
         RuleFor(x => x.Title).NotEmpty().MinimumLength(6);
         RuleFor(x => x.Description).NotEmpty().MinimumLength(10);
+        RuleFor(x => x.GenerationPrompt).NotEmpty().MinimumLength(10).MaximumLength(2000);
         RuleFor(x => x.CardIds).NotNull();
     }
 }

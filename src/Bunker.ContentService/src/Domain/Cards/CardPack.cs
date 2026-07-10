@@ -3,12 +3,15 @@ using System.Collections.ObjectModel;
 namespace Bunker.ContentService.Domain;
 
 /// <summary>
-/// Aggregate root for card packs. Each card pack has a unique public identifier, a title, a description, and a collection of cards. The title must be at least 6 characters long, and the description must be at least 10 characters long.
+/// Aggregate root for card packs. Each card pack has a unique public identifier, a title, a
+/// description, an LLM-facing generation prompt, and a collection of cards. The title must be
+/// at least 6 characters long, the description and generation prompt at least 10 characters long.
 /// </summary>
 /// <param name="PublicId"></param>
 /// <param name="Title">Title of the card pack.</param>
-/// <param name="Description">Description of the card pack.</param>
-public record CardPack(CardPack.Id PublicId, string Title, string Description)
+/// <param name="Description">Human-facing description of the card pack, shown in the host picker.</param>
+/// <param name="GenerationPrompt">LLM-facing prompt used to theme AI-generated game content to this pack.</param>
+public record CardPack(CardPack.Id PublicId, string Title, string Description, string GenerationPrompt)
 {
     public readonly record struct Id(Guid Value)
     {
@@ -29,17 +32,22 @@ public record CardPack(CardPack.Id PublicId, string Title, string Description)
         ? throw new ArgumentException("Description must be at least 10 characters long.")
         : Description;
 
+    public string GenerationPrompt { get; private set; } =
+        string.IsNullOrWhiteSpace(GenerationPrompt) | GenerationPrompt.Length < 10
+        ? throw new ArgumentException("Generation prompt must be at least 10 characters long.")
+        : GenerationPrompt;
+
     internal Collection<CardPackCards> _cards { get; set; } = [];
     public IReadOnlyCollection<CardPackCards> Cards => _cards.AsReadOnly();
 }
 
 public static class CardPackFactory
 {
-    public static CardPack Create(CardPack.Id publicId, string title, string description)
-        => new CardPack(publicId, title, description);
+    public static CardPack Create(CardPack.Id publicId, string title, string description, string generationPrompt)
+        => new CardPack(publicId, title, description, generationPrompt);
 
-    public static CardPack New(string title, string description)
-        => new CardPack(CardPack.Id.New(), title, description);
+    public static CardPack New(string title, string description, string generationPrompt)
+        => new CardPack(CardPack.Id.New(), title, description, generationPrompt);
 }
 
 public static class CardPackExtensions

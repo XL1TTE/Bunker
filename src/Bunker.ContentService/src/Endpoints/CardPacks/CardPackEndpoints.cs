@@ -33,7 +33,7 @@ internal static class CardPackEndpoints
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
 
         var result = await bus.InvokeAsync<CreateCardPack.Result>(
-            new CreateCardPack(request.Title, request.Description, request.CardIds));
+            new CreateCardPack(request.Title, request.Description, request.GenerationPrompt, request.CardIds));
 
         return result switch
         {
@@ -57,7 +57,7 @@ internal static class CardPackEndpoints
             return TypedResults.ValidationProblem(validationResult.ToDictionary());
 
         var result = await bus.InvokeAsync<UpdateCardPack.Result>(
-            new UpdateCardPack(CardPack.Id.Create(id), request.Title, request.Description, request.CardIds));
+            new UpdateCardPack(CardPack.Id.Create(id), request.Title, request.Description, request.GenerationPrompt, request.CardIds));
 
         return result switch
         {

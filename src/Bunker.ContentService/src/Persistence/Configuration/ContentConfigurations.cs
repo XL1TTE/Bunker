@@ -35,6 +35,7 @@ internal class CardPackConfiguration : IEntityTypeConfiguration<CardPack>
 
         builder.Property(x => x.Title).HasMaxLength(100).IsRequired();
         builder.Property(x => x.Description).HasMaxLength(255).IsRequired();
+        builder.Property(x => x.GenerationPrompt).HasMaxLength(2000).IsRequired();
 
         builder.OwnsMany(x => x.Cards, cb =>
         {
@@ -111,5 +112,40 @@ internal class FactCardConfiguration : IEntityTypeConfiguration<FactCard>
     {
         builder.ToTable("FactCards", "content");
         builder.Property(x => x.Fact).HasColumnName("Fact");
+    }
+}
+
+internal class HealthCardConfiguration : IEntityTypeConfiguration<HealthCard>
+{
+    public void Configure(EntityTypeBuilder<HealthCard> builder)
+    {
+        builder.ToTable("HealthCards", "content");
+        builder.Property(x => x.Health).HasColumnName("Health");
+    }
+}
+
+internal class LuggageCardConfiguration : IEntityTypeConfiguration<LuggageCard>
+{
+    public void Configure(EntityTypeBuilder<LuggageCard> builder)
+    {
+        builder.ToTable("LuggageCards", "content");
+        builder.Property(x => x.Luggage).HasColumnName("Luggage");
+    }
+}
+
+internal class BunkerCardConfiguration : IEntityTypeConfiguration<BunkerCard>
+{
+    public void Configure(EntityTypeBuilder<BunkerCard> builder)
+    {
+        builder.ToTable("BunkerCards", "content");
+
+        builder.Property<int>("Id").ValueGeneratedOnAdd();
+        builder.HasKey("Id");
+
+        builder.HasAlternateKey(x => x.PublicId);
+
+        builder.Property(x => x.Catastrophe).HasMaxLength(255).IsRequired();
+        builder.Property(x => x.SurvivalDuration).HasMaxLength(64).IsRequired();
+        builder.Property(x => x.BunkerEnvironment).HasMaxLength(2000).IsRequired();
     }
 }

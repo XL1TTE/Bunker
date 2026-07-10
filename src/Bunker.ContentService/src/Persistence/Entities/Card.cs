@@ -6,7 +6,8 @@ public class CardPack
     public required Guid PublicId { get; set; }
     public required string Title { get; set; }
     public required string Description { get; set; }
-    
+    public required string GenerationPrompt { get; set; }
+
     public ICollection<CardPackCards> Cards { get; set; } = [];
 }
 
@@ -41,4 +42,14 @@ public class SexCard : Card
 public class FactCard : Card
 {
     public required string Fact { get; set; }
+};
+
+public class HealthCard : Card
+{
+    public required string Health { get; set; }
+};
+
+public class LuggageCard : Card
+{
+    public required string Luggage { get; set; }
 };

@@ -6,8 +6,8 @@ namespace Bunker.ContentService.Persistence.Queries;
 
 public class DbContextHydrationQueries(ContentDbContext db) : IHydrationQueries
 {
-    public async Task<(IReadOnlyCollection<Domain.CardPack> Packs, IReadOnlyCollection<Domain.PersonalityPreset> Presets, IReadOnlyCollection<Domain.Card> Cards)> GetHydrationDataAsync(
-        IEnumerable<Guid> cardPackIds, 
+    public async Task<(IReadOnlyCollection<Domain.CardPack> Packs, IReadOnlyCollection<Domain.PersonalityPreset> Presets, IReadOnlyCollection<Domain.Card> Cards, IReadOnlyCollection<Domain.BunkerCard> BunkerCards)> GetHydrationDataAsync(
+        IEnumerable<Guid> cardPackIds,
         IEnumerable<Guid> personalityPresetIds)
     {
         var packs = await db.CardPacks.AsNoTracking()
@@ -24,10 +24,14 @@ public class DbContextHydrationQueries(ContentDbContext db) : IHydrationQueries
             .Where(x => cardIds.Contains(x.PublicId))
             .ToListAsync();
 
+        var bunkerCards = await db.BunkerCards.AsNoTracking()
+            .ToListAsync();
+
         return (
             packs.Select(x => x.ToDomain()).ToList(),
             personalities.Select(x => x.ToDomain()).ToList(),
-            cards.Select(x => x.ToDomain()).ToList()
+            cards.Select(x => x.ToDomain()).ToList(),
+            bunkerCards.Select(x => x.ToDomain()).ToList()
         );
     }
 }

@@ -15,6 +15,8 @@ public abstract partial class Transfer
     public record AgeCard(Guid Id, int Age) : Card(Id);
     public record SexCard(Guid Id, string Sex) : Card(Id);
     public record FactCard(Guid Id, string Fact) : Card(Id);
+    public record HealthCard(Guid Id, string Health) : Card(Id);
+    public record LuggageCard(Guid Id, string Luggage) : Card(Id);
 }
 
 

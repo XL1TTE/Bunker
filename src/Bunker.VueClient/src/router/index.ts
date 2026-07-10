@@ -32,6 +32,13 @@ const routes: RouteRecordRaw[] = [
     props: true,
   },
   {
+    path: '/game/:gameId',
+    name: 'game-room',
+    component: () => import('@/views/GameRoomView.vue'),
+    meta: { requiresAuth: true },
+    props: true,
+  },
+  {
     path: '/:catchAll(.*)',
     name: 'not-found',
     component: () => import('@/views/NotFoundView.vue'),

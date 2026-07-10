@@ -4,5 +4,6 @@ public record SagaParticipant(
     string Id,
     string Nickname,
     string Type,
-    Guid? PersonalityPresetId
+    Guid? PersonalityPresetId,
+    string? AccountId
 );

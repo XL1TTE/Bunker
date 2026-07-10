@@ -1,6 +1,4 @@
 using Bunker.GameService.Messages;
-using Bunker.GameService.Persistence.Contracts;
-using Bunker.GameService.Persistence.Entities;
 using Wolverine;
 
 namespace Bunker.GameService.Sagas;
@@ -14,7 +12,6 @@ public class GameStartSaga : Saga
     public List<Guid> PersonalityPresetIds { get; set; } = [];
     public List<SagaParticipant> Participants { get; set; } = [];
     public string Status { get; set; } = "AwaitingHydration";
-    public Guid? GameId { get; set; }
 
     public static (GameStartSaga, RequestGameContentHydration) Start(GameStartRequested request)
     {
@@ -32,25 +29,41 @@ public class GameStartSaga : Saga
         return (saga, new RequestGameContentHydration(request.StartRequestId, request.CardPackIds, request.PersonalityPresetIds));
     }
 
-    public GameStartSucceeded Handle(GameContentHydrated hydrated, IUnitOfWork uow)
+    public object Handle(GameContentHydrated hydrated)
     {
-        var gameId = Guid.NewGuid();
+        var missing = new List<string>();
+        if (hydrated.ProfessionCards.Count == 0) missing.Add("Profession");
+        if (hydrated.HobbiesCards.Count == 0) missing.Add("Hobbies");
+        if (hydrated.AgeCards.Count == 0) missing.Add("Age");
+        if (hydrated.SexCards.Count == 0) missing.Add("Sex");
+        if (hydrated.FactCards.Count == 0) missing.Add("Fact");
+        if (hydrated.HealthCards.Count == 0) missing.Add("Health");
+        if (hydrated.LuggageCards.Count == 0) missing.Add("Luggage");
+        if (hydrated.BunkerCards.Count == 0) missing.Add("Bunker");
 
-        var repository = uow.GetRepository<IGameSessionRepository>();
-        repository.Add(new GameSessionEntity
+        if (missing.Count > 0)
         {
-            GameId = gameId,
-            LobbyId = LobbyId,
-            HostId = HostId,
-            Status = "Started",
-            CreatedAt = DateTime.UtcNow
-        });
+            Status = "Failed";
+            MarkCompleted();
+            return new GameStartFailed(StartRequestId: Id, LobbyId, $"Insufficient canned content: missing {string.Join(", ", missing)} cards.");
+        }
 
-        GameId = gameId;
         Status = "Completed";
         MarkCompleted();
 
-        return new GameStartSucceeded(StartRequestId: Id, LobbyId, GameId: gameId, JoinUrl: $"/game/{gameId}");
+        return new StartGame(
+            StartRequestId: Id,
+            LobbyId,
+            HostId,
+            Participants,
+            hydrated.ProfessionCards,
+            hydrated.HobbiesCards,
+            hydrated.AgeCards,
+            hydrated.SexCards,
+            hydrated.FactCards,
+            hydrated.HealthCards,
+            hydrated.LuggageCards,
+            hydrated.BunkerCards);
     }
 
     public GameStartFailed Handle(GameContentHydrationFailed failed)
