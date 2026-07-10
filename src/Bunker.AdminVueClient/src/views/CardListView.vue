@@ -63,7 +63,9 @@ function closeModal(): void {
 function validate(): CreateCardRequest | null {
   const cfg = config.value;
   if (!cfg) return null;
-  const raw = inputValue.value.trim();
+  // `v-model` on <input type="number"> yields a number, not a string, so coerce before
+  // trimming — otherwise `.trim` throws for the Age card.
+  const raw = String(inputValue.value ?? '').trim();
   if (raw.length === 0) {
     inputError.value = 'Enter a value.';
     return null;

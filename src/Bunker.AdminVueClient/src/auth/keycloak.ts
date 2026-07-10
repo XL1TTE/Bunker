@@ -75,9 +75,35 @@ export const auth = {
   // (every /content mutation requires the `content-service.admin` role), but this
   // lets the router show an AccessDenied view instead of a wall of 403s. In SKIP_AUTH
   // mode we grant the role so local dev without Keycloak still works.
+  //
+  // keycloak-js's hasRealmRole only inspects the nested `realm_access.roles` claim,
+  // but our Keycloak client emits a flat top-level `roles` array instead — so check
+  // all three shapes (flat `roles`, flat `role`, nested `realm_access.roles`).
   hasRealmRole(role: string): boolean {
     if (SKIP_AUTH) return true;
     const kc = initKeycloak();
-    return typeof kc.hasRealmRole === 'function' ? kc.hasRealmRole(role) : false;
+    if (typeof kc.hasRealmRole === 'function' && kc.hasRealmRole(role)) return true;
+
+    const parsed = kc.tokenParsed as
+      | {
+          roles?: string[] | string;
+          role?: string[] | string;
+          realm_access?: { roles?: string[] | string };
+        }
+      | undefined;
+    if (!parsed) return false;
+
+    const collect = (v: string[] | string | undefined): string[] => {
+      if (Array.isArray(v)) return v.filter((x): x is string => typeof x === 'string');
+      if (typeof v === 'string') return [v];
+      return [];
+    };
+
+    const roles = [
+      ...collect(parsed.roles),
+      ...collect(parsed.role),
+      ...collect(parsed.realm_access?.roles),
+    ];
+    return roles.includes(role);
   },
 };

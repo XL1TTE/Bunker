@@ -5,9 +5,17 @@
   </head>
   <body>
     <script>
-      // Keycloak silent SSO check iframe callback. The parent window's keycloak-js
-      // instance reads the auth state from this iframe to avoid a full redirect.
-      parent.checkLoginIframe();
+      // Keycloak silent SSO check iframe callback.
+      //
+      // keycloak-js 25's check-sso flow creates a hidden iframe pointing at the
+      // authorization endpoint with prompt=none and this page as the redirect URI.
+      // Keycloak redirects back here with the result in the URL hash
+      // (#session_state=... on success, or #error=login_required when there's no
+      // session). The parent's keycloak-js listens for a postMessage from this
+      // iframe and parses the hash — so we forward location.href back to the parent.
+      // (The older parent.checkLoginIframe() form no longer exists in v25 and throws
+      // "parent.checkLoginIframe is not a function".)
+      parent.postMessage(location.href, location.origin);
     </script>
   </body>
 </html>
