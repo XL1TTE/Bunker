@@ -8,6 +8,7 @@ import { useToast } from '@/composables/useToast';
 import ParticipantSlot from '@/components/lobby/ParticipantSlot.vue';
 import SettingsPanel from '@/components/lobby/SettingsPanel.vue';
 import ChatPanel from '@/components/lobby/ChatPanel.vue';
+import Modal from '@/components/common/Modal.vue';
 import styles from '@/views/lobby-room.module.css';
 
 const props = defineProps<{ id: string }>();
@@ -39,6 +40,12 @@ onMounted(async () => {
   const lobby = await run(() => lobbyStore.fetchLobby(props.id));
   if (!lobby) return;
   await run(() => lobbyStore.connectAndJoin(props.id));
+  // The invite code is private to the host — it's no longer on the snapshot, so
+  // only the host fetches it (the backend rejects non-hosts). Guests never see
+  // it and so never see the copy button either.
+  if (lobbyStore.isHost) {
+    await run(() => lobbyStore.fetchInviteCode());
+  }
 });
 
 onBeforeUnmount(async () => {
@@ -97,7 +104,7 @@ async function goToLobbies(): Promise<void> {
 }
 
 async function copyCode(): Promise<void> {
-  const code = lobby.value?.inviteCode;
+  const code = lobbyStore.inviteCode;
   if (!code) return;
   try {
     await navigator.clipboard.writeText(code);
@@ -114,7 +121,7 @@ async function copyCode(): Promise<void> {
     <header :class="styles.header">
       <div :class="styles.headerLeft">
         <div :class="styles.headerTitle">
-          <span :class="styles.headerCode">{{ lobby?.inviteCode ?? '———' }}</span>
+          <span :class="styles.headerName">{{ lobby?.name ?? 'Lobby' }}</span>
         </div>
         <p :class="styles.headerSubline">
           <span :class="styles.headerMetaItem">
@@ -134,9 +141,12 @@ async function copyCode(): Promise<void> {
         </p>
       </div>
       <div :class="styles.headerRight">
+        <!-- Host-only: the invite code is private to the host, so only they get
+             a way to copy (and share) it. Guests never see this control. -->
         <button
+          v-if="lobbyStore.isHost"
           :class="[styles.copyButton, codeCopied ? styles.copyButtonCopied : '']"
-          :disabled="!lobby?.inviteCode"
+          :disabled="!lobbyStore.inviteCode"
           @click="copyCode"
         >
           {{ codeCopied ? '✓ Copied' : 'Copy invite code' }}
@@ -201,16 +211,15 @@ async function copyCode(): Promise<void> {
       </div>
     </div>
 
-    <Teleport to="body">
-      <div v-if="showDestroyedModal" :class="styles.modalBackdrop" @click.self="goToLobbies">
-        <div :class="styles.modal" role="dialog" aria-modal="true">
-          <h2>Lobby was destroyed</h2>
-          <p>The host left or the lobby was otherwise terminated.</p>
-          <div :class="styles.modalActions">
-            <button :class="styles.modalButton" @click="goToLobbies">Back to browser</button>
-          </div>
-        </div>
+    <Modal
+      :open="showDestroyedModal"
+      title="Lobby was destroyed"
+      @close="goToLobbies"
+    >
+      <p>The host left or the lobby was otherwise terminated.</p>
+      <div :class="styles.modalActions">
+        <button :class="styles.modalButton" @click="goToLobbies">Back to browser</button>
       </div>
-    </Teleport>
+    </Modal>
   </section>
 </template>

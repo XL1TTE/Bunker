@@ -29,7 +29,9 @@ internal static class WolverineConfiguration
             options.Policies.AutoApplyTransactions();
             options.Policies.UseDurableOutboxOnAllSendingEndpoints();
 
-            options.PublishMessage<GameStartRequested>().ToRabbitExchange("game-start-requests");
+            options.PublishMessage<GameStartRequested>()
+                .ToRabbitExchange("game-start-requests")
+                .UseDurableOutbox();
 
             options.ListenToRabbitQueue("lobby-service-account-updates")
                 .DefaultIncomingMessage<AccountUpdated>()

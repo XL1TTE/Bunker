@@ -26,7 +26,10 @@ public static class CreateLobbyHandler
                 ? PrivacyPolicy.PublicPolicy(command.Password)
                 : PrivacyPolicy.PrivatePolicy(command.Password);
 
-            var lobby = Domain.Lobby.Create(capacity: command.Capacity, visibility: visibility);
+            var lobby = Domain.Lobby.Create(
+                capacity: command.Capacity,
+                visibility: visibility,
+                name: LobbyName.Create(command.Name));
             lobby.WithHost(AccountId.Create(command.HostId), command.Nickname);
 
             foreach (var packId in command.SelectedPackIds)

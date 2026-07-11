@@ -16,7 +16,7 @@ public abstract partial class Transfer
 
     public readonly record struct LobbySnapshot(
         string Id,
-        string InviteCode,
+        string Name,
         int Capacity,
         bool IsPublic,
         string? HostParticipantId,
@@ -27,7 +27,7 @@ public abstract partial class Transfer
 
     public readonly record struct LobbySummary(
         string Id,
-        string InviteCode,
+        string Name,
         int Capacity,
         int CurrentPlayers,
         bool HasPassword,
@@ -46,5 +46,9 @@ public abstract partial class Transfer
     public readonly record struct LobbyListResponse(
         LobbySummary[] Items,
         int Total
+    );
+
+    public readonly record struct LobbyInviteCode(
+        string InviteCode
     );
 }

@@ -2,6 +2,7 @@
 import { computed } from 'vue';
 import type { LobbySummary } from '@/types/lobby.types';
 import { useCatalogStore } from '@/stores/catalog.store';
+import LobbyIcons from '@/components/icons/LobbyIcons.vue';
 import styles from '@/components/lobby/lobby-summary-card.module.css';
 
 const props = defineProps<{ summary: LobbySummary; isCurrent?: boolean }>();
@@ -15,12 +16,14 @@ const isFull = computed(() => props.summary.currentPlayers >= props.summary.capa
 <template>
   <article :class="styles.card">
     <div :class="styles.headRow">
-      <span v-if="!summary.hasPassword" :class="styles.code">{{ summary.inviteCode }}</span>
-      <span v-else :class="styles.protected" :title="'Joining requires a password'">
-        <span aria-hidden="true">🔒</span> Protected
-      </span>
-      <span :class="[styles.countWrap, isFull ? styles.countWrapFull : '']">
-        {{ summary.currentPlayers }} / {{ summary.capacity }}
+      <span :class="styles.name">{{ summary.name }}</span>
+      <span
+        v-if="summary.hasPassword"
+        :class="styles.protected"
+        title="Joining requires a password"
+      >
+        <LobbyIcons :class="styles.lockIcon" name="lock" />
+        Protected
       </span>
     </div>
     <p :class="styles.host">
@@ -35,12 +38,15 @@ const isFull = computed(() => props.summary.currentPlayers >= props.summary.capa
       </span>
     </div>
     <div :class="styles.footer">
-      <span :class="styles.meta">{{ summary.id.slice(0, 8) }}</span>
+      <span :class="[styles.count, isFull && styles.countFull]">
+        <LobbyIcons :class="styles.countIcon" name="users" />
+        {{ summary.currentPlayers }} / {{ summary.capacity }}
+      </span>
       <!-- The lobby we're already in: we can always re-enter it, even when full. -->
-      <button v-if="isCurrent" :class="styles.enterButton" @click="$emit('enter')">
+      <button v-if="isCurrent" :class="styles.enterBtn" @click="$emit('enter')">
         Enter →
       </button>
-      <button v-else :class="styles.joinButton" :disabled="isFull" @click="$emit('join')">
+      <button v-else :class="styles.joinBtn" :disabled="isFull" @click="$emit('join')">
         {{ isFull ? 'Full' : 'Join →' }}
       </button>
     </div>

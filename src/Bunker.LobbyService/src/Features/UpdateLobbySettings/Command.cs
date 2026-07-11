@@ -6,7 +6,8 @@ public readonly record struct UpdateLobbySettings(
     int? Capacity,
     bool? IsPublic,
     string? Password,
-    string[]? SelectedPackIds
+    string[]? SelectedPackIds,
+    string? Name
 )
 {
     public abstract record Result

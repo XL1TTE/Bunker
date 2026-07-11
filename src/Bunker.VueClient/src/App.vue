@@ -1,57 +1,38 @@
 <script setup lang="ts">
 import { computed, onMounted } from 'vue';
-import { RouterLink } from 'vue-router';
+import { useRoute } from 'vue-router';
 import { useAuthStore } from '@/stores/auth.store';
-import { auth } from '@/auth/keycloak';
+import { useToastStore } from '@/stores/toast.store';
+import AppHeader from '@/components/layout/AppHeader.vue';
 import ToastHost from '@/components/common/ToastHost.vue';
 import styles from '@/styles/app.module.css';
 
 const authStore = useAuthStore();
+const toast = useToastStore();
+const route = useRoute();
 
-const initial = computed(() =>
-  authStore.profile?.nickname?.[0]?.toUpperCase() ?? '?',
-);
+// Landing route renders full-bleed under a transparent header; every other
+// route keeps the solid sticky header + max-width main.
+const isLanding = computed(() => route.meta.layout === 'landing');
 
+// Resolve the signed-in user's profile on boot. While this is in flight the
+// auth store's `initializing` flag is true, so the header shows a "signing in"
+// spinner in place of the Sign in button (and the landing CTAs are disabled) —
+// the user never sees a logged-out-looking page for an account they're already
+// authenticated as. If the fetch fails, surface a toast so it isn't silent
+// (the header then falls back to Sign in, which the user can click to retry).
 onMounted(async () => {
-  if (auth.isAuthenticated()) {
-    await authStore.fetchProfile();
+  await authStore.initialize();
+  if (authStore.error) {
+    toast.error('Couldn’t load your profile. Sign in to try again.');
   }
 });
 </script>
 
 <template>
   <div :class="styles.shell">
-    <header :class="styles.header">
-      <div :class="styles.brandWrap">
-        <span :class="styles.logoMark" aria-hidden="true">B</span>
-        <RouterLink to="/" :class="styles.brand">Bunker</RouterLink>
-      </div>
-      <nav :class="styles.nav">
-        <template v-if="authStore.profile">
-          <RouterLink
-            to="/lobbies"
-            :class="[styles.navLink, $route.path.startsWith('/lobbies') && !$route.path.startsWith('/lobbies/new') ? styles.navLinkActive : '']"
-          >
-            Lobbies
-          </RouterLink>
-          <RouterLink
-            to="/lobbies/new"
-            :class="[styles.navLink, $route.path === '/lobbies/new' ? styles.navLinkActive : '']"
-          >
-            Create
-          </RouterLink>
-          <button :class="styles.userChip" @click="authStore.logout()" :title="`Logged in as ${authStore.profile.nickname}`">
-            <span :class="styles.avatar">{{ initial }}</span>
-            <span>{{ authStore.profile.nickname }}</span>
-            <span :class="styles.chipExit" aria-hidden="true">↩</span>
-          </button>
-        </template>
-        <button v-else :class="styles.primaryButton" @click="authStore.login()">
-          Log in
-        </button>
-      </nav>
-    </header>
-    <main :class="styles.main">
+    <AppHeader :transparent="isLanding" />
+    <main :class="[styles.main, isLanding && styles.mainLanding]">
       <RouterView />
     </main>
 

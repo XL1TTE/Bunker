@@ -7,6 +7,10 @@ internal sealed class CreateLobbyRequestValidator : AbstractValidator<CreateLobb
 {
     public CreateLobbyRequestValidator()
     {
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(64);
+
         RuleFor(x => x.Capacity)
             .GreaterThanOrEqualTo(4);
 
@@ -24,6 +28,11 @@ internal sealed class UpdateSettingsRequestValidator : AbstractValidator<UpdateS
         RuleFor(x => x.Capacity)
             .GreaterThanOrEqualTo(4)
             .When(x => x.Capacity is not null);
+
+        RuleFor(x => x.Name)
+            .NotEmpty()
+            .MaximumLength(64)
+            .When(x => x.Name is not null);
 
         RuleFor(x => x.SelectedPackIds)
             .Must(ids => ids is null || ids.All(id => Guid.TryParse(id, out _)))

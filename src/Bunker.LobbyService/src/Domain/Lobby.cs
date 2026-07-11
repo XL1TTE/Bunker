@@ -22,6 +22,7 @@ public record Lobby
 
     public Id PublicId { get; internal set; }
     public InviteCode InviteCode { get; internal set; }
+    public LobbyName Name        { get; internal set; }
     public int Capacity          { get; internal set; }
 
     public PrivacyPolicy PrivacyPolicy { get; internal set; } = PrivacyPolicy.PublicPolicy();
@@ -38,6 +39,7 @@ public record Lobby
 }
 
 public readonly record struct LobbyConfiguration(
+    LobbyName Name,
     int Capacity,
     PrivacyPolicy Visibility,
     IReadOnlyCollection<PlayerParticipant> Players,
@@ -48,8 +50,8 @@ public static class LobbyFactory
 {       
     extension (Lobby)
     {
-        public static Lobby Create(int capacity, PrivacyPolicy visibility)
-            => CreateValid(new LobbyConfiguration(capacity, visibility, [], [], []));
+        public static Lobby Create(int capacity, PrivacyPolicy visibility, LobbyName name)
+            => CreateValid(new LobbyConfiguration(name, capacity, visibility, [], [], []));
 
         public static Lobby Create(LobbyConfiguration configuration) => CreateValid(configuration);
 
@@ -64,6 +66,7 @@ public static class LobbyFactory
             {
                 PublicId = Lobby.Id.New(),
                 InviteCode = InviteCode.New(),
+                Name = configuration.Name,
                 Capacity = configuration.Capacity,
                 PrivacyPolicy = configuration.Visibility,
                 Participants = [.. configuration.Players, .. configuration.Bots],

@@ -16,6 +16,7 @@ internal static partial class IRouteBuilderExtensions
 
         root.MapPost("/{lobbyId:guid}/leave", LobbyEndpoints.Leave);
         root.MapGet("/{lobbyId:guid}", LobbyEndpoints.GetOne);
+        root.MapGet("/{lobbyId:guid}/invite-code", LobbyEndpoints.GetInviteCode);
         root.MapGet("/", LobbyEndpoints.List);
         root.MapPatch("/{lobbyId:guid}/settings", LobbyEndpoints.UpdateSettings);
 

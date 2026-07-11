@@ -1,0 +1,26 @@
+.toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-pill);
+  border: none;
+  background-color: transparent;
+  color: var(--color-text);
+}
+
+.toggle:hover {
+  color: var(--color-heading);
+}
+
+.toggle:focus-visible {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.icon {
+  width: 20px;
+  height: 20px;
+}

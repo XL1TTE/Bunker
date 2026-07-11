@@ -28,7 +28,7 @@ public static class LobbyMappers
             var host = lobby.Participants.FirstOrDefault(x => x.Role == Role.Host);
             return new Transfer.LobbySnapshot(
                 Id: lobby.PublicId.Value.ToString(),
-                InviteCode: lobby.InviteCode.Value,
+                Name: lobby.Name.Value,
                 Capacity: lobby.Capacity,
                 IsPublic: lobby.PrivacyPolicy.IsVisible,
                 HostParticipantId: host?.PublicId.Value.ToString(),
@@ -43,7 +43,7 @@ public static class LobbyMappers
             var host = lobby.Participants.FirstOrDefault(x => x.Role == Role.Host);
             return new Transfer.LobbySummary(
                 Id: lobby.PublicId.Value.ToString(),
-                InviteCode: lobby.InviteCode.Value,
+                Name: lobby.Name.Value,
                 Capacity: lobby.Capacity,
                 CurrentPlayers: lobby.Participants.Count,
                 HasPassword: !string.IsNullOrEmpty(lobby.PrivacyPolicy.Password),

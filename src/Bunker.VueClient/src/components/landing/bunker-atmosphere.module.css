@@ -1,0 +1,144 @@
+.atmosphere {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  z-index: 0;
+  --parallax: 0px;
+  /* Fade the atmosphere out toward the hero's bottom edge so the clipped glow
+   * blobs dissolve into the page background — no hard "square" seam when
+   * scrolling. Top is left solid so the signal light at 18% stays crisp. */
+  mask-image: linear-gradient(to bottom, black 0%, black 62%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, black 0%, black 62%, transparent 100%);
+}
+
+/* Two large, slow-drifting glow blobs tinted with the brand accents. */
+.glow {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.5;
+  will-change: transform;
+  transform: translateY(calc(var(--parallax) * 0.4));
+}
+
+.glowA {
+  width: 60vw;
+  height: 60vw;
+  max-width: 720px;
+  max-height: 720px;
+  left: -10vw;
+  top: -20vh;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-primary) 35%, transparent),
+    transparent 70%
+  );
+  animation: glowDrift 24s var(--ease) infinite alternate;
+}
+
+.glowB {
+  width: 50vw;
+  height: 50vw;
+  max-width: 600px;
+  max-height: 600px;
+  right: -10vw;
+  bottom: -25vh;
+  background: radial-gradient(
+    circle,
+    color-mix(in srgb, var(--color-accent) 30%, transparent),
+    transparent 70%
+  );
+  animation: glowDrift 30s var(--ease) infinite alternate-reverse;
+}
+
+/* Drifting embers/dust motes rising from the bottom. */
+.mote {
+  position: absolute;
+  bottom: -10px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--color-accent) 70%, transparent);
+  opacity: 0;
+  will-change: transform, opacity;
+  animation-name: drift;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+  transform: translateY(calc(var(--parallax) * 0.7));
+}
+
+/* A thin vertical signal light that flickers occasionally. */
+.signal {
+  position: absolute;
+  top: 18%;
+  left: 12%;
+  width: 2px;
+  height: 64px;
+  background: linear-gradient(var(--color-accent), transparent);
+  opacity: 0;
+  animation: flicker 9s var(--ease) infinite;
+}
+
+@keyframes drift {
+  0% {
+    transform: translateY(0) translateX(0) translateZ(0);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.5;
+  }
+  100% {
+    transform: translateY(-110vh) translateX(var(--drift)) translateZ(0);
+    opacity: 0;
+  }
+}
+
+@keyframes glowDrift {
+  from {
+    transform: translate(0, 0) scale(1) translateY(calc(var(--parallax) * 0.4));
+  }
+  to {
+    transform: translate(4vw, 3vh) scale(1.1) translateY(calc(var(--parallax) * 0.4));
+  }
+}
+
+@keyframes flicker {
+  0%,
+  92%,
+  100% {
+    opacity: 0;
+  }
+  93%,
+  96% {
+    opacity: 0.9;
+  }
+  94% {
+    opacity: 0.2;
+  }
+}
+
+/* Reduced motion: freeze everything, but keep the elements VISIBLE (never
+ * opacity:0 hidden by default). Parallax listener is not attached in JS. */
+@media (prefers-reduced-motion: reduce) {
+  .glow,
+  .mote,
+  .signal {
+    animation: none;
+  }
+  .mote {
+    opacity: 0.5;
+    bottom: auto;
+    top: 22%;
+  }
+  .glow {
+    opacity: 0.4;
+  }
+  .signal {
+    opacity: 0.35;
+  }
+  .atmosphere {
+    --parallax: 0px;
+  }
+}

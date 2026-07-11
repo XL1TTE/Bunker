@@ -11,9 +11,11 @@ import type {
 export interface ILobbyApi {
   createLobby(request: CreateLobbyRequest): Promise<LobbySnapshot>;
   joinLobby(inviteCode: string): Promise<LobbySnapshot>;
+  joinLobbyById(lobbyId: string): Promise<LobbySnapshot>;
   joinLobbyByPassword(lobbyId: string, password: string): Promise<LobbySnapshot>;
   leaveLobby(lobbyId: string): Promise<void>;
   getLobby(lobbyId: string): Promise<LobbySnapshot>;
+  getInviteCode(lobbyId: string): Promise<{ inviteCode: string }>;
   listPublicLobbies(limit?: number, offset?: number): Promise<{ items: LobbySummary[]; total: number }>;
   updateSettings(lobbyId: string, request: UpdateSettingsRequest): Promise<LobbySnapshot>;
   addBot(lobbyId: string, request: AddBotRequest): Promise<LobbySnapshot>;

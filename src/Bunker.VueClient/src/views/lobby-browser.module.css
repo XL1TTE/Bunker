@@ -1,68 +1,213 @@
-.container {
+/* Lobbies browser. Reuses the landing page's visual language: a page intro
+ * (eyebrow / title / subtitle) like a landing section, a primary CTA, a
+ * landing-style card for the join-by-code panel, and token-only color (no
+ * #0b0e14, no rgba warning tints). This view sits inside the app shell's
+ * .main frame (which already provides the content column + padding), so it
+ * does NOT use the global .container utility. */
+
+.page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-5);
+  gap: var(--space-6);
+  padding-top: var(--space-2);
 }
 
-.headingBlock {
+/* ---------- Page intro ---------- */
+.pageHead {
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
-  gap: var(--space-4);
+  gap: var(--space-5);
   flex-wrap: wrap;
 }
 
+.headText {
+  max-width: 640px;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  margin-bottom: var(--space-3);
+}
+
 .title {
-  margin: 0 0 var(--space-1);
-  font-size: 28px;
+  margin: 0 0 var(--space-3);
+  font-size: clamp(28px, 4vw, 40px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  color: var(--color-heading);
+  text-wrap: balance;
 }
 
 .subtitle {
-  color: var(--color-text-muted);
   margin: 0;
-  font-size: 14px;
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 60ch;
+  text-wrap: pretty;
 }
 
-.toolbar {
-  display: flex;
-  gap: var(--space-3);
-  align-items: center;
-}
-
-.newButton {
+.newLobby {
   display: inline-flex;
   align-items: center;
   gap: var(--space-2);
   background-color: var(--color-primary);
-  color: #0b0e14;
+  color: var(--color-on-primary);
   border-radius: var(--radius-md);
-  padding: 10px 16px;
-  font-weight: 600;
+  padding: 12px 18px;
+  font-weight: 700;
+  font-size: 14px;
   box-shadow: var(--shadow-sm);
 }
 
-.newButton:hover {
+.newLobby:hover {
   background-color: var(--color-primary-hover);
   box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
 }
 
-.empty {
+.newLobbyIcon {
+  width: 18px;
+  height: 18px;
+}
+
+/* ---------- Join-by-code panel (relocated from the create page) ---------- */
+/* Landing-style card: light surface tint, branded top accent edge, hover
+ * lift. Two columns on desktop (lead text | form), stacks on mobile. */
+.joinPanel {
+  position: relative;
   display: flex;
-  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  background-color: color-mix(in srgb, var(--color-surface) 18%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  transition:
+    border-color var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease);
+}
+
+.joinPanel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-heading), color-mix(in srgb, var(--color-accent) 55%, transparent));
+  opacity: 0.45;
+}
+
+.joinPanel:focus-within {
+  border-color: var(--color-heading);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 22%, transparent);
+}
+
+.joinLead {
+  display: flex;
+  align-items: center;
+  gap: var(--space-4);
+}
+
+.joinIcon {
+  display: inline-flex;
   align-items: center;
   justify-content: center;
-  text-align: center;
-  padding: var(--space-8) var(--space-4);
-  background-color: var(--color-surface);
-  border: 1px dashed var(--color-border-strong);
-  border-radius: var(--radius-lg);
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 22%, transparent);
+  color: var(--color-heading);
+}
+
+.joinIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.joinTitle {
+  margin: 0 0 var(--space-1);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+.joinHint {
+  margin: 0;
+  font-size: 13px;
   color: var(--color-text-muted);
 }
 
-.emptyTitle {
-  font-size: 18px;
-  color: var(--color-text);
-  margin: 0 0 var(--space-2);
+.joinForm {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+}
+
+.joinInput {
+  width: 160px;
+  font-family: var(--font-mono);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.joinBtn {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-md);
+  padding: 12px 22px;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.joinBtn:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* ---------- Public list ---------- */
+.listHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-3);
+  margin-top: var(--space-1);
+}
+
+.listTitle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-heading);
+}
+
+.listIcon {
+  width: 16px;
+  height: 16px;
+}
+
+.listCount {
+  font-size: 13px;
+  color: var(--color-text-dim);
 }
 
 .list {
@@ -74,6 +219,70 @@
   gap: var(--space-4);
 }
 
+/* ---------- Empty state ---------- */
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  gap: var(--space-2);
+  padding: var(--space-8) var(--space-5);
+  background-color: color-mix(in srgb, var(--color-surface) 8%, transparent);
+  border: 1px dashed var(--color-border-strong);
+  border-radius: var(--radius-lg);
+}
+
+.emptyIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 22%, transparent);
+  color: var(--color-heading);
+  margin-bottom: var(--space-2);
+}
+
+.emptyIcon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  margin: 0;
+}
+
+.emptyBody {
+  color: var(--color-text-muted);
+  font-size: 14px;
+  margin: 0 0 var(--space-3);
+  max-width: 46ch;
+}
+
+.emptyCta {
+  display: inline-flex;
+  align-items: center;
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-md);
+  padding: 11px 20px;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: var(--shadow-sm);
+}
+
+.emptyCta:hover {
+  background-color: var(--color-primary-hover);
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* ---------- Modal content (leave + password) ---------- */
 .passwordHint {
   margin: 0 0 var(--space-3);
   color: var(--color-text-muted);
@@ -92,30 +301,83 @@
   gap: var(--space-2);
 }
 
+/* Secondary modal action: bare control (no heavy surface fill), matching the
+ * header's bare Sign in / nav-link language. */
 .passwordCancel {
   border-radius: var(--radius-md);
-  padding: 8px 14px;
+  padding: 9px 16px;
   color: var(--color-text-muted);
-  border: 1px solid var(--color-border);
-  background-color: var(--color-surface);
-  font-weight: 500;
+  font-weight: 600;
+  font-size: 14px;
+  transition: color var(--t-base) var(--ease);
 }
 
-.passwordCancel:hover {
+.passwordCancel:hover:not(:disabled) {
   color: var(--color-text);
-  border-color: var(--color-border-strong);
 }
 
+/* Primary modal action: brand fill, on-primary text (no #0b0e14). */
 .passwordSubmit {
   border-radius: var(--radius-md);
-  padding: 8px 16px;
+  padding: 9px 18px;
   background-color: var(--color-primary);
-  color: #0b0e14;
-  font-weight: 600;
+  color: var(--color-on-primary);
+  font-weight: 700;
+  font-size: 14px;
   box-shadow: var(--shadow-sm);
 }
 
 .passwordSubmit:hover:not(:disabled) {
   background-color: var(--color-primary-hover);
   box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+/* ---------- One-shot entrance (app page — not replayable) ---------- */
+.joinPanel,
+.list li {
+  animation: browserIn 0.5s var(--ease) both;
+}
+
+.list li:nth-child(1) { animation-delay: 0.04s; }
+.list li:nth-child(2) { animation-delay: 0.08s; }
+.list li:nth-child(3) { animation-delay: 0.12s; }
+.list li:nth-child(4) { animation-delay: 0.16s; }
+.list li:nth-child(5) { animation-delay: 0.20s; }
+.list li:nth-child(6) { animation-delay: 0.24s; }
+.list li:nth-child(n + 7) { animation-delay: 0.28s; }
+
+@keyframes browserIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .joinPanel,
+  .list li {
+    animation: none;
+  }
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 720px) {
+  .pageHead {
+    align-items: flex-start;
+  }
+  .joinPanel {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .joinForm {
+    width: 100%;
+  }
+  .joinInput {
+    width: 100%;
+  }
 }

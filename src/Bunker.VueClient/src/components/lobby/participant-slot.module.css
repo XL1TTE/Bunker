@@ -1,9 +1,14 @@
+/* Participant slot — a sub-card inside the participants panel. Light surface
+ * tint (not a solid slab), sharp corners, token-only color. Role/identity is
+ * carried by semantic tints: host → warning, bot → bot token, ready → success.
+ * No #0b0e14 (avatars use --color-on-*), no rgba badge tints. */
+
 .slot {
   position: relative;
   display: flex;
   align-items: center;
   gap: var(--space-3);
-  background-color: var(--color-bg-elev);
+  background-color: color-mix(in srgb, var(--color-surface) 14%, transparent);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   padding: var(--space-3);
@@ -16,15 +21,18 @@
   border-color: var(--color-border-strong);
 }
 
+/* The host's own slot is emphasized with a warning tint + border. */
 .hostSlot {
-  border-color: var(--color-warning);
-  background-color: rgba(210, 153, 34, 0.06);
+  border-color: color-mix(in srgb, var(--color-warning) 45%, transparent);
+  background-color: color-mix(in srgb, var(--color-warning) 10%, transparent);
 }
 
+/* Bots read as "not a real player" — a dashed border, same tint as a slot. */
 .botSlot {
   border-style: dashed;
 }
 
+/* ---------- Avatar ---------- */
 .avatar {
   width: 36px;
   height: 36px;
@@ -34,22 +42,28 @@
   justify-content: center;
   font-weight: 800;
   font-size: 14px;
-  color: #0b0e14;
   flex-shrink: 0;
+  /* Initial color is overridden per role below via the on-* tokens so the
+   * letter always contrasts its gradient fill. */
+  color: var(--color-on-primary);
 }
 
 .avatarPlayer {
-  background: linear-gradient(135deg, var(--color-primary), #2d6dcc);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-primary-hover));
+  color: var(--color-on-primary);
 }
 
 .avatarHost {
-  background: linear-gradient(135deg, var(--color-warning), #b87a0f);
+  background: linear-gradient(135deg, var(--color-warning), color-mix(in srgb, var(--color-warning) 70%, var(--color-text)));
+  color: var(--color-on-warning);
 }
 
 .avatarBot {
-  background: linear-gradient(135deg, var(--color-bot), #6d3fd9);
+  background: linear-gradient(135deg, var(--color-bot), color-mix(in srgb, var(--color-bot) 70%, var(--color-text)));
+  color: var(--color-on-bot);
 }
 
+/* ---------- Info ---------- */
 .info {
   flex: 1;
   display: flex;
@@ -76,7 +90,7 @@
 
 .youBadge {
   background-color: var(--color-primary);
-  color: #0b0e14;
+  color: var(--color-on-primary);
   font-size: 9px;
   padding: 2px 6px;
   border-radius: var(--radius-pill);
@@ -92,8 +106,10 @@
   flex-wrap: wrap;
 }
 
+/* Role/status chips — framed semantic tints (text + border + bg from the one
+ * semantic token), replacing the old rgba(…, 0.15) triplets. */
 .botBadge {
-  background-color: rgba(163, 113, 247, 0.15);
+  background-color: color-mix(in srgb, var(--color-bot) 14%, transparent);
   color: var(--color-bot);
   font-size: 10px;
   padding: 2px 8px;
@@ -101,11 +117,11 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border: 1px solid rgba(163, 113, 247, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-bot) 40%, transparent);
 }
 
 .hostBadge {
-  background-color: rgba(210, 153, 34, 0.15);
+  background-color: color-mix(in srgb, var(--color-warning) 14%, transparent);
   color: var(--color-warning);
   font-size: 10px;
   padding: 2px 8px;
@@ -113,7 +129,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  border: 1px solid rgba(210, 153, 34, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 40%, transparent);
 }
 
 .statusBadge {
@@ -127,35 +143,41 @@
 }
 
 .statusReady {
-  background-color: rgba(63, 185, 80, 0.12);
+  background-color: color-mix(in srgb, var(--color-success) 14%, transparent);
   color: var(--color-success);
-  border-color: rgba(63, 185, 80, 0.3);
+  border-color: color-mix(in srgb, var(--color-success) 40%, transparent);
 }
 
 .statusNotReady {
-  background-color: var(--color-surface);
+  background-color: color-mix(in srgb, var(--color-surface) 12%, transparent);
   color: var(--color-text-muted);
   border-color: var(--color-border);
 }
 
+/* ---------- Actions ---------- */
 .actions {
   display: flex;
   gap: var(--space-1);
   flex-shrink: 0;
 }
 
+/* Kick/Remove — bare ghost controls. No border/bg at rest; danger wash + border
+ * on hover so the destructive intent shows up only when it's about to be used. */
 .kickButton {
-  background-color: transparent;
   color: var(--color-text-dim);
-  border: 1px solid var(--color-border);
+  border: 1px solid transparent;
   border-radius: var(--radius-sm);
   padding: 6px 10px;
   font-size: 11px;
   font-weight: 600;
+  transition:
+    color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease);
 }
 
 .kickButton:hover {
   color: var(--color-danger);
   border-color: var(--color-danger-dim);
-  background-color: rgba(248, 81, 73, 0.08);
+  background-color: color-mix(in srgb, var(--color-danger) 10%, transparent);
 }

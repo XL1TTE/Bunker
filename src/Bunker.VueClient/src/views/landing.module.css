@@ -1,0 +1,659 @@
+/* Landing page styles. The hero is full-bleed (100vh, edge-to-edge) with the
+ * BunkerAtmosphere layered behind the content; the sections below are normal
+ * max-width content on the themed body background.
+ *
+ * Animation budget:
+ *  - Hero content fades/slides in once on load (staggered).
+ *  - Each non-hero block and the text inside it reveal on scroll (staggered).
+ *  - The How-to-Play section is a horizontal auto-scrolling marquee of the
+ *    step titles (no numbers, no descriptions) — pauses on hover.
+ *  - All animation respects prefers-reduced-motion (elements stay visible).
+ */
+
+.landing {
+  position: relative;
+  /* Prevent the full-bleed .sectionAlt band (100vw pseudo) from causing a
+   * horizontal page scrollbar. `clip` (not `hidden`) avoids creating a scroll
+   * container, so the page's normal scroll + the sticky header still work. */
+  overflow-x: clip;
+}
+
+/* ---------- Section 1 — Hero ---------- */
+/* Left-aligned hero (not centered). A consistent left axis matches the
+ * sections below, gives the eye a stable starting point (F-pattern scan), and
+ * avoids the ragged left edge / per-line re-anchoring that centered paragraphs
+ * produce. The content column shares the sections' 1100px measure so its left
+ * edge aligns with the section text; the headline's own max-width +
+ * text-wrap: balance keep the display type to clean balanced lines. */
+.hero {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-height: 100vh;
+  padding: calc(var(--space-8) + 40px) 0 var(--space-8);
+  overflow: hidden;
+}
+
+.heroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(color-mix(in srgb, var(--color-primary) 6%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--color-primary) 6%, transparent) 1px, transparent 1px);
+  background-size: 32px 32px;
+  /* Mask shifted left to back the left-aligned copy. */
+  mask-image: radial-gradient(ellipse 65% 55% at 38% 50%, black 30%, transparent 82%);
+  -webkit-mask-image: radial-gradient(ellipse 65% 55% at 38% 50%, black 30%, transparent 82%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.eyebrow {
+  display: inline-block;
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  padding: 6px 14px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-pill);
+  background: color-mix(in srgb, var(--color-surface) 22%, transparent);
+  margin-bottom: var(--space-5);
+}
+
+.title {
+  font-size: clamp(40px, 8vw, 84px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.08;
+  margin: 0 0 var(--space-5);
+  max-width: 1000px;
+  /* Solid heading color — a vertical gradient on a multi-line headline makes
+   * line 2 dimmer than line 1, which reads as noise on large type. */
+  color: var(--color-heading);
+  text-wrap: balance;
+}
+
+.subtitle {
+  font-size: clamp(16px, 2.2vw, 20px);
+  line-height: 1.6;
+  color: var(--color-text-muted);
+  max-width: 56ch;
+  margin: 0 0 var(--space-6);
+  text-wrap: pretty;
+}
+
+.actions {
+  display: flex;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  justify-content: flex-start;
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  border-radius: var(--radius-md);
+  padding: 14px 28px;
+  font-weight: 700;
+  font-size: 16px;
+  text-decoration: none;
+  box-shadow: var(--shadow-md);
+}
+
+.cta:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+  color: var(--color-on-primary);
+  text-decoration: none;
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-1px);
+}
+
+.cta:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+.ctaGhost {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: transparent;
+  color: var(--color-text);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-md);
+  padding: 14px 24px;
+  font-weight: 600;
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.ctaGhost:hover {
+  background-color: color-mix(in srgb, var(--color-surface) 20%, transparent);
+  border-color: var(--color-heading);
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+/* Hero entrance — staggered fade-up on load. */
+.eyebrow,
+.title,
+.subtitle,
+.actions {
+  animation: heroIn 0.75s var(--ease) both;
+}
+.eyebrow { animation-delay: 0.05s; }
+.title { animation-delay: 0.15s; }
+.subtitle { animation-delay: 0.32s; }
+.actions { animation-delay: 0.48s; }
+
+@keyframes heroIn {
+  from {
+    opacity: 0;
+    transform: translateY(16px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ---------- Shared section framing ---------- */
+/* Sections are full-bleed (edge to edge) so an alternating background band
+ * clearly separates one neighbor from the next. Content is held in the shared
+ * global .container column (see global.css), so every section's left/right
+ * edges — and the hero's — share one source of truth. */
+.section {
+  position: relative;
+  padding: var(--space-8) 0;
+}
+
+/* Alternating neighbor sections get a full-bleed tinted band so you can see
+ * where one ends and the next begins. The tint strength is theme-aware
+ * (--section-alt-bg): in light it's a gentle pale-teal lift, in dark a much
+ * subtler 7% teal lift so the band reads "slightly different" rather than a
+ * hard green stripe against the near-dark plain sections. */
+.sectionAlt {
+  background: var(--section-alt-bg);
+}
+
+.sectionHead {
+  max-width: 680px;
+  margin-bottom: var(--space-6);
+}
+
+.sectionTitle {
+  font-size: clamp(26px, 4vw, 36px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0 0 var(--space-3);
+}
+
+.sectionIntro {
+  font-size: 17px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+.footnote {
+  margin-top: var(--space-5);
+  font-size: 13px;
+  color: var(--color-text-dim);
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.footnote::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--color-success);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-success) 25%, transparent);
+}
+
+/* ---------- Section 2 — AI-generated content (3 cards) ---------- */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-5);
+}
+
+/* Reveal wrapper is the grid item; the card fills it and keeps its own hover
+ * transitions (no transition-property clobber between reveal and hover). */
+.cardWrap {
+  display: flex;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  background-color: color-mix(in srgb, var(--color-surface) 18%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  transition:
+    border-color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    transform var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease);
+}
+
+/* Branded top accent edge — a heading->accent gradient strip that sits just
+ * inside the top border and brightens on hover. */
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-heading), color-mix(in srgb, var(--color-accent) 55%, transparent));
+  opacity: 0.45;
+  transition: opacity var(--t-base) var(--ease);
+}
+
+.card:hover {
+  border-color: var(--color-heading);
+  background-color: color-mix(in srgb, var(--color-surface) 28%, transparent);
+  transform: translateY(-3px);
+  box-shadow: 0 10px 28px color-mix(in srgb, var(--color-heading) 18%, transparent);
+}
+
+.card:hover::before {
+  opacity: 1;
+}
+
+/* Framed icon badge — a sharp-cornered square chip holding the card's glyph.
+ * On hover its border tightens to the heading color and it picks up a soft
+ * glow, so the card has a focal point instead of being a wall of text. */
+.cardIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 22%, transparent);
+  color: var(--color-heading);
+  margin-bottom: var(--space-4);
+  transition:
+    border-color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease);
+}
+
+.cardIcon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.card:hover .cardIcon {
+  border-color: var(--color-heading);
+  background: color-mix(in srgb, var(--color-surface) 40%, transparent);
+  box-shadow: 0 0 18px color-mix(in srgb, var(--color-heading) 22%, transparent);
+}
+
+.cardTitle {
+  font-size: 17px;
+  font-weight: 700;
+  margin: 0 0 var(--space-2);
+}
+
+.cardBody {
+  font-size: 14px;
+  color: var(--color-text);
+  margin: 0;
+}
+
+/* ---------- Section 3 — How to play (horizontal marquee) ---------- */
+/* A single horizontal line of step-title chips that auto-scrolls left
+ * forever. The list is duplicated once and the track translates by -50%, so
+ * the loop is seamless. Each chip carries a trailing margin (not a flex gap)
+ * so -50% equals exactly one set width. This section is NOT interactive: it
+ * does not pause on hover and the chips have no hover state. Under reduced
+ * motion it becomes a manually scrollable row. */
+.howScroll {
+  position: relative;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+  mask-image: linear-gradient(to right, transparent, black 7%, black 93%, transparent);
+  padding: var(--space-3) 0;
+}
+
+.howTrack {
+  display: flex;
+  width: max-content;
+  animation: howMarquee 42s linear infinite;
+}
+
+.howChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-5);
+  margin-right: var(--space-5);
+  border: 1px solid var(--color-border);
+  background: color-mix(in srgb, var(--color-surface) 16%, transparent);
+  white-space: nowrap;
+}
+
+.howDot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--color-heading);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--color-accent) 50%, transparent);
+  flex: 0 0 auto;
+  animation: dotPulse 3.4s var(--ease) infinite;
+}
+
+.howLabel {
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--color-text);
+}
+
+@keyframes howMarquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    box-shadow: 0 0 6px color-mix(in srgb, var(--color-accent) 35%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 12px color-mix(in srgb, var(--color-accent) 65%, transparent);
+  }
+}
+
+/* ---------- Section 4 — What you get (feature grid) ---------- */
+.features {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--space-4);
+}
+
+.featureWrap {
+  display: flex;
+}
+
+.feature {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  width: 100%;
+  background-color: color-mix(in srgb, var(--color-surface) 14%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  transition:
+    border-color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    transform var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease);
+}
+
+.feature:hover {
+  border-color: var(--color-heading);
+  background-color: color-mix(in srgb, var(--color-surface) 24%, transparent);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 22px color-mix(in srgb, var(--color-heading) 16%, transparent);
+}
+
+.featureIcon {
+  width: 28px;
+  height: 28px;
+  color: var(--color-heading);
+  margin-bottom: var(--space-1);
+}
+
+.featureTitle {
+  font-size: 15px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.featureDesc {
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  margin: 0;
+}
+
+/* Section 5 (final call) was merged into the footer — see .footerCta below. */
+
+/* ---------- Footer ---------- */
+/* Full-bleed footer on the alternating alt band, with a centered inner column.
+ * Left: brand block (mark + name + tagline). Right: three link columns — Play
+ * (working How-to-Play / Play-Now actions), Legal (placeholder policies), Social
+ * (placeholder handles, all href="#"). Bottom bar: copyright + tagline. */
+.footer {
+  /* Gap above the footer so the last content section and the footer don't sit
+   * flush — a band of body background separates them (the "bottom gap"). */
+  margin-top: var(--space-7);
+  border-top: 1px solid var(--color-border);
+  background: var(--section-alt-bg);
+}
+
+.footerInner {
+  padding-top: var(--space-7);
+  padding-bottom: var(--space-6);
+}
+
+/* Merged pre-footer CTA: the old standalone final-call section now lives as a
+ * headline + Play-Now row at the top of the footer, separated from the link
+ * columns by a hairline divider. */
+.footerCta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-5);
+  flex-wrap: wrap;
+  padding-bottom: var(--space-6);
+  margin-bottom: var(--space-6);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.footerCtaTitle {
+  font-size: clamp(20px, 3vw, 30px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin: 0;
+  max-width: 720px;
+  color: var(--color-heading);
+}
+
+.footerTop {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-6);
+  flex-wrap: wrap;
+}
+
+.footerBrandBlock {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  max-width: 260px;
+}
+
+.footerMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: var(--radius-xs);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-bot));
+  color: var(--color-on-primary);
+  font-weight: 800;
+  font-size: 16px;
+  flex: 0 0 auto;
+}
+
+.footerName {
+  display: block;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
+}
+
+.footerTag {
+  font-size: 13px;
+  color: var(--color-text-dim);
+  margin: 2px 0 0;
+}
+
+.footerCols {
+  display: flex;
+  gap: var(--space-7);
+  flex-wrap: wrap;
+}
+
+.footerColTitle {
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--color-heading);
+  margin: 0 0 var(--space-3);
+}
+
+.footerList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+/* Shared styling for the column links. Works for both <a> placeholders and
+ * <button> actions (padding/text-align reset so the button reads like a link). */
+.footerLink {
+  display: inline-block;
+  padding: 0;
+  text-align: left;
+  text-decoration: none;
+  font-size: 13.5px;
+  color: var(--color-text-muted);
+  transition: color var(--t-fast) var(--ease);
+}
+
+.footerLink:hover {
+  color: var(--color-text);
+}
+
+.footerBottom {
+  margin-top: var(--space-6);
+  padding-top: var(--space-5);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  justify-content: space-between;
+  gap: var(--space-3);
+  flex-wrap: wrap;
+  font-size: 12.5px;
+  color: var(--color-text-dim);
+}
+
+.footerMade {
+  color: var(--color-text-dim);
+}
+
+/* ---------- Scroll reveal (subtle, staggered, replays on re-entry) ----------
+ * The directive adds .reveal on mount and toggles .revealVisible each time the
+ * element enters or leaves the viewport, so the reveal replays on every
+ * re-entry (not one-shot). For blocks whose inner element also has hover
+ * transitions, the reveal is on a wrapper (.cardWrap / .featureWrap) so the
+ * reveal's transition and the hover transition never share an element. */
+.reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition:
+    opacity 0.55s var(--ease),
+    transform 0.55s var(--ease);
+}
+
+.revealVisible {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- Responsive ---------- */
+@media (max-width: 900px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+  .features {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 560px) {
+  .features {
+    grid-template-columns: 1fr;
+  }
+  .footerCta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .footerTop {
+    flex-direction: column;
+  }
+  .footerBottom {
+    justify-content: flex-start;
+  }
+}
+
+/* Reduced motion: no entrance/reveal/marquee animation — everything renders
+ * in its final state and stays visible/reachable. The marquee becomes a
+ * horizontally scrollable row (overflow-x: auto) so all titles are still
+ * reachable without animation. */
+@media (prefers-reduced-motion: reduce) {
+  .eyebrow,
+  .title,
+  .subtitle,
+  .actions {
+    animation: none;
+  }
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+  .howScroll {
+    overflow-x: auto;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+  .howTrack {
+    animation: none;
+    transform: none;
+  }
+  .howDot {
+    animation: none;
+  }
+}

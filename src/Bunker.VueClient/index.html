@@ -4,6 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Bunker</title>
+    <!--
+      Set the theme on <html> before first paint so the correct token set is
+      used on the very first frame (main.ts is a deferred module and would
+      otherwise flash the default dark theme). Persisted choice wins; else OS
+      preference; else dark. Kept inline + synchronous intentionally.
+    -->
+    <script>
+      (function () {
+        try {
+          var stored = localStorage.getItem('bunker:theme');
+          var theme =
+            stored === 'dark' || stored === 'light'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: light)').matches
+                ? 'light'
+                : 'dark';
+          var root = document.documentElement;
+          root.setAttribute('data-theme', theme);
+          root.style.backgroundColor = theme === 'light' ? '#D1E8E2' : '#2C3531';
+        } catch (e) {
+          var root = document.documentElement;
+          root.setAttribute('data-theme', 'dark');
+          root.style.backgroundColor = '#2C3531';
+        }
+      })();
+    </script>
   </head>
   <body>
     <div id="app"></div>

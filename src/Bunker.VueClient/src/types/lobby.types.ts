@@ -15,7 +15,7 @@ export interface Participant {
 
 export interface LobbySnapshot {
   id: string;
-  inviteCode: string;
+  name: string;
   capacity: number;
   isPublic: boolean;
   hostParticipantId: string;
@@ -26,7 +26,7 @@ export interface LobbySnapshot {
 
 export interface LobbySummary {
   id: string;
-  inviteCode: string;
+  name: string;
   capacity: number;
   currentPlayers: number;
   hasPassword: boolean;
@@ -45,6 +45,7 @@ export interface ChatMessage {
 export type LobbyDestroyedReason = 'HostLeft' | 'CapacityChanged' | 'Kicked';
 
 export interface CreateLobbyRequest {
+  name: string;
   capacity: number;
   isPublic: boolean;
   selectedPackIds: string[];

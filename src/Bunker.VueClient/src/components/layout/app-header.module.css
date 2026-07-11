@@ -1,0 +1,212 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--space-3) var(--space-5);
+  background-color: color-mix(in srgb, var(--color-bg) 78%, transparent);
+  backdrop-filter: saturate(140%) blur(10px);
+  -webkit-backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid var(--color-border);
+}
+
+/* Landing hero variant: float over the full-bleed hero instead of sticking. */
+.transparent {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  background-color: transparent;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+  border-bottom: none;
+}
+
+.brandWrap {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.logoMark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(135deg, var(--color-primary), var(--color-bot));
+  color: var(--color-on-primary);
+  font-weight: 800;
+  font-size: 14px;
+  letter-spacing: 0.05em;
+  box-shadow: var(--shadow-glow);
+}
+
+.brand {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  letter-spacing: 0.02em;
+}
+
+.brand:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.nav {
+  display: flex;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+/* Nav links are bare text — no background, no border, matching the bare Sign
+ * in button. State is conveyed by color alone: muted (idle) -> text (hover) ->
+ * heading (current page). No radius/bg means nothing to clash with the
+ * transparent header over the hero. */
+.navLink {
+  padding: 8px 12px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  transition: color var(--t-base) var(--ease);
+}
+
+.navLink:hover {
+  color: var(--color-text);
+  text-decoration: none;
+}
+
+.navLinkActive {
+  color: var(--color-heading);
+}
+
+/* Profile chip is bare too — no border, no surface fill (the avatar's gradient
+ * circle is the user's mark, not button chrome). Hover brightens the name and
+ * the exit icon rather than lighting a background. */
+.userChip {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 6px 12px 6px 6px;
+  background-color: transparent;
+  color: var(--color-text);
+  font-size: 13px;
+  font-weight: 500;
+  transition: color var(--t-base) var(--ease);
+}
+
+.userChip:hover {
+  color: var(--color-heading);
+}
+
+.userChip:hover .chipExit {
+  opacity: 1;
+}
+
+.userName {
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.chipExit {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+.avatar {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-bot));
+  color: var(--color-on-primary);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.primaryButton {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  background-color: transparent;
+  color: var(--color-heading);
+  border-radius: var(--radius-md);
+  padding: 9px 16px;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.primaryButton:hover:not(:disabled) {
+  color: var(--color-text);
+}
+
+.primaryButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+/* Boot-time "signing in" state — shown in place of the Sign in button while
+ * the /accounts/me profile is being fetched. The spinner is a CSS border ring
+ * (50% radius is intentional here — it's a circle, not a themed corner) with
+ * the heading color on its leading edge so it reads on both themes. The label
+ * continues the "Sign in" -> "Signing in…" -> user chip progression, so the
+ * transition feels like the same control changing state rather than a new
+ * element appearing. */
+.authLoading {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 9px 16px;
+  color: var(--color-text-muted);
+  font-weight: 500;
+  font-size: 14px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid color-mix(in srgb, var(--color-text-muted) 35%, transparent);
+  border-top-color: var(--color-heading);
+  border-radius: 50%;
+  animation: authSpin 0.7s linear infinite;
+}
+
+.authLoadingText {
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+@keyframes authSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: var(--space-3) var(--space-4);
+  }
+  .userName {
+    display: none;
+  }
+  /* Keep the spinner but drop the label on narrow screens so it fits next to
+   * the theme toggle; the spinner alone still signals "working". */
+  .authLoadingText {
+    display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .spinner {
+    animation: none;
+  }
+}

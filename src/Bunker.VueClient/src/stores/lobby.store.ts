@@ -23,6 +23,10 @@ export const useLobbyStore = defineStore('lobby', () => {
   const gameStartError = ref<string | null>(null);
   const connecting = ref(false);
   const myAccountId = ref<string | null>(null);
+  // The invite code for the current lobby. It's private to the host, so it's no
+  // longer part of the snapshot — the host fetches it through a dedicated
+  // endpoint and only when they're hosting. Null until fetched (or for guests).
+  const inviteCode = ref<string | null>(null);
 
   const api = () => getApiContainer().lobby;
   const rt = (): ILobbyRealtime => getApiContainer().realtime;
@@ -72,10 +76,27 @@ export const useLobbyStore = defineStore('lobby', () => {
     return snapshot;
   }
 
+  // Join a public lobby listed in the browser — by id, no code (codes are
+  // private to the host) and no password.
+  async function joinById(lobbyId: string): Promise<LobbySnapshot> {
+    const snapshot = await api().joinLobbyById(lobbyId);
+    applySnapshot(snapshot);
+    return snapshot;
+  }
+
   async function joinByPassword(lobbyId: string, password: string): Promise<LobbySnapshot> {
     const snapshot = await api().joinLobbyByPassword(lobbyId, password);
     applySnapshot(snapshot);
     return snapshot;
+  }
+
+  // Host-only: fetch the current lobby's invite code so it can be shared. Only
+  // meaningful for the host; guests have no business calling it (and the
+  // backend rejects non-hosts).
+  async function fetchInviteCode(): Promise<void> {
+    if (!currentLobby.value) return;
+    const { inviteCode: code } = await api().getInviteCode(currentLobby.value.id);
+    inviteCode.value = code;
   }
 
   async function leaveCurrent(): Promise<void> {
@@ -175,6 +196,7 @@ export const useLobbyStore = defineStore('lobby', () => {
     handoffGameId.value = null;
     gameStartError.value = null;
     myAccountId.value = null;
+    inviteCode.value = null;
   }
 
   function setMyAccountId(accountId: string | null): void {
@@ -263,11 +285,14 @@ export const useLobbyStore = defineStore('lobby', () => {
     hostParticipantId,
     currentLobbyId,
     isHost,
+    inviteCode: computed(() => inviteCode.value),
     findParticipant,
     fetchBrowser,
     fetchLobby,
+    fetchInviteCode,
     create,
     joinByCode,
+    joinById,
     joinByPassword,
     leaveCurrent,
     updateSettings,

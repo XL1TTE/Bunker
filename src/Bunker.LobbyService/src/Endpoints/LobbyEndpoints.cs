@@ -41,6 +41,7 @@ internal static class LobbyEndpoints
         var result = await bus.InvokeAsync<CreateLobby.Result>(new CreateLobby(
             HostId: identity.UserId,
             Nickname: identity.Nickname ?? "Anonymous",
+            Name: request.Name,
             Capacity: request.Capacity,
             IsPublic: request.IsPublic,
             Password: request.Password,
@@ -156,6 +157,29 @@ internal static class LobbyEndpoints
     }
 
     [Authorize]
+    [ProducesResponseType<Transfer.LobbyInviteCode>(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    public static async Task<IResult> GetInviteCode(
+        [FromRoute] Guid lobbyId,
+        [FromServices] ILobbyQueries queries,
+        [FromServices] IUserIdentityContext identity)
+    {
+        if (identity.UserId is null)
+            return TypedResults.Unauthorized();
+
+        var lobby = await queries.GetByIdAsync(Lobby.Id.Restore(lobbyId));
+        if (lobby is null)
+            return TypedResults.NotFound();
+
+        var host = lobby.Players.FirstOrDefault(p => p.Role == Role.Host);
+        if (host is null || host.UserId != AccountId.Create(identity.UserId))
+            return TypedResults.Forbid();
+
+        return TypedResults.Ok(new Transfer.LobbyInviteCode(lobby.InviteCode.Value));
+    }
+
+    [Authorize]
     [ProducesResponseType<Transfer.LobbySnapshot>(StatusCodes.Status200OK)]
     [ProducesResponseType<ValidationProblem>(StatusCodes.Status400BadRequest)]
     public static async Task<IResult> UpdateSettings(
@@ -178,7 +202,8 @@ internal static class LobbyEndpoints
             Capacity: request.Capacity,
             IsPublic: request.IsPublic,
             Password: request.Password,
-            SelectedPackIds: request.SelectedPackIds
+            SelectedPackIds: request.SelectedPackIds,
+            Name: request.Name
         ));
 
         return result switch

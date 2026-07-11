@@ -1,9 +1,17 @@
+/* Lobby room. Same landing design language as the browser/create pages:
+ * light surface tints (not heavy solid slabs), a branded top accent edge on
+ * each panel, bare secondary controls, --color-on-* text on fills, and
+ * token-only color (no #0b0e14, no rgba badge tints). The destroyed-lobby
+ * modal is now the shared <Modal>, so this file no longer carries its own
+ * modal chrome. Sits inside the app shell's .main frame. */
+
 .container {
   display: flex;
   flex-direction: column;
   gap: var(--space-5);
 }
 
+/* ---------- Header ---------- */
 .header {
   display: flex;
   align-items: center;
@@ -28,12 +36,16 @@
   flex-wrap: wrap;
 }
 
-.headerCode {
-  font-family: var(--font-mono);
+/* The lobby's display name — the room's headline. Heading color + balanced
+ * wrap; a name (not a mono invite code) lives here now that codes are private
+ * to the host. */
+.headerName {
   font-size: 24px;
   font-weight: 800;
-  letter-spacing: 0.06em;
-  color: var(--color-text);
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+  color: var(--color-heading);
+  text-wrap: balance;
 }
 
 .headerSubline {
@@ -72,15 +84,15 @@
 }
 
 .privacyPublic {
-  background-color: rgba(63, 185, 80, 0.15);
+  background-color: color-mix(in srgb, var(--color-success) 14%, transparent);
   color: var(--color-success);
-  border: 1px solid rgba(63, 185, 80, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-success) 45%, transparent);
 }
 
 .privacyPrivate {
-  background-color: rgba(210, 153, 34, 0.15);
+  background-color: color-mix(in srgb, var(--color-warning) 14%, transparent);
   color: var(--color-warning);
-  border: 1px solid rgba(210, 153, 34, 0.3);
+  border: 1px solid color-mix(in srgb, var(--color-warning) 45%, transparent);
 }
 
 .headerRight {
@@ -89,29 +101,45 @@
   align-items: center;
 }
 
+/* Copy invite code — a framed control (host only): tinted surface fill +
+ * border, so it reads as a button rather than bare text. The "copied" state
+ * flips to the success tint. */
 .copyButton {
   display: inline-flex;
   align-items: center;
   gap: 6px;
   padding: 8px 12px;
-  background-color: var(--color-surface);
+  background-color: color-mix(in srgb, var(--color-surface) 14%, transparent);
   border: 1px solid var(--color-border);
   color: var(--color-text);
   border-radius: var(--radius-md);
   font-size: 13px;
   font-weight: 500;
+  transition:
+    color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease);
 }
 
-.copyButton:hover {
-  border-color: var(--color-primary);
-  color: var(--color-primary);
+.copyButton:hover:not(:disabled) {
+  color: var(--color-heading);
+  border-color: var(--color-heading);
+  background-color: color-mix(in srgb, var(--color-surface) 26%, transparent);
+}
+
+.copyButton:disabled {
+  opacity: 0.45;
 }
 
 .copyButtonCopied {
-  border-color: var(--color-success);
   color: var(--color-success);
+  border-color: color-mix(in srgb, var(--color-success) 55%, transparent);
+  background-color: color-mix(in srgb, var(--color-success) 12%, transparent);
 }
 
+/* Leave — a framed danger control. Transparent at rest with a danger border;
+ * fills with the danger wash + on-danger text on hover (token-based, so the
+ * old #fff text is now --color-on-danger). */
 .leaveButton {
   padding: 8px 16px;
   background-color: transparent;
@@ -120,14 +148,19 @@
   border-radius: var(--radius-md);
   font-weight: 600;
   font-size: 13px;
+  transition:
+    color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease);
 }
 
 .leaveButton:hover {
   background-color: var(--color-danger-dim);
-  color: #fff;
+  color: var(--color-on-danger);
   border-color: var(--color-danger);
 }
 
+/* ---------- Two-column layout ---------- */
 .grid {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(0, 360px);
@@ -142,12 +175,26 @@
   min-width: 0;
 }
 
+/* ---------- Shared panel (participants, "your status") ---------- */
 .panel {
-  background-color: var(--color-surface);
+  position: relative;
+  background-color: color-mix(in srgb, var(--color-surface) 18%, transparent);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   overflow: hidden;
   box-shadow: var(--shadow-sm);
+}
+
+/* Branded top accent edge — same as the browser/create cards. */
+.panel::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--color-heading), color-mix(in srgb, var(--color-accent) 55%, transparent));
+  opacity: 0.45;
 }
 
 .panelHeader {
@@ -156,7 +203,6 @@
   justify-content: space-between;
   padding: var(--space-3) var(--space-4);
   border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-bg-elev);
 }
 
 .panelTitle {
@@ -202,6 +248,7 @@
   min-height: 64px;
 }
 
+/* ---------- "Your status" (non-host ready block) ---------- */
 .readyBlock {
   padding: var(--space-4);
   display: flex;
@@ -212,7 +259,7 @@
 
 .readyButton {
   background-color: var(--color-primary);
-  color: #0b0e14;
+  color: var(--color-on-primary);
   border-radius: var(--radius-md);
   padding: var(--space-3) var(--space-4);
   font-weight: 700;
@@ -227,11 +274,11 @@
 
 .readyButtonReady {
   background-color: var(--color-success);
-  color: #0b0e14;
+  color: var(--color-on-success);
 }
 
 .readyButtonReady:hover:not(:disabled) {
-  background-color: #4ec963;
+  background-color: color-mix(in srgb, var(--color-success) 85%, var(--color-text));
 }
 
 .readyNote {
@@ -247,40 +294,9 @@
   }
 }
 
-.modalBackdrop {
-  position: fixed;
-  inset: 0;
-  background-color: rgba(0, 0, 0, 0.7);
-  backdrop-filter: blur(4px);
-  -webkit-backdrop-filter: blur(4px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: var(--space-4);
-  animation: fadeIn var(--t-base) var(--ease);
-}
-
-.modal {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border-strong);
-  border-radius: var(--radius-lg);
-  padding: var(--space-5);
-  max-width: 460px;
-  width: 100%;
-  box-shadow: var(--shadow-lg);
-  animation: pop var(--t-base) var(--ease);
-}
-
-.modal h2 {
-  margin: 0 0 var(--space-2);
-  font-size: 20px;
-}
-
-.modal p {
-  color: var(--color-text-muted);
-}
-
+/* ---------- Destroyed-lobby modal (shared <Modal>) ---------- */
+/* Only the in-modal action row + primary button live here now; the backdrop,
+ * dialog frame, title, and animations are the shared Modal's job. */
 .modalActions {
   display: flex;
   justify-content: flex-end;
@@ -290,39 +306,14 @@
 
 .modalButton {
   background-color: var(--color-primary);
-  color: #0b0e14;
+  color: var(--color-on-primary);
   border-radius: var(--radius-md);
   padding: 10px 18px;
   font-weight: 600;
+  box-shadow: var(--shadow-sm);
 }
 
 .modalButton:hover {
   background-color: var(--color-primary-hover);
-}
-
-.modalGameId {
-  font-family: var(--font-mono);
-  font-size: 13px;
-  background-color: var(--color-bg-elev);
-  padding: 6px 10px;
-  border-radius: var(--radius-sm);
-  border: 1px solid var(--color-border);
-  display: inline-block;
-  margin-top: 4px;
-}
-
-.modalFooter {
-  margin-top: var(--space-3);
-  font-size: 13px;
-  color: var(--color-text-dim);
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
-}
-
-@keyframes pop {
-  from { opacity: 0; transform: scale(0.96); }
-  to { opacity: 1; transform: scale(1); }
+  box-shadow: var(--shadow-md);
 }

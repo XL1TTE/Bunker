@@ -11,6 +11,11 @@ const { run, success } = useToast();
 
 const lobby = computed(() => lobbyStore.currentLobby);
 
+// Capacity min/max mirrors the create page so the two capacity controls
+// behave identically.
+const MIN_CAPACITY = 4;
+const MAX_CAPACITY = 20;
+
 const localCapacity = ref(lobby.value?.capacity ?? 8);
 const localIsPublic = ref(lobby.value?.isPublic ?? true);
 const localPacks = ref<string[]>(lobby.value?.selectedPackIds ?? []);
@@ -18,6 +23,27 @@ const localPacks = ref<string[]>(lobby.value?.selectedPackIds ?? []);
 const addingBot = ref(false);
 const selectedPresetId = ref<string | null>(null);
 const botNickname = ref('');
+
+const canDecrement = computed(() => localCapacity.value > MIN_CAPACITY);
+const canIncrement = computed(() => localCapacity.value < MAX_CAPACITY);
+
+function decrement(): void {
+  if (canDecrement.value) localCapacity.value -= 1;
+}
+function increment(): void {
+  if (canIncrement.value) localCapacity.value += 1;
+}
+// The field is typeable, so enforce the range on blur (the +/- buttons clamp on
+// their own via the disabled bounds). An empty/invalid entry snaps back to the
+// minimum rather than sending a NaN to the backend.
+function clampCapacity(): void {
+  const n = localCapacity.value;
+  if (!Number.isFinite(n)) {
+    localCapacity.value = MIN_CAPACITY;
+    return;
+  }
+  localCapacity.value = Math.min(MAX_CAPACITY, Math.max(MIN_CAPACITY, Math.round(n)));
+}
 
 watch(lobby, (l) => {
   if (!l) return;
@@ -97,10 +123,39 @@ const canStart = computed(() => playersReqMet.value && readyReqMet.value);
     <div :class="styles.panelBody">
       <div :class="styles.section">
         <h3 :class="styles.sectionTitle">Lobby settings</h3>
-        <label :class="styles.field">
+        <div :class="styles.field">
           <span :class="styles.fieldLabel">Capacity</span>
-          <input v-model.number="localCapacity" type="number" min="4" max="20" />
-        </label>
+          <div :class="styles.capacityControl">
+            <input
+              v-model.number="localCapacity"
+              type="number"
+              :min="MIN_CAPACITY"
+              :max="MAX_CAPACITY"
+              :class="styles.capacityInput"
+              @blur="clampCapacity"
+            />
+            <div :class="styles.spinBtns">
+              <button
+                type="button"
+                :class="styles.spinBtn"
+                :disabled="!canDecrement"
+                aria-label="Decrease capacity"
+                @click="decrement"
+              >
+                −
+              </button>
+              <button
+                type="button"
+                :class="styles.spinBtn"
+                :disabled="!canIncrement"
+                aria-label="Increase capacity"
+                @click="increment"
+              >
+                +
+              </button>
+            </div>
+          </div>
+        </div>
         <label :class="styles.checkboxField">
           <input v-model="localIsPublic" type="checkbox" />
           <span :class="styles.checkboxFieldBody">

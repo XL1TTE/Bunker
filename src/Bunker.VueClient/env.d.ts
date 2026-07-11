@@ -3,6 +3,11 @@
 // Injected by vite.config.ts from the Aspire-provided Keycloak URL. See keycloak.ts.
 declare const __KEYCLOAK_URL__: string | undefined;
 
+// Route meta fields (requiresAuth, layout) are augmented in
+// src/router/router-meta.d.ts — kept in a separate MODULE file so the
+// `declare module 'vue-router'` merges with vue-router's real types instead
+// of replacing them.
+
 declare module '*.vue' {
   import type { DefineComponent } from 'vue';
   const component: DefineComponent<{}, {}, any>;

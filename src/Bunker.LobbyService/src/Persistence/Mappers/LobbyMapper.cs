@@ -15,11 +15,13 @@ public static partial class LobbyMapper
     [MapProperty(nameof(Domain.Lobby.State), nameof(Lobby.Status))]
     [MapperIgnoreSource(nameof(Domain.Lobby.Players))]
     [MapperIgnoreSource(nameof(Domain.Lobby.Bots))]
+    [MapperIgnoreSource(nameof(Domain.Lobby.Host))]
     public static partial Lobby ToEntity(this Domain.Lobby lobby);
 
     [MapProperty(nameof(Domain.Lobby.State), nameof(Lobby.Status))]
     [MapperIgnoreSource(nameof(Domain.Lobby.Players))]
     [MapperIgnoreSource(nameof(Domain.Lobby.Bots))]
+    [MapperIgnoreSource(nameof(Domain.Lobby.Host))]
     public static partial void ApplyUpdate([MappingTarget] this Lobby entity, Domain.Lobby lobby);
 
 }
@@ -34,6 +36,9 @@ internal static class LobbyMapperExtensions
 
     public static InviteCode MapInviteCode(this string code) => InviteCode.Create(code);
     public static string MapInviteCode(this InviteCode code) => code.Value;
+
+    public static LobbyName MapName(this string name) => LobbyName.Create(name);
+    public static string MapName(this LobbyName name) => name.Value;
 
     public static Domain.LobbyState MapState(this string? state) => state switch
     {

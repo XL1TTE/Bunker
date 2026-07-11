@@ -21,6 +21,8 @@ internal class LobbyConfiguration : IEntityTypeConfiguration<Lobby>
 
         builder.HasIndex(x => x.InviteCode).IsUnique();
 
+        builder.Property(x => x.Name).HasMaxLength(64).IsRequired();
+
         builder.Property(x => x.Status)
             .HasMaxLength(20)
             .IsRequired(false);

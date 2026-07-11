@@ -46,6 +46,9 @@ public static class UpdateLobbySettingsHandler
         if (result.IsFailure)
             return UpdateLobbySettings.Failure(result.Match(onSuccess: _ => "", onFailure: e => e.ToString()));
 
+        if (command.Name is not null)
+            lobby.Name = LobbyName.Create(command.Name);
+
         await repository.UpdateAsync(lobby);
         try
         {

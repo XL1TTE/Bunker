@@ -6,6 +6,7 @@ public class Lobby
 {
     public required Guid PublicId { get; set; }
     public required string InviteCode { get; set; }
+    public required string Name { get; set; }
     public required int Capacity { get; set; }
     public required PrivacyPolicy PrivacyPolicy { get; set; }
     public string? Status { get; set; } // "WaitingForPlayers", "InGame", "Finished", etc.

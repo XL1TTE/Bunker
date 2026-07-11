@@ -20,6 +20,13 @@ export class LobbyApiHttp implements ILobbyApi {
     return apiRequest(this.tokens, 'POST', `/lobbies/${encodeURIComponent(inviteCode)}/join`);
   }
 
+  // Join a public lobby straight from the browser list — no invite code (those
+  // are private to the host now) and no password. Shares the /join route with
+  // joinLobbyByPassword; a missing body means "open public lobby".
+  joinLobbyById(lobbyId: string): Promise<LobbySnapshot> {
+    return apiRequest(this.tokens, 'POST', `/lobbies/${lobbyId}/join`);
+  }
+
   joinLobbyByPassword(lobbyId: string, password: string): Promise<LobbySnapshot> {
     return apiRequest(this.tokens, 'POST', `/lobbies/${lobbyId}/join`, { password });
   }
@@ -30,6 +37,12 @@ export class LobbyApiHttp implements ILobbyApi {
 
   getLobby(lobbyId: string): Promise<LobbySnapshot> {
     return apiRequest(this.tokens, 'GET', `/lobbies/${lobbyId}`);
+  }
+
+  // Host-only: the invite code is no longer carried on the lobby snapshot, so
+  // the host fetches it through this dedicated endpoint to share it.
+  getInviteCode(lobbyId: string): Promise<{ inviteCode: string }> {
+    return apiRequest(this.tokens, 'GET', `/lobbies/${lobbyId}/invite-code`);
   }
 
   listPublicLobbies(limit = 50, offset = 0): Promise<{ items: LobbySummary[]; total: number }> {

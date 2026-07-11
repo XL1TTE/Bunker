@@ -1,24 +1,66 @@
+/*
+ * Design tokens. Dark is the base (:root); light is an override on
+ * :root[data-theme='light']. The inline script in index.html sets
+ * data-theme before first paint to avoid a flash of the wrong theme.
+ *
+ * Palette (user-supplied, 5 teal tones; bg<->text inverted between themes):
+ *   #112D32  #2C3531  #116466  #88BDBC  #D1E8E2
+ * Roles:
+ *   #2C3531 — dark bg / light-theme text
+ *   #D1E8E2 — light bg / dark-theme text
+ *   #116466 — primary (brand teal button), dark-theme solid surface fills,
+ *             light-theme headings/titles
+ *   #88BDBC — dark-theme headings/titles + decorative accent (glows, gradients);
+ *             light-theme solid surface fills
+ *   #112D32 — darkest teal: on-accent / on-surface text in the light theme
+ * All secondary tones (borders, hover, elevation, dim, focus rings, *-dim)
+ * are DERIVED from these five via color-mix() so no unrelated hues leak in,
+ * except the functional semantic colors (danger/success/warning) which are
+ * tuned per theme for WCAG contrast.
+ *
+ * NOTE: --color-accent (#88BDBC) is DECORATIVE ONLY (glows, gradients, borders).
+ * It must never be used for body text in the light theme (#88BDBC on light bg
+ * #D1E8E2 fails contrast at ~1.6:1). For text on an #88BDBC fill, use
+ * --color-on-accent (#112D32, ~5.7:1).
+ *
+ * Headings: dark theme uses #88BDBC (light teal, AA ~5.4:1 on the dark bg);
+ * light theme uses #116466 (deep teal, AA ~5.4:1 on the pale bg). #116466 on
+ * the dark bg is only ~1.6:1, so it is NOT used for dark-theme text.
+ */
 :root {
-  --color-bg: #0b0e14;
-  --color-bg-elev: #0f1320;
-  --color-surface: #161b22;
-  --color-surface-hover: #1f262e;
-  --color-surface-elev: #1c222b;
-  --color-border: #2d333b;
-  --color-border-strong: #3a414b;
-  --color-text: #e6edf3;
-  --color-text-muted: #8d96a0;
-  --color-text-dim: #6e7681;
-  --color-primary: #5ea1ff;
-  --color-primary-hover: #7cb4ff;
-  --color-primary-dim: #2d4a78;
+  /* ---- Dark theme (default) ---- */
+  --color-bg: #2C3531;
+  --color-bg-elev: color-mix(in srgb, var(--color-bg) 88%, var(--color-surface));
+  --color-surface: #116466;
+  --color-surface-hover: color-mix(in srgb, var(--color-surface) 78%, var(--color-text));
+  --color-surface-elev: color-mix(in srgb, var(--color-surface) 62%, var(--color-text));
+  --section-alt-bg: color-mix(in srgb, var(--color-surface) 7%, transparent);
+  --color-border: color-mix(in srgb, var(--color-text) 14%, var(--color-bg));
+  --color-border-strong: color-mix(in srgb, var(--color-text) 28%, var(--color-bg));
+  --color-text: #D1E8E2;
+  --color-text-muted: color-mix(in srgb, var(--color-text) 70%, var(--color-bg)); /* ~5.7:1 */
+  --color-text-dim: color-mix(in srgb, var(--color-text) 60%, var(--color-bg));  /* ~4.8:1 */
+  --color-heading: #88BDBC;              /* light teal — titles on dark bg */
+  --color-primary: #116466;
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 72%, var(--color-text));
+  --color-primary-dim: color-mix(in srgb, var(--color-primary) 35%, var(--color-bg));
+  --color-accent: #88BDBC;               /* decorative light teal */
+  --color-on-primary: var(--color-text);  /* pale text on teal button, 5.38:1 */
+  --color-on-accent: #112D32;             /* dark text on light-teal fills, 5.7:1 */
+  --color-on-surface: var(--color-text);
+  --color-on-danger: #ffffff;
   --color-danger: #f85149;
-  --color-danger-dim: #5a1e1c;
+  --color-danger-dim: color-mix(in srgb, var(--color-danger) 20%, var(--color-bg));
   --color-success: #3fb950;
-  --color-success-dim: #1f4d2a;
+  --color-success-dim: color-mix(in srgb, var(--color-success) 20%, var(--color-bg));
   --color-warning: #d29922;
-  --color-bot: #a371f7;
-  --color-bot-dim: #4a2c8f;
+  --color-warning-dim: color-mix(in srgb, var(--color-warning) 20%, var(--color-bg));
+  --color-bot: color-mix(in srgb, var(--color-accent) 55%, var(--color-primary));
+  --color-bot-dim: color-mix(in srgb, var(--color-bot) 22%, var(--color-bg));
+  --color-on-bot: var(--color-bg);
+  --color-on-success: var(--color-bg);
+  --color-on-warning: var(--color-bg);
+  --color-overlay: color-mix(in srgb, var(--color-text) 50%, transparent);
 
   --space-1: 4px;
   --space-2: 8px;
@@ -29,17 +71,19 @@
   --space-7: 48px;
   --space-8: 64px;
 
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-  --radius-pill: 999px;
+  --radius-xs: 0px;
+  --radius-sm: 0px;
+  --radius-md: 0px;
+  --radius-lg: 0px;
+  --radius-xl: 0px;
+  --radius-pill: 0px;
 
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35);
   --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.5);
-  --shadow-glow: 0 0 0 1px rgba(94, 161, 255, 0.35), 0 0 24px rgba(94, 161, 255, 0.15);
+  --shadow-glow:
+    0 0 0 1px color-mix(in srgb, var(--color-accent) 35%, transparent),
+    0 0 24px color-mix(in srgb, var(--color-accent) 22%, transparent);
 
   --ease: cubic-bezier(0.2, 0.7, 0.2, 1);
   --t-fast: 120ms;
@@ -48,6 +92,87 @@
   --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', Inter, Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   --font-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
   --font-display: var(--font-sans);
+}
+
+:root[data-theme='light'] {
+  --color-bg: #D1E8E2;
+  --color-bg-elev: color-mix(in srgb, var(--color-bg) 88%, var(--color-surface));
+  --color-surface: #88BDBC;
+  --color-surface-hover: color-mix(in srgb, var(--color-surface) 80%, var(--color-text));
+  --color-surface-elev: color-mix(in srgb, var(--color-surface) 60%, var(--color-text));
+  --section-alt-bg: color-mix(in srgb, var(--color-surface) 13%, transparent);
+  --color-border: color-mix(in srgb, var(--color-text) 14%, var(--color-bg));
+  --color-border-strong: color-mix(in srgb, var(--color-text) 28%, var(--color-bg));
+  --color-text: #2C3531;
+  --color-text-muted: color-mix(in srgb, var(--color-text) 82%, var(--color-bg)); /* ~6:1 */
+  --color-text-dim: color-mix(in srgb, var(--color-text) 75%, var(--color-bg));  /* ~4.9:1 */
+  --color-heading: #116466;              /* deep teal — titles on pale bg */
+  --color-primary: #116466;
+  --color-primary-hover: color-mix(in srgb, var(--color-primary) 72%, var(--color-bg));
+  --color-primary-dim: color-mix(in srgb, var(--color-primary) 30%, var(--color-bg));
+  --color-accent: #88BDBC;               /* decorative — never text in light */
+  --color-on-primary: var(--color-bg);    /* pale text on teal button, 5.38:1 */
+  --color-on-accent: #112D32;             /* dark text on light-teal fills */
+  --color-on-surface: #112D32;
+  --color-on-danger: #ffffff;
+  --color-danger: #c0202a;                /* darker red for light bg */
+  --color-danger-dim: color-mix(in srgb, var(--color-danger) 16%, var(--color-bg));
+  --color-success: #1a7d3a;               /* darker green for light bg */
+  --color-success-dim: color-mix(in srgb, var(--color-success) 16%, var(--color-bg));
+  --color-warning: #8a5a00;               /* darker amber for light bg */
+  --color-warning-dim: color-mix(in srgb, var(--color-warning) 16%, var(--color-bg));
+  --color-bot: color-mix(in srgb, var(--color-accent) 55%, var(--color-primary));
+  --color-bot-dim: color-mix(in srgb, var(--color-bot) 20%, var(--color-bg));
+  --color-on-bot: var(--color-bg);
+  --color-on-success: #D1E8E2;
+  --color-on-warning: var(--color-bg);
+  --color-overlay: color-mix(in srgb, var(--color-text) 45%, transparent);
+
+  --shadow-sm: 0 1px 2px color-mix(in srgb, var(--color-text) 14%, transparent);
+  --shadow-md: 0 4px 12px color-mix(in srgb, var(--color-text) 16%, transparent);
+  --shadow-lg: 0 12px 32px color-mix(in srgb, var(--color-text) 22%, transparent);
+}
+
+/* No-JS fallback: only matters if the inline script never ran AND the OS
+ * prefers light. Re-declares the light token values for that edge case. */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme]) {
+    --color-bg: #D1E8E2;
+    --color-bg-elev: color-mix(in srgb, #D1E8E2 88%, #88BDBC);
+    --color-surface: #88BDBC;
+    --color-surface-hover: color-mix(in srgb, #88BDBC 80%, #2C3531);
+    --color-surface-elev: color-mix(in srgb, #88BDBC 60%, #2C3531);
+    --section-alt-bg: color-mix(in srgb, #88BDBC 13%, transparent);
+    --color-border: color-mix(in srgb, #2C3531 14%, #D1E8E2);
+    --color-border-strong: color-mix(in srgb, #2C3531 28%, #D1E8E2);
+    --color-text: #2C3531;
+    --color-text-muted: color-mix(in srgb, #2C3531 82%, #D1E8E2);
+    --color-text-dim: color-mix(in srgb, #2C3531 75%, #D1E8E2);
+    --color-heading: #116466;
+    --color-primary: #116466;
+    --color-primary-hover: color-mix(in srgb, #116466 72%, #D1E8E2);
+    --color-primary-dim: color-mix(in srgb, #116466 30%, #D1E8E2);
+    --color-accent: #88BDBC;
+    --color-on-primary: #D1E8E2;
+    --color-on-accent: #112D32;
+    --color-on-surface: #112D32;
+    --color-on-danger: #ffffff;
+    --color-danger: #c0202a;
+    --color-danger-dim: color-mix(in srgb, #c0202a 16%, #D1E8E2);
+    --color-success: #1a7d3a;
+    --color-success-dim: color-mix(in srgb, #1a7d3a 16%, #D1E8E2);
+    --color-warning: #8a5a00;
+    --color-warning-dim: color-mix(in srgb, #8a5a00 16%, #D1E8E2);
+    --color-bot: color-mix(in srgb, #88BDBC 55%, #116466);
+    --color-bot-dim: color-mix(in srgb, #88BDBC 20%, #D1E8E2);
+    --color-on-bot: #2C3531;
+    --color-on-success: #D1E8E2;
+    --color-on-warning: #2C3531;
+    --color-overlay: color-mix(in srgb, #2C3531 45%, transparent);
+    --shadow-sm: 0 1px 2px color-mix(in srgb, #2C3531 14%, transparent);
+    --shadow-md: 0 4px 12px color-mix(in srgb, #2C3531 16%, transparent);
+    --shadow-lg: 0 12px 32px color-mix(in srgb, #2C3531 22%, transparent);
+  }
 }
 
 * {
@@ -60,8 +185,8 @@ body {
   padding: 0;
   background-color: var(--color-bg);
   background-image:
-    radial-gradient(ellipse 80% 50% at 50% -20%, rgba(94, 161, 255, 0.08), transparent 60%),
-    radial-gradient(ellipse 60% 40% at 100% 100%, rgba(163, 113, 247, 0.06), transparent 60%);
+    radial-gradient(ellipse 80% 50% at 50% -20%, color-mix(in srgb, var(--color-primary) 12%, transparent), transparent 60%),
+    radial-gradient(ellipse 60% 40% at 100% 100%, color-mix(in srgb, var(--color-accent) 12%, transparent), transparent 60%);
   background-attachment: fixed;
   color: var(--color-text);
   font-family: var(--font-sans);
@@ -76,7 +201,7 @@ h1, h2, h3, h4 {
   font-weight: 700;
   letter-spacing: -0.01em;
   line-height: 1.2;
-  color: var(--color-text);
+  color: var(--color-heading);
 }
 
 h1 { font-size: 32px; }
@@ -148,7 +273,7 @@ input:focus, select:focus, textarea:focus {
   outline: none;
   border-color: var(--color-primary);
   background-color: var(--color-bg);
-  box-shadow: 0 0 0 3px rgba(94, 161, 255, 0.2);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 35%, transparent);
 }
 
 input[type='checkbox'], input[type='radio'] {
@@ -156,6 +281,11 @@ input[type='checkbox'], input[type='radio'] {
   padding: 0;
   margin: 0;
   accent-color: var(--color-primary);
+}
+
+:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 40%, transparent);
 }
 
 ::-webkit-scrollbar {
@@ -172,4 +302,16 @@ input[type='checkbox'], input[type='radio'] {
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-strong);
+}
+
+/* ---------- Layout utilities ---------- */
+/* Shared content container — the single source of truth for the page's content
+ * width and side gutters. Apply `class="container"` on the inner wrapper of any
+ * full-bleed section/hero/footer so every page's content shares the same left/
+ * right edges. Vertical padding/spacing belongs on the outer section element,
+ * not here (this only sets max-width + centering + horizontal gutters). */
+.container {
+  max-width: 1100px;
+  margin-inline: auto;
+  padding-inline: var(--space-5);
 }

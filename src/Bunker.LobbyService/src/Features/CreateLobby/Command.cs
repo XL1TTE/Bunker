@@ -3,6 +3,7 @@ namespace Bunker.LobbyService.Features.CreateLobby;
 public readonly record struct CreateLobby(
     string HostId,
     string Nickname,
+    string Name,
     int Capacity,
     bool IsPublic,
     string? Password,
