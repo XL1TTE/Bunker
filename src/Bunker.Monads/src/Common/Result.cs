@@ -58,6 +58,26 @@ public static class ResultExtensions
 public static class AsyncResultExtensions
 {
     public static async Task<TMatch> MatchAsync<TSuccess, TError, TMatch>(
+        this Result<TSuccess, TError> result,
+        Func<TSuccess, Task<TMatch>> onSuccess,
+        Func<TError, TMatch> onFailure)
+    {
+        if (result._result is not null) return await onSuccess(result._result);
+        if (result._error is not null) return onFailure(result._error);
+        throw new UnreachableException();
+    }
+
+    public static async Task<TMatch> MatchAsync<TSuccess, TError, TMatch>(
+        this Result<TSuccess, TError> result,
+        Func<TSuccess, Task<TMatch>> onSuccess,
+        Func<TError, Task<TMatch>> onFailure)
+    {
+        if (result._result is not null) return await onSuccess(result._result);
+        if (result._error is not null) return await onFailure(result._error);
+        throw new UnreachableException();
+    }
+
+    public static async Task<TMatch> MatchAsync<TSuccess, TError, TMatch>(
         this Task<Result<TSuccess, TError>> task,
         Func<TSuccess, TMatch> onSuccess,
         Func<TError, TMatch> onFailure)

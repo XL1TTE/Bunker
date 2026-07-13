@@ -21,41 +21,33 @@ public static class LeaveLobbyHandler
             return LeaveLobby.Failure("Invalid lobby id.");
 
         var callerId = AccountId.Create(command.CallerId);
-        var repository = uow.GetRepository<ILobbyRepository>();
+        var lobbiesRepository = uow.GetRepository<ILobbyRepository>();
 
-        var lobby = await repository.TryFindAsync(Lobby.Id.Restore(lobbyGuid));
+        var lobby = await lobbiesRepository.TryFindAsync(Lobby.Id.Restore(lobbyGuid));
 
         if (lobby is null)
             return LeaveLobby.Failure("Lobby not found.");
 
         var leavingResult = lobby.Leave(callerId);
 
-        leavingResult.Match(
+        var result = await leavingResult.MatchAsync(
             onSuccess: async leaver =>
             {
                 if (leaver.Role == Role.Host)
                 {
-                    await repository.DeleteByIdAsync(lobby.PublicId);
+                    await lobbiesRepository.DeleteByIdAsync(lobby.PublicId);
                     await hub.Clients.Group(lobby.PublicId.Value.ToString()).LobbyDestroyed("HostLeft");
                     return LeaveLobby.Success();
                 }
                 else
                 {
-                    await repository.UpdateAsync(lobby);
+                    await lobbiesRepository.UpdateAsync(lobby);
                     await hub.Clients.Group(lobby.PublicId.Value.ToString()).ParticipantLeft(leaver.PublicId.Value.ToString());
                     return LeaveLobby.Success();
                 }
             },
-            onFailure: error => LeaveLobby.Failure(error.ToString())
+            onFailure: async error => LeaveLobby.Failure(error.ToString())
         );
-
-        if (leavingResult is null)
-            return LeaveLobby.Failure("You are not in the lobby you want to leave.");
-
-        var leaveResult = lobby.Leave(callerId);
-        if (leaveResult.IsFailure)
-            return LeaveLobby.Failure(leaveResult.Match(onSuccess: _ => "", onFailure: e => e.ToString()));
-
 
         try
         {
@@ -66,6 +58,6 @@ public static class LeaveLobbyHandler
             return LeaveLobby.Failure("Failed to leave lobby.");
         }
 
-        return LeaveLobby.Success();
+        return result;
     }
 }

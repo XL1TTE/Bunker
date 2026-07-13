@@ -8,6 +8,6 @@ public readonly record struct LeaveLobby(string LobbyId, string CallerId)
         public record Failure(string Error) : Result;
     }
 
-    public static Result.Success Success() => new Result.Success();
-    public static Result.Failure Failure(string error) => new Result.Failure(error);
+    public static Result Success() => new Result.Success();
+    public static Result Failure(string error) => new Result.Failure(error);
 }
