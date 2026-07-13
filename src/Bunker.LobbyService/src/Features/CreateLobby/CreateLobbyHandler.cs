@@ -12,12 +12,12 @@ public static class CreateLobbyHandler
     public static async Task<CreateLobby.Result> Handle(
         CreateLobby command,
         IUnitOfWork uow,
-        ILobbyQueries queries,
+        ILobbyQueries lobbyQueries,
         ILogger<CreateLobby> logger)
     {
         var repository = uow.GetRepository<ILobbyRepository>();
 
-        if (await queries.GetByPlayerIdAsync(AccountId.Create(command.HostId)) is not null)
+        if (await lobbyQueries.GetByPlayerIdAsync(AccountId.Create(command.HostId)) is not null)
             return CreateLobby.Failure("You're already in a lobby. Leave it before creating a new one.");
 
         try

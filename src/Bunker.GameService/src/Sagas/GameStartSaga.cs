@@ -13,7 +13,7 @@ public class GameStartSaga : Saga
     public List<SagaParticipant> Participants { get; set; } = [];
     public string Status { get; set; } = "AwaitingHydration";
 
-    public static (GameStartSaga, RequestGameContentHydration) Start(GameStartRequested request)
+    public static (GameStartSaga, RequestGameContentHydration, GameStartProgress, GameStartProgress) Start(GameStartRequested request)
     {
         var saga = new GameStartSaga
         {
@@ -26,10 +26,15 @@ public class GameStartSaga : Saga
             Status = "AwaitingHydration"
         };
 
-        return (saga, new RequestGameContentHydration(request.StartRequestId, request.CardPackIds, request.PersonalityPresetIds));
+        return (
+            saga,
+            new RequestGameContentHydration(request.StartRequestId, request.CardPackIds, request.PersonalityPresetIds),
+            new GameStartProgress(request.StartRequestId, request.LobbyId, "request-content", "Succeeded", null),
+            new GameStartProgress(request.StartRequestId, request.LobbyId, "fetch-content", "Started", null)
+        );
     }
 
-    public object Handle(GameContentHydrated hydrated)
+    public object[] Handle(GameContentHydrated hydrated)
     {
         var missing = new List<string>();
         if (hydrated.ProfessionCards.Count == 0) missing.Add("Profession");
@@ -45,32 +50,47 @@ public class GameStartSaga : Saga
         {
             Status = "Failed";
             MarkCompleted();
-            return new GameStartFailed(StartRequestId: Id, LobbyId, $"Insufficient canned content: missing {string.Join(", ", missing)} cards.");
+            var reason = $"Not enough content available for the following categories: {string.Join(", ", missing)}. Try to select more card packs.";
+            return new object[]
+            {
+                new GameStartProgress(Id, LobbyId, "fetch-content", "Failed", null),
+                new GameStartProgress(Id, LobbyId, "validate-content", "Failed", reason),
+                new GameStartFailed(StartRequestId: Id, LobbyId, reason)
+            };
         }
 
         Status = "Completed";
         MarkCompleted();
 
-        return new StartGame(
-            StartRequestId: Id,
-            LobbyId,
-            HostId,
-            Participants,
-            hydrated.ProfessionCards,
-            hydrated.HobbiesCards,
-            hydrated.AgeCards,
-            hydrated.SexCards,
-            hydrated.FactCards,
-            hydrated.HealthCards,
-            hydrated.LuggageCards,
-            hydrated.BunkerCards);
+        return new object[]
+        {
+            new GameStartProgress(Id, LobbyId, "fetch-content", "Succeeded", null),
+            new GameStartProgress(Id, LobbyId, "validate-content", "Succeeded", null),
+            new StartGame(
+                StartRequestId: Id,
+                LobbyId,
+                HostId,
+                Participants,
+                hydrated.ProfessionCards,
+                hydrated.HobbiesCards,
+                hydrated.AgeCards,
+                hydrated.SexCards,
+                hydrated.FactCards,
+                hydrated.HealthCards,
+                hydrated.LuggageCards,
+                hydrated.BunkerCards)
+        };
     }
 
-    public GameStartFailed Handle(GameContentHydrationFailed failed)
+    public object[] Handle(GameContentHydrationFailed failed)
     {
         Status = "Failed";
         MarkCompleted();
 
-        return new GameStartFailed(StartRequestId: Id, LobbyId, failed.Reason);
+        return new object[]
+        {
+            new GameStartProgress(Id, LobbyId, "fetch-content", "Failed", failed.Reason),
+            new GameStartFailed(StartRequestId: Id, LobbyId, failed.Reason)
+        };
     }
 }

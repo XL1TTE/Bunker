@@ -19,6 +19,17 @@
   max-width: none;
 }
 
+/* Game room is a cockpit: a flex column that fills the viewport height under
+ * the sticky header, so the game view can lay out pinned header + action bar +
+ * a scrolling participant grid without page-level scroll. Reduced vertical
+ * padding vs .main so the play area is taller. The child view uses flex:1 +
+ * min-height:0 to own the remaining height. */
+.mainGame {
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-4) var(--space-5);
+}
+
 @media (max-width: 640px) {
   .main {
     padding: var(--space-4);

@@ -11,8 +11,8 @@ public record HobbiesCard : Card
     public static HobbiesCard CreateNew(Id Id, string Hobbies) => CreateValid(Id, Hobbies);
         
     private static HobbiesCard CreateValid(Id Id, string Hobbies)
-        => string.IsNullOrEmpty(Hobbies) | Hobbies.Length < 6
-        ? throw new ArgumentException("Hobbies must be at least 6 characters long.")
+        => string.IsNullOrEmpty(Hobbies) | Hobbies.Length < 4
+        ? throw new ArgumentException("Hobbies must be at least 4 characters long.")
         : new HobbiesCard(Id, Hobbies);
 }
 

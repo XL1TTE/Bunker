@@ -86,7 +86,7 @@ public class GameSaga : Saga
         Phase = "BunkerIntroduction";
         var group = Id.ToString();
 
-        await hub.Clients.Group(group).PhaseChanged(Phase, RoundNumber);
+        await hub.Clients.Group(group).PhaseChanged(Phase, RoundNumber, (int)timings.Value.BunkerIntroduction.TotalSeconds);
         await hub.Clients.Group(group).BunkerCardRevealed(ToBunkerCardDto());
 
         return new BeginIntroDiscussion(GameId: Id).DelayedFor(timings.Value.BunkerIntroduction);
@@ -100,7 +100,7 @@ public class GameSaga : Saga
         Phase = "IntroDiscussion";
         CurrentTurnIndex = -1;
 
-        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber);
+        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber, 0);
 
         return new AdvanceTurn(GameId: Id);
     }
@@ -110,7 +110,7 @@ public class GameSaga : Saga
         Phase = "Reveal";
         CurrentTurnIndex = -1;
 
-        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber);
+        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber, 0);
 
         return new AdvanceTurn(GameId: Id);
     }
@@ -159,7 +159,7 @@ public class GameSaga : Saga
             return new AdvanceTurn(GameId: Id);
         }
 
-        await hub.Clients.Group(group).TurnChanged(participant.Id, Phase, CurrentTurnIndex);
+        await hub.Clients.Group(group).TurnChanged(participant.Id, Phase, CurrentTurnIndex, (int)timings.Value.TurnTimeout.TotalSeconds);
 
         return new TurnTimeout(GameId: Id, Phase, RoundNumber, CurrentTurnIndex, TurnEpoch)
             .DelayedFor(timings.Value.TurnTimeout);
@@ -227,7 +227,7 @@ public class GameSaga : Saga
         Phase = "Discussion";
         CurrentTurnIndex = -1;
 
-        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber);
+        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber, (int)timings.Value.DiscussionFreeForAll.TotalSeconds);
 
         // 2-minute free-for-all chat, then turn-based closing turns.
         return new BeginClosingTurns(GameId: Id).DelayedFor(timings.Value.DiscussionFreeForAll);
@@ -238,7 +238,7 @@ public class GameSaga : Saga
         Phase = "DiscussionClosing";
         CurrentTurnIndex = -1;
 
-        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber);
+        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber, 0);
 
         return new AdvanceTurn(GameId: Id);
     }
@@ -250,7 +250,7 @@ public class GameSaga : Saga
         Votes.Clear();
         VoteRound = VoteRound == 0 ? 1 : VoteRound; // first entry => 1; revote stays 2.
 
-        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber);
+        await hub.Clients.Group(Id.ToString()).PhaseChanged(Phase, RoundNumber, 0);
 
         return new AdvanceTurn(GameId: Id);
     }
@@ -335,7 +335,7 @@ public class GameSaga : Saga
         TiedParticipantIds.Clear();
         VoteRound = 0;
 
-        await hub.Clients.Group(Id.ToString()).PhaseChanged("Reveal", RoundNumber);
+        await hub.Clients.Group(Id.ToString()).PhaseChanged("Reveal", RoundNumber, 0);
 
         return new BeginReveal(GameId: Id);
     }
@@ -348,7 +348,7 @@ public class GameSaga : Saga
         var survivors = Participants.Where(p => !p.Eliminated).Select(p => p.Id).ToList();
         await hub.Clients.Group(Id.ToString()).GameFinished(survivors);
 
-        return null; // terminal
+        return new GameFinished(LobbyId, Id);
     }
 
     // --- Helpers ---

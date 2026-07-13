@@ -58,8 +58,10 @@ internal static class WolverineConfiguration
             .UseDurableInbox();
 
         options.PublishMessage<RequestGameContentHydration>().ToRabbitExchange("content-hydration-requests");
+        options.PublishMessage<GameStartProgress>().ToRabbitExchange("game-start-progress");
         options.PublishMessage<GameStartSucceeded>().ToRabbitExchange("game-start-succeeded");
         options.PublishMessage<GameStartFailed>().ToRabbitExchange("game-start-failed");
+        options.PublishMessage<GameFinished>().ToRabbitExchange("game-finished");
 
         return options;
     }

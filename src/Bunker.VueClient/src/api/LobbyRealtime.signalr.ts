@@ -41,6 +41,11 @@ const payloadAdapters: { [K in LobbyEvent]: PayloadAdapter<K> } = {
   LobbyDestroyed: (args) => ({ reason: args[0] as LobbyDestroyedReason }),
   HandoffStarted: (args) => ({ gameSessionId: args[0] as string }),
   GameStartFailed: (args) => ({ reason: args[0] as string }),
+  GameStartProgress: (args) => ({
+    step: args[0] as string,
+    status: args[1] as 'Started' | 'Succeeded' | 'Failed',
+    message: args[2] as string | null,
+  }),
 };
 
 export class LobbyRealtimeSignalR implements ILobbyRealtime {

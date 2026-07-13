@@ -7,7 +7,7 @@ namespace Bunker.ContentService.Persistence;
 public partial class ContentDbContext : ICardPackRepository
 {
     async Task<Domain.CardPack?> IRepository<Domain.CardPack, Domain.CardPack.Id>.TryFindAsync(Domain.CardPack.Id key)
-        => (await CardPacks.Include(x => x.Cards).FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain();
+        => (await CardPacks.AsNoTracking().Include(x => x.Cards).FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain();
 
     void IRepository<Domain.CardPack, Domain.CardPack.Id>.Add(Domain.CardPack aggregate)
         => CardPacks.Add(aggregate.ToEntity());

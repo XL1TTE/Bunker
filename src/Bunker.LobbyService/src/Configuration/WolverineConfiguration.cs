@@ -41,8 +41,16 @@ internal static class WolverineConfiguration
                 .DefaultIncomingMessage<GameStartSucceeded>()
                 .UseDurableInbox();
 
+            options.ListenToRabbitQueue("lobby-service-game-start-progress")
+                .DefaultIncomingMessage<GameStartProgress>()
+                .UseDurableInbox();
+
             options.ListenToRabbitQueue("lobby-service-game-start-failed")
                 .DefaultIncomingMessage<GameStartFailed>()
+                .UseDurableInbox();
+
+            options.ListenToRabbitQueue("lobby-service-game-finished")
+                .DefaultIncomingMessage<GameFinished>()
                 .UseDurableInbox();
         });
         return builder;

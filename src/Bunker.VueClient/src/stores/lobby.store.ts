@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia';
 import { computed, ref } from 'vue';
 import { getApiContainer } from '@/api/register';
+import { GAME_START_STEP_IDS, GAME_START_STEP_LABELS } from '@/components/lobby/game-start-steps';
 import type { ILobbyRealtime, LobbyEvent, LobbyEventHandler } from '@/api/ILobbyRealtime';
 import type {
   AddBotRequest,
@@ -22,6 +23,49 @@ export const useLobbyStore = defineStore('lobby', () => {
   const handoffGameId = ref<string | null>(null);
   const gameStartError = ref<string | null>(null);
   const connecting = ref(false);
+
+  type StartStepStatus = 'pending' | 'started' | 'succeeded' | 'failed';
+  interface StartStep {
+    id: string;
+    label: string;
+    status: StartStepStatus;
+    message: string | null;
+  }
+  const startSteps = ref<StartStep[]>(
+    GAME_START_STEP_IDS.map((id) => ({ id, label: GAME_START_STEP_LABELS[id], status: 'pending' as StartStepStatus, message: null })),
+  );
+  const startInProgress = ref(false);
+  const startFailed = ref(false);
+  const startFailReason = ref<string | null>(null);
+
+  function resetStartSteps(): void {
+    startSteps.value = GAME_START_STEP_IDS.map((id) => ({ id, label: GAME_START_STEP_LABELS[id], status: 'pending' as StartStepStatus, message: null }));
+  }
+
+  function setStartStep(stepId: string, status: StartStepStatus, message: string | null): void {
+    const idx = startSteps.value.findIndex((s) => s.id === stepId);
+    if (idx < 0) return;
+    for (let i = 0; i < idx; i++) {
+      if (startSteps.value[i].status === 'pending') startSteps.value[i].status = 'succeeded';
+    }
+    startSteps.value[idx].status = status;
+    if (status === 'failed') startSteps.value[idx].message = message;
+  }
+
+  function beginStart(): void {
+    resetStartSteps();
+    startFailed.value = false;
+    startFailReason.value = null;
+    setStartStep('validate-lobby', 'started', null);
+    startInProgress.value = true;
+  }
+
+  function dismissStart(): void {
+    startInProgress.value = false;
+    resetStartSteps();
+    startFailed.value = false;
+    startFailReason.value = null;
+  }
   const myAccountId = ref<string | null>(null);
   // The invite code for the current lobby. It's private to the host, so it's no
   // longer part of the snapshot — the host fetches it through a dedicated
@@ -149,7 +193,14 @@ export const useLobbyStore = defineStore('lobby', () => {
 
   async function start(): Promise<void> {
     if (!currentLobby.value) return;
-    await api().startLobby(currentLobby.value.id);
+    try {
+      await api().startLobby(currentLobby.value.id);
+    } catch (e) {
+      const message = (e as { message?: string } | undefined)?.message ?? 'Could not start the game.';
+      setStartStep('validate-lobby', 'failed', message);
+      startFailed.value = true;
+      startFailReason.value = message;
+    }
   }
 
   async function sendMessage(text: string): Promise<void> {
@@ -197,6 +248,10 @@ export const useLobbyStore = defineStore('lobby', () => {
     gameStartError.value = null;
     myAccountId.value = null;
     inviteCode.value = null;
+    startInProgress.value = false;
+    startFailed.value = false;
+    startFailReason.value = null;
+    resetStartSteps();
   }
 
   function setMyAccountId(accountId: string | null): void {
@@ -264,11 +319,36 @@ export const useLobbyStore = defineStore('lobby', () => {
       destroyed.value = { reason };
     });
     rt().on('HandoffStarted', ({ gameSessionId }) => {
+      for (const s of startSteps.value) {
+        if (s.status !== 'failed') s.status = 'succeeded';
+      }
       handoffGameId.value = gameSessionId;
       gameStartError.value = null;
     });
     rt().on('GameStartFailed', ({ reason }) => {
       gameStartError.value = reason;
+      startFailed.value = true;
+      startFailReason.value = reason;
+      if (!startSteps.value.some((s) => s.status === 'failed')) {
+        for (let i = startSteps.value.length - 1; i >= 0; i--) {
+          const s = startSteps.value[i];
+          if (s.status === 'started' || s.status === 'pending') {
+            s.status = 'failed';
+            s.message = reason;
+            break;
+          }
+        }
+      }
+    });
+    rt().on('GameStartProgress', ({ step, status, message }) => {
+      startInProgress.value = true;
+      const mapped: StartStepStatus =
+        status === 'Started' ? 'started' : status === 'Succeeded' ? 'succeeded' : 'failed';
+      setStartStep(step, mapped, message);
+      if (mapped === 'failed') {
+        startFailed.value = true;
+        startFailReason.value = message;
+      }
     });
   }
 
@@ -280,6 +360,10 @@ export const useLobbyStore = defineStore('lobby', () => {
     destroyed,
     handoffGameId: computed(() => handoffGameId.value),
     gameStartError: computed(() => gameStartError.value),
+    startSteps: computed(() => startSteps.value),
+    startInProgress: computed(() => startInProgress.value),
+    startFailed: computed(() => startFailed.value),
+    startFailReason: computed(() => startFailReason.value),
     connecting,
     participants,
     hostParticipantId,
@@ -301,6 +385,8 @@ export const useLobbyStore = defineStore('lobby', () => {
     kickParticipant,
     toggleReadiness,
     start,
+    beginStart,
+    dismissStart,
     sendMessage,
     connectAndJoin,
     disconnectRealtime,

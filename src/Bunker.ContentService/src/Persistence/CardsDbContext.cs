@@ -7,11 +7,18 @@ namespace Bunker.ContentService.Persistence;
 public partial class ContentDbContext : ICardRepository
 {
     public async Task<Domain.Card?> TryFindAsync(Domain.Card.Id key)
-        => (await Cards.FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain();
+        => (await Cards.AsNoTracking().FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain();
 
     public void Add(Domain.Card aggregate) => Cards.Add(aggregate.ToEntity());
 
-    public void Delete(Domain.Card aggregate) => Cards.Remove(aggregate.ToEntity());
+    public void Delete(Domain.Card aggregate)
+    {
+        var entity = Cards.FirstOrDefault(x => x.PublicId == aggregate.PublicId.Value);
+        if (entity is not null)
+        {
+            Cards.Remove(entity);
+        }
+    }
 
     public bool Update(Domain.Card aggregate)
     {

@@ -9,7 +9,7 @@ public partial class ContentDbContext : ISexCardRepository
 {
     /// <inheritdoc />
     async Task<SexCard?> IRepository<SexCard, Card.Id>.TryFindAsync(Card.Id key)
-        => (await Cards.OfType<Entities.SexCard>().FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain<SexCard>();
+        => (await Cards.OfType<Entities.SexCard>().AsNoTracking().FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain<SexCard>();
 
     /// <inheritdoc />
     void IRepository<SexCard, Card.Id>.Add(SexCard aggregate) => Add((Card)aggregate);

@@ -11,8 +11,8 @@ public record HealthCard : Card
     public static HealthCard Restore(Id Id, string Health) => CreateValid(Id, Health);
 
     private static HealthCard CreateValid(Id Id, string Health)
-        => string.IsNullOrWhiteSpace(Health) | Health.Length < 8
-        ? throw new ArgumentException("Health must be at least 8 characters long.")
+        => string.IsNullOrWhiteSpace(Health) | Health.Length < 4
+        ? throw new ArgumentException("Health must be at least 4 characters long.")
         : new HealthCard(Id, Health);
 }
 

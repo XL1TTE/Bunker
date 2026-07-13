@@ -11,8 +11,8 @@ public record LuggageCard : Card
     public static LuggageCard Restore(Id Id, string Luggage) => CreateValid(Id, Luggage);
 
     private static LuggageCard CreateValid(Id Id, string Luggage)
-        => string.IsNullOrWhiteSpace(Luggage) | Luggage.Length < 8
-        ? throw new ArgumentException("Luggage must be at least 8 characters long.")
+        => string.IsNullOrWhiteSpace(Luggage) | Luggage.Length < 4
+        ? throw new ArgumentException("Luggage must be at least 4 characters long.")
         : new LuggageCard(Id, Luggage);
 }
 

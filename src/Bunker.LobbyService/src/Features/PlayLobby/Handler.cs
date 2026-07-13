@@ -1,7 +1,9 @@
 using Bunker.LobbyService.Domain;
+using Bunker.LobbyService.Hubs;
 using Bunker.LobbyService.Messages;
 using Bunker.LobbyService.Persistence;
 using Bunker.LobbyService.Persistence.Abstractions;
+using Microsoft.AspNetCore.SignalR;
 using Shared.Monads.Result;
 using Wolverine;
 using Wolverine.Attributes;
@@ -14,7 +16,8 @@ public static class PlayLobbyHandler
     public static async Task<PlayLobby.Result> Handle(
         PlayLobby command,
         IMessageContext messaging,
-        IUnitOfWork uow)
+        IUnitOfWork uow,
+        IHubContext<LobbyHub, ILobbyHub> hub)
     {
         if (!Guid.TryParse(command.LobbyId, out var lobbyGuid))
             return PlayLobby.Failure("Invalid lobby id.");
@@ -33,6 +36,9 @@ public static class PlayLobbyHandler
 
         var started = startOutcome.Lobby!;
         await repository.UpdateAsync(started);
+
+        await hub.Clients.Group(started.PublicId.Value.ToString())
+            .GameStartProgress("validate-lobby", "Succeeded", null);
 
         var participants = started.Participants.Select(p => new SagaParticipant(
             Id: p.PublicId.Value.ToString(),

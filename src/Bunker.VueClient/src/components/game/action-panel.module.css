@@ -1,60 +1,62 @@
-.panel {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
+/* Action bar — a compact full-width strip below the game header. Quiet at
+ * rest (a status line + phase tag), emphasized with the accent glow when the
+ * user has a real action to take (reveal/vote buttons). Sharp corners, tinted
+ * surface, token-only color — matches the landing redesign. */
 
-.panelHeader {
+.bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-4);
   padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-bg-elev);
+  background-color: color-mix(in srgb, var(--color-surface) 14%, transparent);
+  border: 1px solid var(--color-border);
+  border-left: 3px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  transition:
+    border-color var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease);
 }
 
-.panelTitle {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-muted);
+/* Emphasized when the user has an action to take — the accent edge + glow
+ * make "your move" glanceable without reading the text. */
+.active {
+  border-color: color-mix(in srgb, var(--color-primary) 55%, transparent);
+  border-left-color: var(--color-primary);
+  background-color: color-mix(in srgb, var(--color-primary) 10%, transparent);
+  box-shadow: var(--shadow-glow);
 }
 
-.panelMeta {
-  font-size: 12px;
-  color: var(--color-primary);
-  font-weight: 600;
-}
-
-.body {
-  padding: var(--space-4);
+.info {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
+  gap: 4px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.phaseTag {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-dim);
 }
 
 .prompt {
   margin: 0;
   font-size: 14px;
-  color: var(--color-text);
   font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.4;
 }
 
-.status {
-  margin: 0;
-  font-size: 13px;
-  color: var(--color-text-muted);
-  line-height: 1.5;
-}
-
-.actionRow {
+.actions {
   display: flex;
   flex-wrap: wrap;
   gap: var(--space-2);
+  align-items: center;
+  flex: 0 1 auto;
 }
 
 .actionButton {
@@ -62,13 +64,34 @@
   border: 1px solid var(--color-border-strong);
   color: var(--color-text);
   border-radius: var(--radius-md);
-  padding: 8px 14px;
+  padding: 9px 14px;
+  min-height: 40px;
   font-weight: 600;
   font-size: 13px;
+  transition:
+    border-color var(--t-base) var(--ease),
+    color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease);
 }
 
 .actionButton:hover:not(:disabled) {
   border-color: var(--color-primary);
   color: var(--color-primary);
-  background-color: var(--color-surface-hover);
+  background-color: color-mix(in srgb, var(--color-primary) 14%, transparent);
+}
+
+.actionButton:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--color-primary) 40%, transparent);
+}
+
+/* On narrow widths the actions wrap below the status line. */
+@media (max-width: 720px) {
+  .bar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .actions {
+    justify-content: flex-start;
+  }
 }

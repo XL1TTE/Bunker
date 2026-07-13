@@ -1,8 +1,5 @@
-using Bunker.ContentService.Domain;
 using Wolverine;
 using Wolverine.Attributes;
-using Microsoft.EntityFrameworkCore;
-using Bunker.ContentService.Persistence;
 using Bunker.ContentService.Persistence.Contracts;
 
 namespace Bunker.ContentService.Features.Cards.DeleteCard;

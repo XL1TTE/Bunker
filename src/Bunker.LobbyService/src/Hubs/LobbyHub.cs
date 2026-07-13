@@ -17,6 +17,7 @@ public interface ILobbyHub
     Task LobbyDestroyed(string reason);
     Task HandoffStarted(string gameSessionId);
     Task GameStartFailed(string reason);
+    Task GameStartProgress(string step, string status, string? message);
 }
 
 [Authorize]

@@ -11,9 +11,12 @@ const authStore = useAuthStore();
 const toast = useToastStore();
 const route = useRoute();
 
-// Landing route renders full-bleed under a transparent header; every other
-// route keeps the solid sticky header + max-width main.
-const isLanding = computed(() => route.meta.layout === 'landing');
+// Landing route renders full-bleed under a transparent header; the game route
+// uses a cockpit shell (flex column main) so the game room can fill the viewport
+// height; every other route keeps the solid sticky header + max-width main.
+const layout = computed(() => route.meta.layout);
+const isLanding = computed(() => layout.value === 'landing');
+const isGame = computed(() => layout.value === 'game');
 
 // Resolve the signed-in user's profile on boot. While this is in flight the
 // auth store's `initializing` flag is true, so the header shows a "signing in"
@@ -32,7 +35,7 @@ onMounted(async () => {
 <template>
   <div :class="styles.shell">
     <AppHeader :transparent="isLanding" />
-    <main :class="[styles.main, isLanding && styles.mainLanding]">
+    <main :class="[styles.main, isLanding && styles.mainLanding, isGame && styles.mainGame]">
       <RouterView />
     </main>
 

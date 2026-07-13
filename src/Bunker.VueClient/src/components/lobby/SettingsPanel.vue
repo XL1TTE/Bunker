@@ -89,6 +89,7 @@ async function addBot(): Promise<void> {
 }
 
 async function startGame(): Promise<void> {
+  lobbyStore.beginStart();
   await run(() => lobbyStore.start());
 }
 

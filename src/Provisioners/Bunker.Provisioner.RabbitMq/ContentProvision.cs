@@ -3,20 +3,12 @@ using Wolverine.RabbitMQ.Internal;
 
 namespace Bunker.Provisioner.RabbitMq;
 
-internal static class ProvisionExtensions
+internal static class ContentProvision
 {
     extension(RabbitMqTransportExpression rabbit)
     {
         internal RabbitMqTransportExpression ProvisionContent()
         {
-            rabbit.DeclareExchange("account-updates", e =>
-            {
-                e.ExchangeType = ExchangeType.Fanout;
-
-                e.BindQueue("lobby-service-account-updates");
-                e.BindQueue("read-service-account-updates");
-            });
-
             rabbit.DeclareExchange("sex-card-updates", e =>
             {
                 e.ExchangeType = ExchangeType.Fanout;
@@ -72,16 +64,24 @@ internal static class ProvisionExtensions
                 e.ExchangeType = ExchangeType.Fanout;
             });
 
-            rabbit.DeclareExchange("game-start-requests", e =>
+            rabbit.DeclareExchange("card-pack-updates", e =>
             {
                 e.ExchangeType = ExchangeType.Fanout;
-                e.BindQueue("game-service-game-start-requests");
             });
 
-            rabbit.DeclareExchange("content-hydration-requests", e =>
+            rabbit.DeclareExchange("card-pack-deleted", e =>
             {
                 e.ExchangeType = ExchangeType.Fanout;
-                e.BindQueue("content-service-hydration-requests");
+            });
+
+            rabbit.DeclareExchange("personality-preset-updates", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+            });
+
+            rabbit.DeclareExchange("personality-preset-deleted", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
             });
 
             rabbit.DeclareExchange("game-content-hydrated", e =>
@@ -94,18 +94,6 @@ internal static class ProvisionExtensions
             {
                 e.ExchangeType = ExchangeType.Fanout;
                 e.BindQueue("game-service-content-hydration-failed");
-            });
-
-            rabbit.DeclareExchange("game-start-succeeded", e =>
-            {
-                e.ExchangeType = ExchangeType.Fanout;
-                e.BindQueue("lobby-service-game-start-succeeded");
-            });
-
-            rabbit.DeclareExchange("game-start-failed", e =>
-            {
-                e.ExchangeType = ExchangeType.Fanout;
-                e.BindQueue("lobby-service-game-start-failed");
             });
 
             return rabbit;

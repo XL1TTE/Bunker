@@ -2,8 +2,6 @@ using Shared.Monads.Result;
 
 namespace Bunker.LobbyService.Domain;
 
-public readonly record struct LeaveOutcome(bool Destroyed);
-
 public static partial class LobbyExtensions
 {
     extension (Lobby lobby)
@@ -15,10 +13,10 @@ public static partial class LobbyExtensions
         public Result<Lobby, LobbyErrors.AddPlayerError> AddPlayer(PlayerParticipant player)
         {
             if (lobby.Players.Any(p => Equals(p.UserId, player.UserId)))
-                return Result<Lobby, LobbyErrors.AddPlayerError>.Failure(new LobbyErrors.PlayerAlreadyInLobby());
+                return Result<Lobby, LobbyErrors.AddPlayerError>.Failure(new LobbyErrors.AddPlayerError.PlayerAlreadyInLobby());
 
             if (lobby.Participants.Count >= lobby.Capacity)
-                return Result<Lobby, LobbyErrors.AddPlayerError>.Failure(new LobbyErrors.LobbyIsFull());
+                return Result<Lobby, LobbyErrors.AddPlayerError>.Failure(new LobbyErrors.AddPlayerError.LobbyIsFull());
 
             lobby.Participants.Add(player);
             return Result<Lobby, LobbyErrors.AddPlayerError>.Success(lobby);
@@ -27,7 +25,7 @@ public static partial class LobbyExtensions
         public Result<Lobby, LobbyErrors.AddPlayerError> AddBot(BotParticipant bot)
         {
             if (lobby.Participants.Count >= lobby.Capacity)
-                return Result<Lobby, LobbyErrors.AddPlayerError>.Failure(new LobbyErrors.LobbyIsFull());
+                return Result<Lobby, LobbyErrors.AddPlayerError>.Failure(new LobbyErrors.AddPlayerError.LobbyIsFull());
 
             lobby.Participants.Add(bot);
             return Result<Lobby, LobbyErrors.AddPlayerError>.Success(lobby);
@@ -45,7 +43,7 @@ public static partial class LobbyExtensions
             IEnumerable<LobbyCardPack> packs)
         {
             if (capacity < lobby.Participants.Count)
-                return Result<Lobby, LobbyErrors.UpdateSettingsError>.Failure(new LobbyErrors.CapacityTooSmall());
+                return Result<Lobby, LobbyErrors.UpdateSettingsError>.Failure(new LobbyErrors.UpdateSettingsError.CapacityTooSmall());
 
             lobby.Capacity = capacity;
             lobby.PrivacyPolicy = new PrivacyPolicy(isVisible, password);
@@ -55,31 +53,12 @@ public static partial class LobbyExtensions
             return Result<Lobby, LobbyErrors.UpdateSettingsError>.Success(lobby);
         }
 
-        public Result<Lobby, LobbyErrors.RemovePlayerError> RemovePlayer(AccountId playerId)
-        {
-            var player = lobby.Players.FirstOrDefault(p => Equals(p.UserId, playerId));
-            if (player == null)
-                return Result<Lobby, LobbyErrors.RemovePlayerError>.Failure(new LobbyErrors.PlayerNotFound());
-
-            lobby.Participants.Remove(player);
-
-            if (player.Role is Host)
-            {
-                var nextPlayer = lobby.Players.FirstOrDefault();
-                if (nextPlayer != null)
-                {
-                    nextPlayer.Role = Role.Host;
-                }
-            }
-
-            return Result<Lobby, LobbyErrors.RemovePlayerError>.Success(lobby);
-        }
 
         public Result<Lobby, LobbyErrors.ToggleReadyError> ToggleReady(AccountId playerId)
         {
             var player = lobby.Players.FirstOrDefault(p => p.UserId == playerId);
             if (player == null)
-                return Result<Lobby, LobbyErrors.ToggleReadyError>.Failure(new LobbyErrors.PlayerNotInLobby());
+                return Result<Lobby, LobbyErrors.ToggleReadyError>.Failure(new LobbyErrors.ToggleReadyError.PlayerNotInLobby());
 
             player.Status = player.Status is Status.Ready ? Status.GetNotReady() : Status.GetReady();
 
@@ -96,43 +75,44 @@ public static partial class LobbyExtensions
         {
             var host = lobby.Players.FirstOrDefault(p => p.Role is Host);
             if (host is null || host.UserId != callerId)
-                return Result<Lobby, LobbyErrors.StartGameError>.Failure(new LobbyErrors.NotHost());
+                return Result<Lobby, LobbyErrors.StartGameError>.Failure(new LobbyErrors.StartGameError.NotHost());
 
             if (lobby.AllReady is false)
-                return Result<Lobby, LobbyErrors.StartGameError>.Failure(new LobbyErrors.NotAllReady());
+                return Result<Lobby, LobbyErrors.StartGameError>.Failure(new LobbyErrors.StartGameError.NotAllReady());
 
             if (lobby.Players.Count() < 2)
-                return Result<Lobby, LobbyErrors.StartGameError>.Failure(new LobbyErrors.InsufficientPlayers());
+                return Result<Lobby, LobbyErrors.StartGameError>.Failure(new LobbyErrors.StartGameError.InsufficientPlayers());
 
             lobby.State = LobbyState.Starting;
             return Result<Lobby, LobbyErrors.StartGameError>.Success(lobby);
         }
 
-        public Result<LeaveOutcome, LobbyErrors.LeaveError> Leave(AccountId callerId)
+        public Result<PlayerParticipant, LobbyErrors.LeaveError> Leave(AccountId callerId)
         {
             var player = lobby.Players.FirstOrDefault(p => p.UserId == callerId);
-            if (player is null)
-                return Result<LeaveOutcome, LobbyErrors.LeaveError>.Failure(new LobbyErrors.CallerNotInLobby());
 
-            if (player.Role is Host)
-                return Result<LeaveOutcome, LobbyErrors.LeaveError>.Success(new LeaveOutcome(Destroyed: true));
+            if (player is null)
+                return Result<PlayerParticipant, LobbyErrors.LeaveError>.Failure(new LobbyErrors.LeaveError.PlayerNotInLobby());
 
             lobby.Participants.Remove(player);
-            return Result<LeaveOutcome, LobbyErrors.LeaveError>.Success(new LeaveOutcome(Destroyed: false));
+
+            return Result<PlayerParticipant, LobbyErrors.LeaveError>.Success(player);
         }
+
 
         public Result<Lobby, LobbyErrors.KickError> Kick(LobbyParticipant.Id participantId, AccountId callerId)
         {
             var caller = lobby.Players.FirstOrDefault(p => p.UserId == callerId);
+
             if (caller is null || caller.Role is not Host)
-                return Result<Lobby, LobbyErrors.KickError>.Failure(new LobbyErrors.KickerNotHost());
+                return Result<Lobby, LobbyErrors.KickError>.Failure(new LobbyErrors.KickError.KickerNotHost());
 
             var target = lobby.Participants.FirstOrDefault(p => p.PublicId == participantId);
             if (target is null)
-                return Result<Lobby, LobbyErrors.KickError>.Failure(new LobbyErrors.KickParticipantNotFound());
+                return Result<Lobby, LobbyErrors.KickError>.Failure(new LobbyErrors.KickError.KickParticipantNotFound());
 
             if (target.Role is Host)
-                return Result<Lobby, LobbyErrors.KickError>.Failure(new LobbyErrors.CannotKickHost());
+                return Result<Lobby, LobbyErrors.KickError>.Failure(new LobbyErrors.KickError.CannotKickHost());
 
             lobby.Participants.Remove(target);
             return Result<Lobby, LobbyErrors.KickError>.Success(lobby);
@@ -142,11 +122,11 @@ public static partial class LobbyExtensions
         {
             var caller = lobby.Players.FirstOrDefault(p => p.UserId == callerId);
             if (caller is null || caller.Role is not Host)
-                return Result<Lobby, LobbyErrors.RemoveBotError>.Failure(new LobbyErrors.BotRemoverNotHost());
+                return Result<Lobby, LobbyErrors.RemoveBotError>.Failure(new LobbyErrors.RemoveBotError.BotRemoverNotHost());
 
             var bot = lobby.Bots.FirstOrDefault(b => b.PublicId == participantId);
             if (bot is null)
-                return Result<Lobby, LobbyErrors.RemoveBotError>.Failure(new LobbyErrors.BotNotFound());
+                return Result<Lobby, LobbyErrors.RemoveBotError>.Failure(new LobbyErrors.RemoveBotError.BotNotFound());
 
             lobby.Participants.Remove(bot);
             return Result<Lobby, LobbyErrors.RemoveBotError>.Success(lobby);
@@ -155,6 +135,16 @@ public static partial class LobbyExtensions
         public void MarkInGame()
         {
             lobby.State = LobbyState.InGame;
+        }
+
+        public void ReopenAfterGame()
+        {
+            lobby.State = LobbyState.WaitingForPlayers;
+
+            foreach (var player in lobby.Players)
+            {
+                player.Status = Status.GetNotReady();
+            }
         }
 
         public void RevertStarting()

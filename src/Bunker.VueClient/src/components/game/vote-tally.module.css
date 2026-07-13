@@ -1,61 +1,97 @@
-.panel {
-  background-color: var(--color-surface);
+/* Vote tally — a dismissible banner shown after an elimination. Tinted surface,
+ * sharp corners, token-only color; the bar widths give a glanceable read of who
+ * drew votes without needing to compare the counts. */
+
+.banner {
+  background-color: color-mix(in srgb, var(--color-surface) 14%, transparent);
   border: 1px solid var(--color-border);
+  border-left: 3px solid color-mix(in srgb, var(--color-accent) 55%, transparent);
   border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
+  padding: var(--space-3) var(--space-4);
 }
 
-.panelHeader {
+.head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-bg-elev);
+  gap: var(--space-3);
+  margin-bottom: var(--space-2);
 }
 
-.panelTitle {
-  margin: 0;
-  font-size: 14px;
+.headInfo {
+  display: flex;
+  align-items: baseline;
+  gap: var(--space-3);
+}
+
+.eyebrow {
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-muted);
+  letter-spacing: 0.12em;
+  color: var(--color-text-dim);
 }
 
-.panelMeta {
-  font-size: 11px;
+.meta {
+  font-size: 12px;
   color: var(--color-text-dim);
+  font-family: var(--font-mono);
+}
+
+.close {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  color: var(--color-text-dim);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  transition:
+    color var(--t-base) var(--ease),
+    background-color var(--t-base) var(--ease),
+    border-color var(--t-base) var(--ease);
+}
+
+.close svg {
+  width: 14px;
+  height: 14px;
+}
+
+.close:hover {
+  color: var(--color-text);
+  border-color: var(--color-border);
+  background-color: color-mix(in srgb, var(--color-surface) 16%, transparent);
 }
 
 .list {
   list-style: none;
   margin: 0;
-  padding: var(--space-3) var(--space-4);
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
+  gap: 6px;
 }
 
 .row {
   display: grid;
-  grid-template-columns: minmax(80px, 140px) 1fr 28px;
+  grid-template-columns: minmax(80px, 160px) 1fr 24px;
   align-items: center;
-  gap: var(--space-2);
+  gap: var(--space-3);
 }
 
 .name {
   font-size: 13px;
+  font-weight: 600;
   color: var(--color-text);
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
 }
 
 .barTrack {
   height: 8px;
-  background-color: var(--color-bg-elev);
+  background-color: color-mix(in srgb, var(--color-text) 8%, transparent);
   border-radius: var(--radius-pill);
   overflow: hidden;
 }
@@ -63,7 +99,7 @@
 .bar {
   display: block;
   height: 100%;
-  background-color: var(--color-primary);
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
   border-radius: var(--radius-pill);
   transition: width var(--t-base) var(--ease);
 }
@@ -71,7 +107,7 @@
 .count {
   font-size: 13px;
   font-weight: 700;
-  color: var(--color-text);
-  text-align: right;
+  color: var(--color-text-muted);
   font-family: var(--font-mono);
+  text-align: right;
 }

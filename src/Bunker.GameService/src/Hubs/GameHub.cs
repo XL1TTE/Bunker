@@ -8,8 +8,8 @@ public interface IGameHub
 {
     // Phase 2b events:
     Task BunkerCardRevealed(BunkerCardDto bunkerCard);
-    Task PhaseChanged(string phase, int roundNumber);
-    Task TurnChanged(string participantId, string phase, int turnIndex);
+    Task PhaseChanged(string phase, int roundNumber, int phaseDurationSeconds);
+    Task TurnChanged(string participantId, string phase, int turnIndex, int turnDurationSeconds);
     Task AttributeRevealed(string participantId, string kind, string value);
 
     // Phase 2c events:

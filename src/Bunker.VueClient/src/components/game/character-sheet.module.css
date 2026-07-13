@@ -1,13 +1,28 @@
+/* Participant card — the centerpiece of the in-game page. A webcam-ready 16:9
+ * tile whose focal center stays clear, with the player's attributes overlaid
+ * ON the tile as colored tags (no separate section below, so every card is the
+ * same height and the grid stays tight). The identity core (Profession/Age/
+ * Health) clusters top-left in a horizontal row; the rest cluster bottom-right
+ * in a right-aligned vertical stack; each kind has its own tag color. Name +
+ * identity tags sit over a bottom scrim on the left. Sharp corners, tinted
+ * surface, token-only base color — matches the landing redesign's card
+ * language. Role/state is carried by semantic tints: turn -> primary glow,
+ * self -> success, eliminated -> dim. The per-kind tag hues are the one place
+ * we step outside the token palette, by request, so attributes read at a
+ * glance without labels. */
+
 .sheet {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  padding: var(--space-3) var(--space-4);
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--space-2);
-  box-shadow: var(--shadow-sm);
-  transition: border-color var(--t-base) var(--ease), box-shadow var(--t-base) var(--ease);
+  background-color: color-mix(in srgb, var(--color-surface) 14%, transparent);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition:
+    border-color var(--t-base) var(--ease),
+    box-shadow var(--t-base) var(--ease),
+    opacity var(--t-base) var(--ease);
 }
 
 .currentTurn {
@@ -16,141 +31,251 @@
 }
 
 .self {
-  border-color: var(--color-success-dim);
+  border-color: color-mix(in srgb, var(--color-success) 45%, transparent);
 }
 
 .eliminated {
-  opacity: 0.55;
-  filter: grayscale(0.4);
+  opacity: 0.6;
+  filter: grayscale(0.45);
 }
 
-.header {
+/* ---------- Webcam-ready tile ---------- */
+.tile {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  background-color: var(--color-bg-elev);
+}
+
+/* The avatar layer sits behind the future <video>. Gradient + initial today;
+ * a webcam feed would layer above this (object-fit: cover) when present. */
+.videoLayer {
+  position: absolute;
+  inset: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+  justify-content: center;
 }
 
-.identity {
+.tilePlayer {
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 35%, color-mix(in srgb, var(--color-accent) 30%, transparent), transparent 70%),
+    linear-gradient(135deg, var(--color-primary), color-mix(in srgb, var(--color-primary) 60%, var(--color-bg)));
+}
+
+.tileBot {
+  background:
+    radial-gradient(ellipse 80% 70% at 50% 35%, color-mix(in srgb, var(--color-bot) 35%, transparent), transparent 70%),
+    linear-gradient(135deg, var(--color-bot), color-mix(in srgb, var(--color-bot) 55%, var(--color-bg)));
+}
+
+.initial {
+  font-size: clamp(28px, 7vw, 44px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  color: var(--color-on-primary);
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.35);
+  user-select: none;
+}
+
+/* ---------- Attribute tags (overlaid on the tile) ---------- */
+/* Top-left cluster: Profession / Age / Health in a horizontal row. The right
+ * side is reserved (right: 80px) so the "Their turn" badge in the top-right
+ * corner never collides with a long tag. Tags wrap to a second row if needed. */
+.attrTopLeft {
+  position: absolute;
+  top: var(--space-2);
+  left: var(--space-2);
+  right: 80px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  z-index: 2;
+}
+
+/* Bottom-right cluster: Hobbies / Sex / Fact / Luggage stacked vertically,
+ * right-aligned, rising from the bottom-right corner. Capped width so a long
+ * value can't run into the nickname on the left. */
+.attrBottomRight {
+  position: absolute;
+  right: var(--space-2);
+  bottom: var(--space-2);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+  max-width: 58%;
+  z-index: 2;
+}
+
+/* The tag itself: a compact colored pill (kind hue + white text) consistent
+ * with the You/Player/Bot identity tags. Long values ellipsize. */
+.attrTag {
   display: inline-flex;
   align-items: center;
-  gap: var(--space-2);
-  flex-wrap: wrap;
+  gap: 4px;
+  max-width: 100%;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.25;
+  color: #fff;
+  background-color: var(--tag-bg, rgba(255, 255, 255, 0.18));
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.28);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.tagValue {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.tagHidden {
+  font-style: italic;
+  font-weight: 500;
+  opacity: 0.82;
+}
+
+.tagLock {
+  width: 11px;
+  height: 11px;
+  flex-shrink: 0;
+  opacity: 0.9;
+}
+
+/* Another player's unrevealed attribute: keep the kind color so you can tell
+ * WHICH trait is hidden, but dim it to a faint tint + lock + "Hidden". */
+.attrLocked {
+  background-color: color-mix(in srgb, var(--tag-bg, rgba(255, 255, 255, 0.18)) 26%, transparent);
+  color: rgba(255, 255, 255, 0.72);
+  box-shadow: none;
+}
+
+/* Your own not-yet-revealed (private) attribute: value is shown, but a dashed
+ * ring + lock mark it as still private so you know it isn't public yet. */
+.attrPrivate {
+  outline: 1px dashed rgba(255, 255, 255, 0.55);
+  outline-offset: -2px;
+}
+
+/* Per-kind tag hues. Saturated enough to tell apart on the teal tile, muted
+ * enough to read as part of the card, and legible with white text in both the
+ * dark and light themes (the tile stays a medium teal in both). */
+.kindProfession { --tag-bg: hsla(212, 65%, 52%, 0.92); }
+.kindAge        { --tag-bg: hsla(40, 80%, 48%, 0.94); }
+.kindHealth     { --tag-bg: hsla(142, 55%, 42%, 0.94); }
+.kindHobbies    { --tag-bg: hsla(265, 55%, 60%, 0.92); }
+.kindSex        { --tag-bg: hsla(328, 68%, 56%, 0.92); }
+.kindFact       { --tag-bg: hsla(25, 78%, 50%, 0.94); }
+.kindLuggage    { --tag-bg: hsla(190, 60%, 47%, 0.92); }
+
+/* ---------- Name + identity tags (bottom-left over the scrim) ---------- */
+/* Full-width bottom scrim for legibility, but the content is kept to the left
+ * (nickname capped) so the bottom-right corner stays free for the attribute
+ * stack. */
+.tileOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: var(--space-2) var(--space-3);
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.62), transparent);
+  z-index: 1;
 }
 
 .nickname {
   font-weight: 700;
-  font-size: 15px;
-  color: var(--color-text);
+  font-size: 14px;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+  max-width: 55%;
 }
 
 .youTag {
-  font-size: 10px;
-  font-weight: 700;
+  font-size: 9px;
+  font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: var(--radius-pill);
-  background-color: var(--color-success-dim);
-  color: var(--color-success);
+  background-color: color-mix(in srgb, var(--color-success) 80%, transparent);
+  color: var(--color-on-success);
+  flex-shrink: 0;
 }
 
 .typeTag {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
-}
-
-.typePlayer {
-  background-color: rgba(94, 161, 255, 0.15);
-  color: var(--color-primary);
-}
-
-.typeBot {
-  background-color: var(--color-bot-dim);
-  color: var(--color-bot);
-}
-
-.eliminatedTag {
-  font-size: 10px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  padding: 1px 6px;
-  border-radius: var(--radius-pill);
-  background-color: var(--color-danger-dim);
-  color: var(--color-danger);
-}
-
-.turnTag {
-  font-size: 11px;
-  font-weight: 600;
-  color: var(--color-primary);
-}
-
-.attrList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-
-.attrItem {
-  display: grid;
-  grid-template-columns: 92px 1fr auto;
-  align-items: baseline;
-  gap: var(--space-2);
-  padding: 4px 0;
-  border-bottom: 1px solid var(--color-border);
-}
-
-.attrItem:last-child {
-  border-bottom: none;
-}
-
-.attrKind {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-dim);
-}
-
-.attrValue {
-  font-size: 14px;
-  color: var(--color-text);
-  word-break: break-word;
-}
-
-.attrBadge {
   font-size: 9px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  padding: 1px 6px;
+  padding: 2px 6px;
   border-radius: var(--radius-pill);
+  flex-shrink: 0;
 }
 
-.attrPublic {
-  background-color: var(--color-success-dim);
-  color: var(--color-success);
+.typePlayer {
+  background-color: rgba(255, 255, 255, 0.18);
+  color: #fff;
 }
 
-.attrPrivate {
-  background-color: var(--color-border);
-  color: var(--color-text-muted);
+.typeBot {
+  background-color: color-mix(in srgb, var(--color-bot) 70%, transparent);
+  color: var(--color-on-bot);
 }
 
-.empty,
-.hint {
+.eliminatedTag {
+  font-size: 9px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 6px;
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, var(--color-danger) 75%, transparent);
+  color: var(--color-on-danger);
+  flex-shrink: 0;
+}
+
+/* "Their turn" badge — moved to the top-right corner so it can't collide with
+ * the top-left attribute cluster. Accent-tinted so it reads without relying on
+ * the border glow alone. */
+.turnBadge {
+  position: absolute;
+  top: var(--space-2);
+  right: var(--space-2);
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 3px 8px;
+  border-radius: var(--radius-pill);
+  background-color: color-mix(in srgb, var(--color-primary) 85%, transparent);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-sm);
+  z-index: 3;
+}
+
+/* Edge case: a participant with no attributes yet (e.g. very early state). */
+.empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   margin: 0;
   font-size: 12px;
-  color: var(--color-text-dim);
+  color: rgba(255, 255, 255, 0.78);
   font-style: italic;
+  z-index: 1;
+  pointer-events: none;
 }

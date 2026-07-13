@@ -9,6 +9,8 @@ const { run } = useToast();
 const draft = ref('');
 const scrollEl = ref<HTMLElement | null>(null);
 
+defineEmits<{ collapse: [] }>();
+
 const messages = computed(() => gameStore.messages);
 const canSend = computed(
   () => !!gameStore.currentGame && !gameStore.finished && draft.value.trim().length > 0,
@@ -46,10 +48,24 @@ watch(
   <section :class="styles.panel">
     <div :class="styles.panelHeader">
       <h2 :class="styles.panelTitle">Game chat</h2>
-      <span :class="styles.panelMeta">
+      <div :class="styles.panelMeta">
         <span :class="styles.liveDot" aria-hidden="true"></span>
-        Live
-      </span>
+        <span>Live</span>
+        <button type="button" :class="styles.collapseBtn" aria-label="Hide chat" @click="$emit('collapse')">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="9 18 15 12 9 6" />
+          </svg>
+        </button>
+      </div>
     </div>
     <div ref="scrollEl" :class="styles.scroll">
       <p v-if="messages.length === 0" :class="styles.empty">

@@ -22,9 +22,13 @@ export class LobbyApiHttp implements ILobbyApi {
 
   // Join a public lobby straight from the browser list — no invite code (those
   // are private to the host now) and no password. Shares the /join route with
-  // joinLobbyByPassword; a missing body means "open public lobby".
+  // joinLobbyByPassword: the backend's JoinByPasswordRequest has a nullable
+  // Password, and the handler skips the password check for lobbies without
+  // one, so an empty body (Password = null) joins a public lobby. The body
+  // must still be present or ASP.NET rejects the required [FromBody] param
+  // with "JoinByPasswordRequest request was not provided from body".
   joinLobbyById(lobbyId: string): Promise<LobbySnapshot> {
-    return apiRequest(this.tokens, 'POST', `/lobbies/${lobbyId}/join`);
+    return apiRequest(this.tokens, 'POST', `/lobbies/${lobbyId}/join`, {});
   }
 
   joinLobbyByPassword(lobbyId: string, password: string): Promise<LobbySnapshot> {

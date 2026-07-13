@@ -8,6 +8,6 @@ import 'vue-router';
 declare module 'vue-router' {
   interface RouteMeta {
     requiresAuth?: boolean;
-    layout?: 'landing' | 'app';
+    layout?: 'landing' | 'app' | 'game';
   }
 }

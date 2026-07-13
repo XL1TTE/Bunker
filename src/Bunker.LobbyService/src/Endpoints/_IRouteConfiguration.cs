@@ -9,6 +9,7 @@ internal static partial class IRouteBuilderExtensions
         var root = builder.MapGroup("/lobbies")
             .WithTags("Lobbies");
 
+        root.MapGet("/", LobbyEndpoints.List);
         root.MapPost("/", LobbyEndpoints.Create);
 
         root.MapPost("/{inviteCode}/join", LobbyEndpoints.JoinByInviteCode);
@@ -17,7 +18,7 @@ internal static partial class IRouteBuilderExtensions
         root.MapPost("/{lobbyId:guid}/leave", LobbyEndpoints.Leave);
         root.MapGet("/{lobbyId:guid}", LobbyEndpoints.GetOne);
         root.MapGet("/{lobbyId:guid}/invite-code", LobbyEndpoints.GetInviteCode);
-        root.MapGet("/", LobbyEndpoints.List);
+
         root.MapPatch("/{lobbyId:guid}/settings", LobbyEndpoints.UpdateSettings);
 
         root.MapPost("/{lobbyId:guid}/bots", LobbyEndpoints.AddBot);

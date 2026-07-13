@@ -15,6 +15,7 @@ export type LobbyEventMap = {
   LobbyDestroyed: { reason: LobbyDestroyedReason };
   HandoffStarted: { gameSessionId: string };
   GameStartFailed: { reason: string };
+  GameStartProgress: { step: string; status: 'Started' | 'Succeeded' | 'Failed'; message: string | null };
 };
 
 export type LobbyEvent = keyof LobbyEventMap;

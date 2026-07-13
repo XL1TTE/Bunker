@@ -29,8 +29,8 @@ public record Lobby
 
     public LobbyState State { get; internal set; } = LobbyState.WaitingForPlayers;
 
-    public Collection<LobbyParticipant> Participants { get; internal set; } = [];
-    public Collection<LobbyCardPack> Packs { get; internal set; } = [];
+    internal Collection<LobbyParticipant> Participants { get; set; } = [];
+    internal Collection<LobbyCardPack> Packs { get; set; } = [];
 
     public IReadOnlyCollection<PlayerParticipant> Players => Participants.OfType<PlayerParticipant>().ToList().AsReadOnly();
     public IReadOnlyCollection<BotParticipant> Bots => Participants.OfType<BotParticipant>().ToList().AsReadOnly();
@@ -87,5 +87,7 @@ public static partial class LobbyExtensions
             lobby.Participants.Add(host);
             return host;
         }
+
+        public bool IsHost(PlayerParticipant player) => lobby.Host.UserId == player.UserId;
     }
 }

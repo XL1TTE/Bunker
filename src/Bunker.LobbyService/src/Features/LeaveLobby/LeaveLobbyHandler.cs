@@ -23,37 +23,40 @@ public static class LeaveLobbyHandler
         var callerId = AccountId.Create(command.CallerId);
         var repository = uow.GetRepository<ILobbyRepository>();
 
-        var lobby = await repository.TryFindAsync(Domain.Lobby.Id.Restore(lobbyGuid));
+        var lobby = await repository.TryFindAsync(Lobby.Id.Restore(lobbyGuid));
+
         if (lobby is null)
             return LeaveLobby.Failure("Lobby not found.");
 
-        var leaving = lobby.Participants.FirstOrDefault(p => p is PlayerParticipant pp && pp.UserId == callerId);
-        var leavingId = leaving?.PublicId.Value.ToString();
+        var leavingResult = lobby.Leave(callerId);
+
+        leavingResult.Match(
+            onSuccess: async leaver =>
+            {
+                if (leaver.Role == Role.Host)
+                {
+                    await repository.DeleteByIdAsync(lobby.PublicId);
+                    await hub.Clients.Group(lobby.PublicId.Value.ToString()).LobbyDestroyed("HostLeft");
+                    return LeaveLobby.Success();
+                }
+                else
+                {
+                    await repository.UpdateAsync(lobby);
+                    await hub.Clients.Group(lobby.PublicId.Value.ToString()).ParticipantLeft(leaver.PublicId.Value.ToString());
+                    return LeaveLobby.Success();
+                }
+            },
+            onFailure: error => LeaveLobby.Failure(error.ToString())
+        );
+
+        if (leavingResult is null)
+            return LeaveLobby.Failure("You are not in the lobby you want to leave.");
 
         var leaveResult = lobby.Leave(callerId);
         if (leaveResult.IsFailure)
             return LeaveLobby.Failure(leaveResult.Match(onSuccess: _ => "", onFailure: e => e.ToString()));
 
-        var outcome = leaveResult.Match(onSuccess: o => o, onFailure: _ => new LeaveOutcome(false));
-        var groupId = lobby.PublicId.Value.ToString();
 
-        if (outcome.Destroyed)
-        {
-            await repository.DeleteByIdAsync(lobby.PublicId);
-            try
-            {
-                await uow.SaveChangesAsync();
-            }
-            catch (DbUpdateException)
-            {
-                return LeaveLobby.Failure("Failed to leave lobby.");
-            }
-
-            await hub.Clients.Group(groupId).LobbyDestroyed("HostLeft");
-            return LeaveLobby.Success();
-        }
-
-        await repository.UpdateAsync(lobby);
         try
         {
             await uow.SaveChangesAsync();
@@ -63,7 +66,6 @@ public static class LeaveLobbyHandler
             return LeaveLobby.Failure("Failed to leave lobby.");
         }
 
-        await hub.Clients.Group(groupId).ParticipantLeft(leavingId!);
         return LeaveLobby.Success();
     }
 }

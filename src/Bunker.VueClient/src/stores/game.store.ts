@@ -24,6 +24,7 @@ export const useGameStore = defineStore('game', () => {
   const survivors = ref<string[]>([]);
   const finished = ref(false);
   const connecting = ref(false);
+  const phaseDeadline = ref<number | null>(null);
 
   const api = () => getApiContainer().game;
   const rt = (): IGameRealtime => getApiContainer().gameRealtime;
@@ -37,15 +38,14 @@ export const useGameStore = defineStore('game', () => {
 
   const me = computed<ParticipantDto | null>(() => participants.value.find((p) => p.isYou) ?? null);
 
-  // Whose turn it is right now. The snapshot exposes `turnOrder` + `currentTurnIndex`
-  // so this resolves correctly on page reload (before any TurnChanged arrives).
-  // `currentTurnIndex` is -1 outside turn-based phases (BunkerIntroduction /
-  // Discussion / Roulette / Finished) → null.
-  const currentTurnParticipantId = computed<string | null>(() => {
-    const g = currentGame.value;
-    if (!g || g.currentTurnIndex < 0 || g.currentTurnIndex >= g.turnOrder.length) return null;
-    return g.turnOrder[g.currentTurnIndex] ?? null;
-  });
+  // Whose turn it is right now. Set directly from each TurnChanged event's
+  // participantId (the saga names the player whose turn it is), and from the
+  // snapshot on (re)load. The snapshot's `turnOrder` is only populated once the
+  // saga reaches IntroDiscussion, so a client that loaded during
+  // BunkerIntroduction has an empty `turnOrder` — deriving from `turnOrder[index]`
+  // would leave this null for the whole game until a reload. Tracking the id the
+  // hub sends avoids that dependency.
+  const currentTurnParticipantId = ref<string | null>(null);
 
   const currentTurnParticipant = computed<ParticipantDto | null>(
     () => participants.value.find((p) => p.id === currentTurnParticipantId.value) ?? null,
@@ -77,6 +77,11 @@ export const useGameStore = defineStore('game', () => {
     votedParticipantIds.value = [];
     lastTally.value = null;
     rouletteTiedIds.value = [];
+    phaseDeadline.value = null;
+    currentTurnParticipantId.value =
+      snapshot.currentTurnIndex >= 0 && snapshot.currentTurnIndex < snapshot.turnOrder.length
+        ? snapshot.turnOrder[snapshot.currentTurnIndex] ?? null
+        : null;
     survivors.value = finished.value
       ? snapshot.participants.filter((p) => !p.eliminated).map((p) => p.id)
       : [];
@@ -148,6 +153,8 @@ export const useGameStore = defineStore('game', () => {
     rouletteTiedIds.value = [];
     survivors.value = [];
     finished.value = false;
+    phaseDeadline.value = null;
+    currentTurnParticipantId.value = null;
   }
 
   function on<K extends GameEvent>(event: K, handler: GameEventHandler<K>): void {
@@ -174,28 +181,34 @@ export const useGameStore = defineStore('game', () => {
       currentGame.value.bunkerCard = bunkerCard;
     });
 
-    rt().on('PhaseChanged', ({ phase, roundNumber }) => {
+    rt().on('PhaseChanged', ({ phase, roundNumber, phaseDurationSeconds }) => {
       if (!currentGame.value) return;
       currentGame.value.phase = phase;
       currentGame.value.roundNumber = roundNumber;
-      // A new voting round starts with a clean vote-progress set.
       votedParticipantIds.value = [];
       finished.value = phase === 'Finished';
+      currentTurnParticipantId.value = null;
+      phaseDeadline.value = phaseDurationSeconds > 0 ? Date.now() + phaseDurationSeconds * 1000 : null;
     });
 
-    rt().on('TurnChanged', ({ phase, turnIndex }) => {
+    rt().on('TurnChanged', ({ participantId, phase, turnIndex, turnDurationSeconds }) => {
       if (!currentGame.value) return;
       currentGame.value.phase = phase;
       currentGame.value.currentTurnIndex = turnIndex;
+      currentTurnParticipantId.value = participantId;
+      phaseDeadline.value = turnDurationSeconds > 0 ? Date.now() + turnDurationSeconds * 1000 : null;
     });
 
     rt().on('AttributeRevealed', ({ participantId, kind, value }) => {
       const participant = findParticipant(participantId);
       if (!participant) return;
       const attr = participant.attributes.find((a) => a.kind === kind);
-      if (!attr) return;
-      attr.revealed = true;
-      attr.value = value;
+      if (attr) {
+        attr.revealed = true;
+        attr.value = value;
+      } else {
+        participant.attributes.push({ kind, value, revealed: true });
+      }
     });
 
     rt().on('ChatMessageReceived', (msg) => {
@@ -218,6 +231,9 @@ export const useGameStore = defineStore('game', () => {
 
     rt().on('RouletteStarted', ({ tiedParticipantIds }) => {
       rouletteTiedIds.value = tiedParticipantIds;
+      if (currentGame.value) currentGame.value.phase = 'Roulette';
+      currentTurnParticipantId.value = null;
+      phaseDeadline.value = null;
     });
 
     rt().on('RouletteResult', ({ eliminatedId }) => {
@@ -231,6 +247,8 @@ export const useGameStore = defineStore('game', () => {
       survivors.value = survivorParticipantIds;
       finished.value = true;
       if (currentGame.value) currentGame.value.phase = 'Finished';
+      currentTurnParticipantId.value = null;
+      phaseDeadline.value = null;
     });
   }
 
@@ -243,6 +261,7 @@ export const useGameStore = defineStore('game', () => {
     survivors,
     finished,
     connecting,
+    phaseDeadline,
     participants,
     phase,
     roundNumber,

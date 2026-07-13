@@ -17,8 +17,8 @@ import type {
 
 // The backend hub (IGameHub) invokes each event with **positional args**:
 //   BunkerCardRevealed(bunkerCard)                      — 1 object arg
-//   PhaseChanged(phase, roundNumber)                    — 2 args
-//   TurnChanged(participantId, phase, turnIndex)        — 3 args
+//   PhaseChanged(phase, roundNumber, phaseDurationSeconds) — 3 args
+//   TurnChanged(participantId, phase, turnIndex, turnDurationSeconds) — 4 args
 //   AttributeRevealed(participantId, kind, value)       — 3 string args
 //   ChatMessageReceived(message)                        — 1 object arg
 //   VoteCast(participantId)                             — 1 string arg
@@ -36,11 +36,13 @@ const payloadAdapters: { [K in GameEvent]: PayloadAdapter<K> } = {
   PhaseChanged: (args) => ({
     phase: args[0] as GamePhase,
     roundNumber: args[1] as number,
+    phaseDurationSeconds: args[2] as number,
   }),
   TurnChanged: (args) => ({
     participantId: args[0] as string,
     phase: args[1] as GamePhase,
     turnIndex: args[2] as number,
+    turnDurationSeconds: args[3] as number,
   }),
   AttributeRevealed: (args) => ({
     participantId: args[0] as string,

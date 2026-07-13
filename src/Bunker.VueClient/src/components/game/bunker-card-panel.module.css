@@ -1,66 +1,44 @@
-.panel {
-  background-color: var(--color-surface);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
+/* Bunker briefing modal content. The three scenario fields laid out as
+ * eyebrow-label + value rows, matching the landing card aesthetic. The outer
+ * dialog chrome + title come from the shared Modal component. */
 
-.panelHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: var(--space-3) var(--space-4);
-  border-bottom: 1px solid var(--color-border);
-  background-color: var(--color-bg-elev);
-}
-
-.panelTitle {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  color: var(--color-text-muted);
-}
-
-.panelMeta {
-  font-size: 11px;
-  color: var(--color-text-dim);
-}
-
-.body {
+.fields {
   display: flex;
   flex-direction: column;
-  gap: var(--space-3);
-  padding: var(--space-4);
+  gap: var(--space-4);
 }
 
 .field {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 4px;
+  padding-bottom: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.field:last-child {
+  padding-bottom: 0;
+  border-bottom: none;
 }
 
 .fieldLabel {
   font-size: 11px;
-  font-weight: 600;
+  font-weight: 700;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
   color: var(--color-text-dim);
 }
 
 .fieldValue {
   margin: 0;
-  font-size: 15px;
+  font-size: 16px;
   color: var(--color-text);
-  line-height: 1.4;
+  line-height: 1.5;
 }
 
 .empty {
   margin: 0;
-  padding: var(--space-4);
   color: var(--color-text-dim);
   font-style: italic;
-  font-size: 13px;
+  font-size: 14px;
 }

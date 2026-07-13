@@ -8,7 +8,7 @@ namespace Bunker.ContentService.Persistence;
 public partial class ContentDbContext : IPersonalityPresetRepository
 {
     async Task<Domain.PersonalityPreset?> IRepository<Domain.PersonalityPreset, Domain.PersonalityPreset.Id>.TryFindAsync(Domain.PersonalityPreset.Id key)
-        => (await PersonalityPresets.FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain();
+        => (await PersonalityPresets.AsNoTracking().FirstOrDefaultAsync(x => x.PublicId == key.Value))?.ToDomain();
 
     void IRepository<Domain.PersonalityPreset, Domain.PersonalityPreset.Id>.Add(Domain.PersonalityPreset aggregate)
         => PersonalityPresets.Add(aggregate.ToEntity());

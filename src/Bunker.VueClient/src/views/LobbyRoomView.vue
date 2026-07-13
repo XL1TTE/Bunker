@@ -8,6 +8,7 @@ import { useToast } from '@/composables/useToast';
 import ParticipantSlot from '@/components/lobby/ParticipantSlot.vue';
 import SettingsPanel from '@/components/lobby/SettingsPanel.vue';
 import ChatPanel from '@/components/lobby/ChatPanel.vue';
+import GameStartModal from '@/components/lobby/GameStartModal.vue';
 import Modal from '@/components/common/Modal.vue';
 import styles from '@/views/lobby-room.module.css';
 
@@ -16,7 +17,7 @@ const router = useRouter();
 const lobbyStore = useLobbyStore();
 const catalogStore = useCatalogStore();
 const authStore = useAuthStore();
-const { run, error: toastError } = useToast();
+const { run } = useToast();
 
 const showDestroyedModal = ref(false);
 const codeCopied = ref(false);
@@ -66,17 +67,6 @@ watch(
     // The game has started — hand off to the game screen. The lobby view unmounts
     // (onBeforeUnmount tears down lobby realtime) and GameRoomView connects /hubs/game.
     if (val) router.push({ name: 'game-room', params: { gameId: val } });
-  },
-);
-
-// The Start button's HTTP call only kicks off an async saga; the actual failure
-// (e.g. insufficient canned content) arrives later as a GameStartFailed event,
-// which the store captures in gameStartError. Surface it so a failed start isn't
-// silent ("nothing happens, no error").
-watch(
-  () => lobbyStore.gameStartError,
-  (val) => {
-    if (val) toastError(`Couldn't start the game: ${val}`);
   },
 );
 
@@ -221,5 +211,7 @@ async function copyCode(): Promise<void> {
         <button :class="styles.modalButton" @click="goToLobbies">Back to browser</button>
       </div>
     </Modal>
+
+    <GameStartModal />
   </section>
 </template>

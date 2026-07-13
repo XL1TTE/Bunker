@@ -11,8 +11,8 @@ public record ProfessionCard : Card
     public static ProfessionCard Restore(Id Id, string Profession) => CreateValid(Id, Profession);
         
     private static ProfessionCard CreateValid(Id Id, string Profession)
-        => string.IsNullOrEmpty(Profession) | Profession.Length < 6
-        ? throw new ArgumentException("Profession must be at least 6 characters long.")
+        => string.IsNullOrEmpty(Profession) | Profession.Length < 4
+        ? throw new ArgumentException("Profession must be at least 4 characters long.")
         : new ProfessionCard(Id, Profession);
 }
 

@@ -14,8 +14,8 @@ export type RealtimeState = 'disconnected' | 'connecting' | 'connected';
 // handlers destructure (same pattern as the lobby realtime layer).
 export type GameEventMap = {
   BunkerCardRevealed: { bunkerCard: BunkerCardDto };
-  PhaseChanged: { phase: GamePhase; roundNumber: number };
-  TurnChanged: { participantId: string; phase: GamePhase; turnIndex: number };
+  PhaseChanged: { phase: GamePhase; roundNumber: number; phaseDurationSeconds: number };
+  TurnChanged: { participantId: string; phase: GamePhase; turnIndex: number; turnDurationSeconds: number };
   AttributeRevealed: { participantId: string; kind: string; value: string };
   // Single object arg — unwrapped, like the lobby's ChatMessageReceived.
   ChatMessageReceived: ChatMessageDto;

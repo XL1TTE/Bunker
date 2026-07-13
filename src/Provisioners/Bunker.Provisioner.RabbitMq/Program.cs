@@ -13,7 +13,10 @@ builder.Services.AddWolverine(options =>
 {
     var mq = options.UseRabbitMqUsingNamedConnection("rabbit-mq").AutoProvision();
 
+    mq.ProvisionAccount();
     mq.ProvisionContent();
+    mq.ProvisionGame();
+    mq.ProvisionLobby();
 });
 
 var app = builder.Build();

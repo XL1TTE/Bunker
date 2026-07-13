@@ -36,7 +36,7 @@ const routes: RouteRecordRaw[] = [
     path: "/game/:gameId",
     name: "game-room",
     component: () => import("@/views/GameRoomView.vue"),
-    meta: { requiresAuth: true },
+    meta: { requiresAuth: true, layout: "game" },
     props: true,
   },
   {
