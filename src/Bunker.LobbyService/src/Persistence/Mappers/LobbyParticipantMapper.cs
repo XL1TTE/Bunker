@@ -6,11 +6,11 @@ namespace Bunker.LobbyService.Persistence.Entities;
 [UseStaticMapper(typeof(LobbyParticipantExtensions))]
 public static partial class LobbyParticipantMapper
 {
-    [MapDerivedType<Domain.PlayerParticipant, PlayerParticipant>]
+    [MapDerivedType<Domain.Player, PlayerParticipant>]
     [MapDerivedType<Domain.BotParticipant, BotParticipant>]
     public static partial LobbyParticipant ToEntity(this Domain.LobbyParticipant participant);
 
-    [MapDerivedType<PlayerParticipant, Domain.PlayerParticipant>]
+    [MapDerivedType<PlayerParticipant, Domain.Player>]
     [MapDerivedType<BotParticipant, Domain.BotParticipant>]
     public static partial Domain.LobbyParticipant ToDomain(this LobbyParticipant participant);
 }

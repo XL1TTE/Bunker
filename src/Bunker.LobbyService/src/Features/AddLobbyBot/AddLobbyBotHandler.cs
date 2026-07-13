@@ -37,7 +37,6 @@ public static class AddLobbyBotHandler
         if (addResult.IsFailure)
             return AddLobbyBot.Failure(addResult.Match(onSuccess: _ => "", onFailure: e => e.ToString()));
 
-        await repository.UpdateAsync(lobby);
         try
         {
             await uow.SaveChangesAsync();

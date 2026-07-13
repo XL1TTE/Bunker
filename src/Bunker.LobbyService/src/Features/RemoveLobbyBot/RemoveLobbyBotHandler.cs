@@ -35,7 +35,6 @@ public static class RemoveLobbyBotHandler
         if (result.IsFailure)
             return RemoveLobbyBot.Failure(result.Match(onSuccess: _ => "", onFailure: e => e.ToString()));
 
-        await repository.UpdateAsync(lobby);
         try
         {
             await uow.SaveChangesAsync();

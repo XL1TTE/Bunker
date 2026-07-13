@@ -16,6 +16,8 @@ public record Lobby
         public static Id Empty { get; } = new(Guid.Empty);
         public static Id New() => new(Guid.NewGuid());
         public static Id Restore(Guid value) => new(value);
+
+        public override string ToString() => Value.ToString();
     }
 
     internal Lobby() { } // EF Core
@@ -32,17 +34,17 @@ public record Lobby
     internal Collection<LobbyParticipant> Participants { get; set; } = [];
     internal Collection<LobbyCardPack> Packs { get; set; } = [];
 
-    public IReadOnlyCollection<PlayerParticipant> Players => Participants.OfType<PlayerParticipant>().ToList().AsReadOnly();
+    public IReadOnlyCollection<Player> Players => Participants.OfType<Player>().ToList().AsReadOnly();
     public IReadOnlyCollection<BotParticipant> Bots => Participants.OfType<BotParticipant>().ToList().AsReadOnly();
 
-    public PlayerParticipant Host => Participants.OfType<PlayerParticipant>().First(x => x.Role == Role.Host);
+    public Player Host => Participants.OfType<Player>().First(x => x.Role == Role.Host);
 }
 
 public readonly record struct LobbyConfiguration(
     LobbyName Name,
     int Capacity,
     PrivacyPolicy Visibility,
-    IReadOnlyCollection<PlayerParticipant> Players,
+    IReadOnlyCollection<Player> Players,
     IReadOnlyCollection<BotParticipant> Bots,
     IReadOnlyCollection<LobbyCardPack> CardPacks);
 
@@ -81,13 +83,16 @@ public static partial class LobbyExtensions
 {
     extension(Lobby lobby)
     {
-        public PlayerParticipant WithHost(AccountId userId, string nickname)
+        public Player WithHost(AccountId userId, string nickname)
         {
-            var host = PlayerParticipant.New(userId, lobby.PublicId, nickname, Role.Host);
+            var host = Player.New(userId, lobby.PublicId, nickname, Role.Host);
             lobby.Participants.Add(host);
             return host;
         }
 
-        public bool IsHost(PlayerParticipant player) => lobby.Host.UserId == player.UserId;
+        public bool IsHost(Player player) => lobby.Host.UserId == player.UserId;
+        public bool IsHost(Player.Id id) => lobby.Host.PublicId == id;
+
+        public bool InGame => lobby.State == LobbyState.InGame;
     }
 }

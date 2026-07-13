@@ -1,5 +1,4 @@
 using Bunker.LobbyService.Domain;
-using Bunker.LobbyService.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Shared.Monads.Result;
 
@@ -7,7 +6,6 @@ namespace Bunker.LobbyService.Persistence.Queries;
 
 public interface ILobbyQueries
 {
-    Task<Result<Domain.Lobby, string>> GetByInviteCodeAsync(string inviteCode, CancellationToken cancellationToken = default);
     Task<Domain.Lobby?> GetByIdAsync(Domain.Lobby.Id id, CancellationToken cancellationToken = default);
     Task<(IReadOnlyList<Domain.Lobby> Items, int Total)> ListPublicAsync(int limit, int offset, CancellationToken cancellationToken = default);
     Task<Domain.Lobby?> GetByPlayerIdAsync(Domain.AccountId player, CancellationToken cancellationToken = default);
@@ -15,30 +13,14 @@ public interface ILobbyQueries
 
 public sealed class LobbyQueries(LobbyDbContext db) : ILobbyQueries
 {
-    public async Task<Result<Domain.Lobby, string>> GetByInviteCodeAsync(string inviteCode, CancellationToken cancellationToken = default)
-    {
-        var normalized = inviteCode.Trim().ToUpperInvariant();
-        var lobby = await db.Lobbies
-            .Include(x => x.Participants)
-            .Include(x => x.Packs)
-            .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.InviteCode == normalized, cancellationToken);
-
-        if (lobby is null)
-            return Result<Domain.Lobby, string>.Failure("Lobby not found.");
-
-        return Result<Domain.Lobby, string>.Success(lobby.ToDomain());
-    }
 
     public async Task<Domain.Lobby?> GetByIdAsync(Domain.Lobby.Id id, CancellationToken cancellationToken = default)
     {
-        var lobby = await db.Lobbies
+        return await db.Lobbies
             .Include(x => x.Participants)
             .Include(x => x.Packs)
             .AsNoTracking()
-            .FirstOrDefaultAsync(l => l.PublicId == id.Value, cancellationToken);
-
-        return lobby?.ToDomain();
+            .FirstOrDefaultAsync(l => l.PublicId == id, cancellationToken);
     }
 
     public async Task<(IReadOnlyList<Domain.Lobby> Items, int Total)> ListPublicAsync(int limit, int offset, CancellationToken cancellationToken = default)
@@ -47,7 +29,7 @@ public sealed class LobbyQueries(LobbyDbContext db) : ILobbyQueries
             .Include(x => x.Participants)
             .Include(x => x.Packs)
             .AsNoTracking()
-            .Where(l => l.PrivacyPolicy.IsVisible && l.Status != "InGame");
+            .Where(l => l.PrivacyPolicy.IsVisible && l.State != Domain.LobbyState.InGame);
 
         var total = await query.CountAsync(cancellationToken);
         var lobbies = await query
@@ -56,11 +38,13 @@ public sealed class LobbyQueries(LobbyDbContext db) : ILobbyQueries
             .Take(limit)
             .ToListAsync(cancellationToken);
 
-        return (lobbies.Select(l => l.ToDomain()).ToList(), total);
+        return (lobbies, total);
     }
 
     public async Task<Domain.Lobby?> GetByPlayerIdAsync(AccountId player, CancellationToken cancellationToken = default)
     {
-        return (await db.Lobbies.AsNoTracking().FirstOrDefaultAsync(l => l.Participants.OfType<Entities.PlayerParticipant>().Any(p => p.UserId == player.Value), cancellationToken))?.ToDomain();
+        return await db.Lobbies
+            .AsNoTracking()
+            .FirstOrDefaultAsync(l => l.Participants.OfType<Domain.Player>().Any(p => p.UserId == player), cancellationToken);
     }
 }

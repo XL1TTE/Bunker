@@ -33,6 +33,12 @@ internal static class GameProvision
                 e.BindQueue("lobby-service-game-finished");
             });
 
+            rabbit.DeclareExchange("player-left-game", e =>
+            {
+                e.ExchangeType = ExchangeType.Fanout;
+                e.BindQueue("lobby-service-player-left-game");
+            });
+
             rabbit.DeclareExchange("content-hydration-requests", e =>
             {
                 e.ExchangeType = ExchangeType.Fanout;

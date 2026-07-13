@@ -62,6 +62,7 @@ internal static class WolverineConfiguration
         options.PublishMessage<GameStartSucceeded>().ToRabbitExchange("game-start-succeeded");
         options.PublishMessage<GameStartFailed>().ToRabbitExchange("game-start-failed");
         options.PublishMessage<GameFinished>().ToRabbitExchange("game-finished");
+        options.PublishMessage<PlayerLeftGame>().ToRabbitExchange("player-left-game");
 
         return options;
     }

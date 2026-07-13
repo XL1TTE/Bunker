@@ -36,7 +36,6 @@ public static class GameFinishedHandler
         }
 
         lobby.ReopenAfterGame();
-        await repository.UpdateAsync(lobby);
 
         try
         {

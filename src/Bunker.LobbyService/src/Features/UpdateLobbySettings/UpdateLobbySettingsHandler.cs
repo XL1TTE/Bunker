@@ -49,7 +49,6 @@ public static class UpdateLobbySettingsHandler
         if (command.Name is not null)
             lobby.Name = LobbyName.Create(command.Name);
 
-        await repository.UpdateAsync(lobby);
         try
         {
             await uow.SaveChangesAsync();

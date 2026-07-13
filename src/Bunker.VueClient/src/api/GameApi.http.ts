@@ -30,4 +30,8 @@ export class GameApiHttp implements IGameApi {
   async vote(gameId: string, request: VoteRequest): Promise<void> {
     await apiRequest(this.tokens, 'POST', `/game/${gameId}/vote`, request);
   }
+
+  async leaveGame(gameId: string): Promise<void> {
+    await apiRequest(this.tokens, 'POST', `/game/${gameId}/leave`);
+  }
 }

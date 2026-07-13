@@ -13,6 +13,7 @@ export interface IGameApi {
   revealAttribute(gameId: string, request: RevealAttributeRequest): Promise<void>;
   sendMessage(gameId: string, request: SendMessageRequest): Promise<void>;
   vote(gameId: string, request: VoteRequest): Promise<void>;
+  leaveGame(gameId: string): Promise<void>;
 }
 
 export const GameApiKey: InjectionKey<IGameApi> = Symbol('IGameApi');

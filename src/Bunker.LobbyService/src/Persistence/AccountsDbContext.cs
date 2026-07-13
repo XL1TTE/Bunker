@@ -1,11 +1,11 @@
 using Bunker.LobbyService.Domain;
 using Microsoft.EntityFrameworkCore;
+using Wolverine.EntityFrameworkCore;
 
 namespace Bunker.LobbyService.Persistence;
 
 public class AccountsDbContext(DbContextOptions<AccountsDbContext> options) : DbContext(options)
 {
-    
     public DbSet<AccountReadModel> Accounts => Set<AccountReadModel>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -20,5 +20,7 @@ public class AccountsDbContext(DbContextOptions<AccountsDbContext> options) : Db
 
         accounts.Property(x => x.PublicId).HasColumnName("AccountId")
                .HasConversion(id => id.Value, value => AccountId.Create(value));
+
+        modelBuilder.MapWolverineEnvelopeStorage("wolverine");
     }
 }

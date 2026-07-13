@@ -35,7 +35,6 @@ public static class PlayLobbyHandler
             return PlayLobby.Failure(startOutcome.Error);
 
         var started = startOutcome.Lobby!;
-        await repository.UpdateAsync(started);
 
         await hub.Clients.Group(started.PublicId.Value.ToString())
             .GameStartProgress("validate-lobby", "Succeeded", null);
@@ -45,7 +44,7 @@ public static class PlayLobbyHandler
             Nickname: p.Nickname,
             Type: p is BotParticipant ? "Bot" : "Player",
             PersonalityPresetId: p is BotParticipant bot ? bot.PersonalityPresetId.Value : null,
-            AccountId: p is PlayerParticipant player ? player.UserId.Value : null
+            AccountId: p is Player player ? player.UserId.Value : null
         )).ToList();
 
         await messaging.PublishAsync(new GameStartRequested(

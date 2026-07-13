@@ -33,7 +33,6 @@ public static class ToggleLobbyReadinessHandler
 
         var participant = lobby.Players.First(p => p.UserId == callerId);
 
-        await repository.UpdateAsync(lobby);
         try
         {
             await uow.SaveChangesAsync();

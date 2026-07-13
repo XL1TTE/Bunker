@@ -22,11 +22,12 @@ public static class JoinLobbyHandler
     {
         var callerId = AccountId.Create(command.CallerId);
 
-        var found = await queries.GetByInviteCodeAsync(command.InviteCode);
-        if (found.IsFailure)
-            return JoinLobby.Failure("Lobby not found.");
+        var normalized = (command.InviteCode ?? "").Trim().ToUpperInvariant();
+        var repository = uow.GetRepository<ILobbyRepository>();
+        var lobby = await repository.TryFindByInviteCodeAsync(InviteCode.Create(normalized));
 
-        var lobby = found.Match(onSuccess: l => l, onFailure: _ => null!);
+        if (lobby is null)
+            return JoinLobby.Failure("Lobby not found.");
 
         return await AddPlayerAndBroadcast(lobby, callerId, command.Nickname, uow, queries, hub);
     }
@@ -59,9 +60,6 @@ public static class JoinLobbyHandler
         ILobbyQueries queries,
         IHubContext<LobbyHub, ILobbyHub> hub)
     {
-        // Joining a lobby you're already in is idempotent: return success without
-        // re-adding or broadcasting, so re-entering a room (e.g. via the browser
-        // after navigating away) doesn't surface a "already joined" error.
         if (lobby.Players.Any(p => p.UserId == callerId))
             return JoinLobby.Success(lobby);
 
@@ -69,12 +67,11 @@ public static class JoinLobbyHandler
         if (existing is not null && existing.PublicId != lobby.PublicId)
             return JoinLobby.Failure("You're already in another lobby. Leave it before joining a new one.");
 
-        var addResult = lobby.AddPlayer(PlayerParticipant.New(callerId, lobby.PublicId, nickname, Role.Member));
+        var addResult = lobby.AddPlayer(Player.New(callerId, lobby.PublicId, nickname, Role.Member));
         if (addResult.IsFailure)
             return JoinLobby.Failure(addResult.Match(onSuccess: _ => "", onFailure: e => e.ToString()));
 
         var repository = uow.GetRepository<ILobbyRepository>();
-        await repository.UpdateAsync(lobby);
 
         try
         {
@@ -85,7 +82,7 @@ public static class JoinLobbyHandler
             return JoinLobby.Failure("Failed to join lobby.");
         }
 
-        var participant = lobby.Participants.First(p => p is PlayerParticipant pp && pp.UserId == callerId);
+        var participant = lobby.Participants.First(p => p is Player pp && pp.UserId == callerId);
         await hub.Clients.Group(lobby.PublicId.Value.ToString()).ParticipantJoined(participant.ToTransfer());
 
         return JoinLobby.Success(lobby);

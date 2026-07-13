@@ -13,7 +13,7 @@ public static class LobbyParticipantMappers
                 Role: participant.Role.ToString(),
                 Status: participant.Status.ToString(),
                 Type: participant is BotParticipant ? "Bot" : "Player",
-                AccountId: participant is PlayerParticipant player ? player.UserId.Value.ToString() : null,
+                AccountId: participant is Player player ? player.UserId.Value.ToString() : null,
                 PersonalityPresetId: participant is BotParticipant bot ? bot.PersonalityPresetId.Value.ToString() : null
             );
     }

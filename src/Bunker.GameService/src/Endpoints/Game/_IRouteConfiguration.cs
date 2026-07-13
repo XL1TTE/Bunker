@@ -14,5 +14,6 @@ internal static partial class IRouteBuilderExtensions
         root.MapPost("/{gameId:guid}/chat", GameEndpoints.SendMessage);
         root.MapGet("/{gameId:guid}/chat", GameEndpoints.GetMessages);
         root.MapPost("/{gameId:guid}/vote", GameEndpoints.Vote);
+        root.MapPost("/{gameId:guid}/leave", GameEndpoints.Leave);
     }
 }

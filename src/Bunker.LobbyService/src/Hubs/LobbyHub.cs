@@ -18,6 +18,7 @@ public interface ILobbyHub
     Task HandoffStarted(string gameSessionId);
     Task GameStartFailed(string reason);
     Task GameStartProgress(string step, string status, string? message);
+    Task HostChanged(string hostId);
 }
 
 [Authorize]

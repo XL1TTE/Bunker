@@ -1,5 +1,6 @@
 using Bunker.Api.Common.Identity;
 using Bunker.GameService.Features.CastVote;
+using Bunker.GameService.Features.LeaveGame;
 using Bunker.GameService.Features.RevealAttribute;
 using Bunker.GameService.Features.SendGameMessage;
 using Bunker.GameService.Persistence.Contracts.Queries;
@@ -151,6 +152,30 @@ internal static class GameEndpoints
         {
             CastVote.Result.Success => TypedResults.NoContent(),
             CastVote.Result.Failure failure => TypedResults.BadRequest(failure.Error),
+            _ => TypedResults.Problem("An unexpected error occurred.")
+        };
+    }
+
+    [Authorize]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ProducesResponseType<string>(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    internal static async Task<IResult> Leave(
+        [FromRoute] Guid gameId,
+        [FromServices] IMessageBus bus,
+        [FromServices] IUserIdentityContext identity)
+    {
+        if (identity.UserId is not { } userId)
+            return TypedResults.Unauthorized();
+
+        var result = await bus.InvokeAsync<LeaveGame.Result>(
+            new LeaveGame(GameId: gameId, AccountId: userId));
+
+        return result switch
+        {
+            LeaveGame.Result.Success => TypedResults.NoContent(),
+            LeaveGame.Result.Failure failure => TypedResults.BadRequest(failure.Error),
             _ => TypedResults.Problem("An unexpected error occurred.")
         };
     }

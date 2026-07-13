@@ -112,6 +112,14 @@ export const useGameStore = defineStore('game', () => {
     await api().vote(currentGame.value.id, { targetParticipantId });
   }
 
+  async function leaveGame(): Promise<void> {
+    if (!currentGame.value) return;
+    const id = currentGame.value.id;
+    await api().leaveGame(id);
+    await disconnectRealtime();
+    reset();
+  }
+
   // Re-fetch the snapshot + chat after a transport reconnect so we close any gap
   // missed while the socket was down (and recover chat history on reload).
   let reconnectHandler: (() => void) | null = null;
@@ -280,6 +288,7 @@ export const useGameStore = defineStore('game', () => {
     revealAttribute,
     sendMessage,
     vote,
+    leaveGame,
     connectAndJoin,
     disconnectRealtime,
     reset,

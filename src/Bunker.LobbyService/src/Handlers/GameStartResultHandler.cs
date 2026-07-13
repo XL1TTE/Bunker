@@ -38,7 +38,6 @@ public static class GameStartResultHandler
         }
 
         lobby.MarkInGame();
-        await repository.UpdateAsync(lobby);
 
         await hub.Clients.Group(message.LobbyId.ToString()).GameStartProgress("create-game", "Succeeded", null);
         await hub.Clients.Group(message.LobbyId.ToString()).HandoffStarted(message.GameId.ToString());
@@ -58,7 +57,6 @@ public static class GameStartResultHandler
         }
 
         lobby.RevertStarting();
-        await repository.UpdateAsync(lobby);
 
         await hub.Clients.Group(message.LobbyId.ToString()).GameStartFailed(message.Reason);
     }

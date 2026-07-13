@@ -10,7 +10,7 @@ public static partial class LobbyExtensions
         // exempt from the all-ready requirement — only the other members must be ready.
         public bool AllReady => lobby.Players.Where(p => p.Role is not Host).All(p => p.Status is Status.Ready);
 
-        public Result<Lobby, LobbyErrors.AddPlayerError> AddPlayer(PlayerParticipant player)
+        public Result<Lobby, LobbyErrors.AddPlayerError> AddPlayer(Player player)
         {
             if (lobby.Players.Any(p => Equals(p.UserId, player.UserId)))
                 return Result<Lobby, LobbyErrors.AddPlayerError>.Failure(new LobbyErrors.AddPlayerError.PlayerAlreadyInLobby());
@@ -87,16 +87,16 @@ public static partial class LobbyExtensions
             return Result<Lobby, LobbyErrors.StartGameError>.Success(lobby);
         }
 
-        public Result<PlayerParticipant, LobbyErrors.LeaveError> Leave(AccountId callerId)
+        public Result<Player, LobbyErrors.LeaveError> Leave(AccountId callerId)
         {
             var player = lobby.Players.FirstOrDefault(p => p.UserId == callerId);
 
             if (player is null)
-                return Result<PlayerParticipant, LobbyErrors.LeaveError>.Failure(new LobbyErrors.LeaveError.PlayerNotInLobby());
+                return Result<Player, LobbyErrors.LeaveError>.Failure(new LobbyErrors.LeaveError.PlayerNotInLobby());
 
             lobby.Participants.Remove(player);
 
-            return Result<PlayerParticipant, LobbyErrors.LeaveError>.Success(player);
+            return Result<Player, LobbyErrors.LeaveError>.Success(player);
         }
 
 
@@ -150,6 +150,15 @@ public static partial class LobbyExtensions
         public void RevertStarting()
         {
             lobby.State = LobbyState.WaitingForPlayers;
+        }
+
+        public Result<Player, string> ReassignHost()
+        {
+            var player = lobby.Players.FirstOrDefault(p => p.Role is not Host);
+
+            return player is null
+                ? Result<Player, string>.Failure("No eligible player to assign as host.")
+                : Result<Player, string>.Success(player.WithRole(Role.Host));
         }
     }
 }

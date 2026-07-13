@@ -328,6 +328,38 @@ public class GameSaga : Saga
         return await EliminateAsync(eliminatedId, tally.ToDto(), hub, group);
     }
 
+    public async Task<object?> Handle(LeaveRequested msg, IHubContext<GameHub, IGameHub> hub, IMessageContext messaging)
+    {
+        var participant = FindParticipant(msg.ParticipantId);
+        if (participant is null || participant.Eliminated)
+            return null;
+
+        participant.Eliminated = true;
+        var group = Id.ToString();
+        await hub.Clients.Group(group).Eliminated(participant.Id, new TallyDto(Array.Empty<VoteTallyEntry>(), 0));
+
+        Votes.Clear();
+        TiedParticipantIds.Clear();
+        VoteRound = 0;
+
+        if (participant.AccountId is string accountId)
+            await messaging.PublishAsync(new PlayerLeftGame(LobbyId, Id, accountId));
+
+        var remaining = Participants.Count(p => !p.Eliminated);
+        if (remaining <= BunkerCapacity)
+            return new BeginFinish(GameId: Id);
+
+        var isTurnPhase = Phase is "Reveal" or "IntroDiscussion" or "DiscussionClosing";
+        if (isTurnPhase
+            && CurrentTurnIndex >= 0 && CurrentTurnIndex < TurnOrder.Count
+            && TurnOrder[CurrentTurnIndex] == participant.Id)
+        {
+            return new AdvanceTurn(GameId: Id);
+        }
+
+        return null;
+    }
+
     public async Task<object?> Handle(BeginNextRound _, IHubContext<GameHub, IGameHub> hub)
     {
         RoundNumber++;

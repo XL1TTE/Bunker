@@ -27,7 +27,7 @@ public static class SendLobbyMessageHandler
         if (lobby is null)
             return SendLobbyMessage.Failure("Lobby not found.");
 
-        var participant = lobby.Participants.FirstOrDefault(p => p is PlayerParticipant pp && pp.UserId == callerId);
+        var participant = lobby.Participants.FirstOrDefault(p => p is Player pp && pp.UserId == callerId);
         if (participant is null)
             return SendLobbyMessage.Failure("You are not in this lobby.");
 

@@ -1,5 +1,5 @@
+using Bunker.LobbyService.Domain;
 using Bunker.LobbyService.Persistence.Abstractions;
-using Bunker.LobbyService.Persistence.Entities;
 using Microsoft.EntityFrameworkCore;
 using Wolverine.EntityFrameworkCore;
 

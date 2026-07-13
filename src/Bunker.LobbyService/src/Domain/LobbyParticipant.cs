@@ -32,13 +32,15 @@ public abstract record LobbyParticipant(LobbyParticipant.Id PublicId, Lobby.Id L
         public static Id Empty { get; } = new (Guid.Empty);
         public static Id New() => new (Guid.NewGuid());
         public static Id Restore(Guid value) => new (value);
+
+        public override string ToString() => Value.ToString();
     }
         
     public string Nickname { get; internal set; } = Nickname;
     public Role Role { get; internal set; } = Role;
     public Status Status { get; internal set; } = Status;
 }
-public record PlayerParticipant(LobbyParticipant.Id PublicId, AccountId UserId, Lobby.Id LobbyId, string Nickname, Role Role) 
+public record Player(LobbyParticipant.Id PublicId, AccountId UserId, Lobby.Id LobbyId, string Nickname, Role Role)
     : LobbyParticipant(PublicId: PublicId, LobbyId: LobbyId, Nickname: Nickname, Role: Role, Status: Status.GetNotReady());
 
 public record BotParticipant(LobbyParticipant.Id PublicId, Lobby.Id LobbyId, string Nickname, Role Role, BotPersonalityId PersonalityPresetId)
@@ -47,18 +49,18 @@ public record BotParticipant(LobbyParticipant.Id PublicId, Lobby.Id LobbyId, str
 
 public static class PlayerParticipantFactory
 {
-    extension (PlayerParticipant)
+    extension(Player)
     {
-        public static PlayerParticipant New(AccountId userId, Lobby.Id lobbyId, string nickname, Role role)
+        public static Player New(AccountId userId, Lobby.Id lobbyId, string nickname, Role role)
         {
             ValidateNickname(nickname);
-            return new PlayerParticipant(LobbyParticipant.Id.New(), userId, lobbyId, nickname, role);
+            return new Player(LobbyParticipant.Id.New(), userId, lobbyId, nickname, role);
         }
 
-        public static PlayerParticipant Create(LobbyParticipant.Id id, AccountId userId, Lobby.Id lobbyId, string nickname, Role role, Status status)
+        public static Player Create(LobbyParticipant.Id id, AccountId userId, Lobby.Id lobbyId, string nickname, Role role, Status status)
         {
             ValidateNickname(nickname);
-            return new PlayerParticipant(id, userId, lobbyId, nickname, role) { Status = status };
+            return new Player(id, userId, lobbyId, nickname, role) { Status = status };
         }
 
         private static void ValidateNickname(string nickname)
@@ -85,15 +87,21 @@ public static class BotParticipantFactory
 
 public static class PlayerParticipantExtensions
 {
-    public static PlayerParticipant ReadyUp(PlayerParticipant player)
+    public static Player ReadyUp(Player player)
     {
         player.Status = Status.GetReady();
         return player;
     }
-    public static PlayerParticipant Unready(PlayerParticipant player)
+    public static Player Unready(Player player)
     {
         player.Status = Status.GetNotReady();
         return player;
     }
-    
+
+    public static Player WithRole(this Player player, Role role)
+    {
+        player.Role = role;
+        return player;
+    }
+
 }

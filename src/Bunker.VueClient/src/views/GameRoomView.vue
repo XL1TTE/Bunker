@@ -130,7 +130,10 @@ onBeforeUnmount(() => {
   gameStore.reset();
 });
 
-async function backToLobbies(): Promise<void> {
+async function leaveGame(): Promise<void> {
+  const ok = await run(() => gameStore.leaveGame());
+  if (ok === null) return;
+  lobbyStore.reset();
   await router.push('/lobbies');
 }
 
@@ -171,7 +174,7 @@ async function backToLobby(): Promise<void> {
           <BriefingIcon :class="styles.briefingIcon" />
           Bunker briefing
         </button>
-        <button :class="styles.leaveButton" @click="backToLobbies">Leave game</button>
+        <button :class="styles.leaveButton" @click="leaveGame">Leave game</button>
       </div>
     </header>
 

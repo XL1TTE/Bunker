@@ -52,6 +52,10 @@ internal static class WolverineConfiguration
             options.ListenToRabbitQueue("lobby-service-game-finished")
                 .DefaultIncomingMessage<GameFinished>()
                 .UseDurableInbox();
+
+            options.ListenToRabbitQueue("lobby-service-player-left-game")
+                .DefaultIncomingMessage<PlayerLeftGame>()
+                .UseDurableInbox();
         });
         return builder;
     }
